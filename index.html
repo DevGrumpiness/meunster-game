@@ -264,26 +264,38 @@
 const PLAYER_COLORS = ['#e63946','#457b9d','#2d6a4f','#f4a261','#6a4c93','#1982c4'];
 
 const CATEGORIES = [
-  { id: 'kneipen', name: 'Kneipen & Ausgehen', icon: '🍺', color: '#e63946' },
+  { id: 'kneipen', name: 'Kneipen & Nightlife', icon: '🍺', color: '#e63946' },
   { id: 'fahrrad', name: 'Fahrrad & Mobilität', icon: '🚲', color: '#457b9d' },
   { id: 'sights', name: 'Sehenswürdigkeiten', icon: '🏰', color: '#2d6a4f' },
   { id: 'essen', name: 'Essen & Trinken', icon: '🥨', color: '#f4a261' },
   { id: 'kultur', name: 'Uni & Kultur', icon: '🎭', color: '#6a4c93' },
-  { id: 'mythen', name: 'Münster-Mythen', icon: '🔮', color: '#1982c4' },
+  { id: 'viral', name: 'Viral & News', icon: '📱', color: '#ff006e' },
 ];
 
 const QUESTIONS = [
-  // KNEIPEN
-  { cat:'kneipen', type:'quiz', q:'Welche Straße ist das Herz des Münsteraner Nachtlebens?', answers:['Kreuzstraße','Salzstraße','Ludgeristraße','Wolbecker Str.'], correct:0, fact:'Die Kreuzstraße ("Kreuz") ist DIE Kneipenmeile Münsters – Bar an Bar.' },
+  // ===== KNEIPEN & NIGHTLIFE (erweitert) =====
+  { cat:'kneipen', type:'quiz', q:'Welche Straße ist das Herz des Münsteraner Nachtlebens?', answers:['Kreuzstraße','Salzstraße','Ludgeristraße','Wolbecker Str.'], correct:0, fact:'Die Kreuzstraße ("Kreuz") ist DIE Kneipenmeile Münsters – Bar an Bar auf wenigen hundert Metern.' },
   { cat:'kneipen', type:'quiz', q:'Welches ist die letzte Altbier-Brauerei Münsters?', answers:['Pinkus Müller','Rolinck','Münster Brau','Aaseebräu'], correct:0, fact:'Pinkus Müller braut seit 1816 – die letzte Altbier-Brauerei der Stadt und weltweit einziges Bio-Altbier.' },
   { cat:'kneipen', type:'quiz', q:'Welcher Club am Hawerkamp war eine Institution für Techno?', answers:['Amp','Fusion Club','Gleis 22','Sputnikhalle'], correct:0, fact:'Das Amp am Hawerkamp war DER Club für elektronische Musik. Das Hawerkamp-Gelände ist das alternative Kulturzentrum.' },
   { cat:'kneipen', type:'estimate', q:'Wie viele Kneipen & Restaurants gibt es in der Altstadt?', answer:300, unit:'', tolerance:80, fact:'Rund 300 gastronomische Betriebe in der Altstadt – eine der höchsten Kneipendichten Deutschlands.' },
-  { cat:'kneipen', type:'quiz', q:'Was ist ein "Kiepenkerl"?', answers:['Ein wandernder Händler','Ein Biermischgetränk','Dialektwort für Wirt','Eine Käsesorte'], correct:0, fact:'Kiepenkerle waren Wanderhändler mit Rückentragekorb (Kiepe). Die Skulptur am Spiekerhof erinnert daran.' },
   { cat:'kneipen', type:'quiz', q:'Welches Viertel ist für Cafés und Boutiquen bekannt?', answers:['Kreuzviertel','Hansaviertel','Hafen','Gievenbeck'], correct:0, fact:'Das Kreuzviertel rund um Kreuz- und Schillerstraße ist bekannt für Café-Kultur und entspannte Atmosphäre.' },
   { cat:'kneipen', type:'vote', q:'Bester Ort für ein erstes Date in Münster?', options:['Aasee-Spaziergang 🌅','Hafen-Viertel 🍷','Botanischer Garten 🌺','Prinzipalmarkt-Bummel 🏛️'] },
   { cat:'kneipen', type:'quiz', q:'Wie heißt die bekannte Cocktailbar an der Kreuzstraße?', answers:['Grotemeyer','Pension Schmidt','Hot Jazz Club','Cavete'], correct:1, fact:'Die Pension Schmidt ist bekannt für kreative Cocktails in gemütlicher Atmosphäre mitten auf der Kreuzstraße.' },
+  { cat:'kneipen', type:'quiz', q:'Welche Studenten-Kneipe am Alten Steinweg ist für ihre Graffiti-Wände bekannt?', answers:['Cavete','Destille','Blaues Haus','Gasolin'], correct:0, fact:'Die Cavete ist eine legendäre Studentenkneipe seit 1959 – mit Biergarten, günstigen Preisen und viel Charme.' },
+  { cat:'kneipen', type:'quiz', q:'Wo findet man die meisten Bars und Clubs auf engem Raum?', answers:['Kreuzstraße/Kuhviertel','Hafen','Prinzipalmarkt','Gievenbeck'], correct:0, fact:'Das Kuhviertel und die Kreuzstraße sind die zwei Hotspots – wer feiern will, kommt hier nicht vorbei.' },
+  { cat:'kneipen', type:'quiz', q:'Welche Bar im Kuhviertel ist für Live-Jazz bekannt?', answers:['Hot Jazz Club','Blaues Haus','Gorilla Bar','Mata Hari'], correct:0, fact:'Der Hot Jazz Club im Kuhviertel bietet regelmäßig Live-Jazz, Blues und Soul in intimem Setting.' },
+  { cat:'kneipen', type:'vote', q:'Wo feiert man in Münster am besten seinen Geburtstag?', options:['Kreuzstraße Bar-Tour 🍸','Hafen-Restaurants 🍽️','Hawerkamp-Clubs 🎶','Biergarten am Aasee 🌳'] },
+  { cat:'kneipen', type:'quiz', q:'Welches ehemalige Hafengebiet wurde zum Ausgehviertel umgebaut?', answers:['Kreativkai / Hafen','Coerde Dock','Kinderhaus Nord','Kanal Promenade'], correct:0, fact:'Der Kreativkai am alten Stadthafen wurde zum hippen Ausgehviertel mit Restaurants, Bars und Büros – absoluter Hotspot!' },
+  { cat:'kneipen', type:'quiz', q:'Welche Kneipe an der Kreuzstraße ist für ihr urig-dunkles Ambiente mit Kerzenlicht bekannt?', answers:['Destille','Blaues Haus','Pension Schmidt','Gorilla Bar'], correct:0, fact:'Die Destille ist eine Institution auf der Kreuzstraße – dunkel, gemütlich, günstig und immer voll.' },
+  { cat:'kneipen', type:'quiz', q:'Was ist das "Gleis 22"?', answers:['Live-Musik-Venue & Club','Ein Bahnhof-Café','Ein Biergarten','Ein Theatersaal'], correct:0, fact:'Das Gleis 22 an der Hafenstraße ist Münsters bekanntester Veranstaltungsort für Indie, Punk, elektronische Musik und Konzerte.' },
+  { cat:'kneipen', type:'vote', q:'Beste Bar für einen spontanen Mittwochabend?', options:['Cavete (günstig & legendär) 🍺','Gorilla Bar (Cocktails) 🍹','Destille (urig & Kerzen) 🕯️','Hafen-Terrasse (wenn Wetter passt) ☀️'] },
+  { cat:'kneipen', type:'quiz', q:'Welche Straße im Kuhviertel ist vor allem Freitag- und Samstagnacht komplett überlaufen?', answers:['Rosenstraße','Kuhstraße','Jüdefelderstraße','Alter Steinweg'], correct:0, fact:'Die Rosenstraße im Kuhviertel wird am Wochenende zur Party-Zone – eng, laut und lustig.' },
+  { cat:'kneipen', type:'quiz', q:'Was findet jeden Freitag im Sommer am Aasee statt?', answers:['Afterwork am See / Feierabend-Grillen','Segelregatta','Fischermarkt','Open-Air-Kino'], correct:0, fact:'Im Sommer treffen sich hunderte Münsteraner zum Feierabend-Grillen und Bier-Trinken an den Aasee-Wiesen – inoffizielles Afterwork!' },
+  { cat:'kneipen', type:'quiz', q:'Welcher Biergarten liegt direkt am Aasee mit Blick aufs Wasser?', answers:['Martinihof / Seeterrassen','Pinkus Müller','Schlossgarten','Kiepenkerl'], correct:0, fact:'Die Seeterrassen am Aasee sind im Sommer DER Spot – Bier, Sonnenuntergang, Wasserblick.' },
+  { cat:'kneipen', type:'estimate', q:'Wie viele Cocktailbars gibt es ungefähr in der Innenstadt?', answer:25, unit:'', tolerance:10, fact:'Münster hat rund 25 dedizierte Cocktailbars – von der Pension Schmidt über die Gorilla Bar bis zum Lux.' },
+  { cat:'kneipen', type:'quiz', q:'Was ist das Besondere an der "Sputnikhalle"?', answers:['Konzerthalle in ehem. Industriehalle','Russisches Restaurant','Bowlingbahn','Kegelhalle'], correct:0, fact:'Die Sputnikhalle ist eine Konzert- und Partylocation in einer ehemaligen Industriehalle am Hawerkamp – Rock, Indie, Elektro.' },
 
-  // FAHRRAD
+  // ===== FAHRRAD & MOBILITÄT =====
   { cat:'fahrrad', type:'quiz', q:'Wie heißt der autofreie Ring um die Altstadt?', answers:['Promenade','Veloroute','Ringallee','Fahrradwall'], correct:0, fact:'Die 4,5 km lange Promenade ist Deutschlands längste autofreie Fahrrad-Allee rund um eine Altstadt!' },
   { cat:'fahrrad', type:'estimate', q:'Wie viele Fahrräder gibt es in Münster?', answer:500000, unit:'', tolerance:100000, fact:'Ca. 500.000 Fahrräder bei 320.000 Einwohnern – deutlich mehr Räder als Menschen!' },
   { cat:'fahrrad', type:'quiz', q:'Wie heißt das große Fahrrad-Parkhaus am Hauptbahnhof?', answers:['Radstation','Bike Tower','Pedaleum','Fahrradburg'], correct:0, fact:'Die Radstation bietet Platz für über 3.300 Fahrräder – eine der größten Deutschlands.' },
@@ -293,7 +305,7 @@ const QUESTIONS = [
   { cat:'fahrrad', type:'vote', q:'Was nervt Münsteraner Radfahrer am meisten?', options:['Fußgänger auf dem Radweg 🚶','Gegenverkehr auf der Promenade 🔄','Fahrraddiebstahl 🔒','Kopfsteinpflaster 🪨'] },
   { cat:'fahrrad', type:'quiz', q:'Beim ADFC-Fahrradklima-Test belegt Münster regelmäßig...', answers:['Platz 1 bei Großstädten','Einen Mittelfeldplatz','Den letzten Platz','Platz 3'], correct:0, fact:'Münster ist seit Jahren auf Platz 1 der fahrradfreundlichsten Großstädte beim ADFC-Test.' },
 
-  // SIGHTS
+  // ===== SEHENSWÜRDIGKEITEN =====
   { cat:'sights', type:'quiz', q:'Was hängt am Turm der Lambertikirche?', answers:['Drei Eisenkäfige','Eine goldene Glocke','Ein Wetterhahn','Eine Uhr'], correct:0, fact:'In den Käfigen wurden 1536 die Wiedertäufer-Anführer ausgestellt. Die Käfige hängen bis heute dort!' },
   { cat:'sights', type:'quiz', q:'Welcher Frieden wurde 1648 in Münster geschlossen?', answers:['Westfälischer Frieden','Münsteraner Frieden','Norddeutscher Frieden','Hanseatischer Frieden'], correct:0, fact:'Der Westfälische Frieden beendete den 30-jährigen Krieg – verhandelt in Münster & Osnabrück.' },
   { cat:'sights', type:'quiz', q:'Das barocke Schloss beherbergt heute...', answers:['Die Uni-Verwaltung','Das Rathaus','Ein Hotel','Ein Museum'], correct:0, fact:'Das Fürstbischöfliche Schloss (1767-1787) ist Sitz der Uni-Verwaltung. Davor liegt der beliebte Schlossplatz.' },
@@ -303,7 +315,7 @@ const QUESTIONS = [
   { cat:'sights', type:'vote', q:'Schönstes Fotomotiv in Münster?', options:['Prinzipalmarkt-Giebel 🏛️','Aasee-Sonnenuntergang 🌅','Lambertikirche nachts 🕯️','Hafen-Kräne 🏗️'] },
   { cat:'sights', type:'quiz', q:'Wie heißt der künstliche See mitten in Münster?', answers:['Aasee','Münstersee','Schlosssee','Domteich'], correct:0, fact:'Der Aasee wurde 1934 aufgestaut und ist heute DAS Naherholungsgebiet – zum Joggen, Segeln, Grillen.' },
 
-  // ESSEN
+  // ===== ESSEN & TRINKEN =====
   { cat:'essen', type:'quiz', q:'Welches Gericht ist typisch münsterländisch?', answers:['Töttchen','Labskaus','Maultaschen','Sauerbraten'], correct:0, fact:'Töttchen ist ein süß-saures Ragout aus Kalbsfleisch – klingt seltsam, schmeckt aber großartig!' },
   { cat:'essen', type:'quiz', q:'Welches Brot wird 16+ Stunden gebacken?', answers:['Pumpernickel','Schwarzbrot','Vollkorntoast','Roggenbrot'], correct:0, fact:'Echtes Pumpernickel wird mindestens 16 Stunden bei niedriger Temperatur gebacken. Hält sich monatelang!' },
   { cat:'essen', type:'quiz', q:'Was sind "Struwen"?', answers:['Hefepfannkuchen mit Rosinen','Brezeln','Kartoffelpuffer','Waffeln'], correct:0, fact:'Struwen sind dicke Hefepfannkuchen mit Rosinen – traditionell am Karfreitag, aber auch an Imbissständen.' },
@@ -311,8 +323,11 @@ const QUESTIONS = [
   { cat:'essen', type:'quiz', q:'Wofür ist "Westfälischer Knochenschinken" bekannt?', answers:['Luftgetrocknet & über Buche geräuchert','Gekocht in Bier','Paniert & frittiert','Süß mariniert'], correct:0, fact:'Der Westfälische Knochenschinken wird monatelang luftgetrocknet und über Buchenholz geräuchert.' },
   { cat:'essen', type:'vote', q:'Was muss man in Münster unbedingt probieren?', options:['Pinkus Alt im Brauhaus 🍺','Töttchen beim Kiepenkerl 🍲','Struwen vom Imbiss 🥞','Käse vom Wochenmarkt 🧀'] },
   { cat:'essen', type:'quiz', q:'Welches Getränk ist Münsters Traditionsgebräu?', answers:['Pinkus Altbier','Weizenbier','Kölsch','Exportbier'], correct:0, fact:'Pinkus Alt – obergärig, mild, süffig – ist seit 1816 DAS Münsteraner Bier.' },
+  { cat:'essen', type:'quiz', q:'Welches günstige Restaurant am Hafen ist für seine Burger bekannt?', answers:['Flamingos','Heaven','Alex','Pier 31'], correct:0, fact:'Flamingos am Hafen ist beliebt für solide Burger, lockere Atmosphäre und faire Preise – Studenten-Treff!' },
+  { cat:'essen', type:'quiz', q:'Wo bekommt man den besten Döner laut Münster-Studierenden?', answers:['Verschiedene Favoriten – aber Wolbecker Str. wird oft genannt','Prinzipalmarkt','Aasee','Handorf'], correct:0, fact:'Münster hat eine lebendige Döner-Debatte – die Wolbecker Straße und der Bahnhof werden oft genannt, aber jeder hat seinen Geheim-Tipp!' },
+  { cat:'essen', type:'vote', q:'Bester Spot für günstiges Mittagessen in Münster?', options:['Mensa am Aasee 🍝','Döner Wolbecker Str. 🥙','Asia-Imbiss Altstadt 🍜','Markt am Domplatz 🥨'] },
 
-  // KULTUR
+  // ===== UNI & KULTUR =====
   { cat:'kultur', type:'quiz', q:'Wie heißt die Universität offiziell?', answers:['Westfälische Wilhelms-Universität','Universität Münster','Friedensuni','Albertus-Magnus-Uni'], correct:0, fact:'Die WWU wurde 1780 gegründet – mit 43.000 Studierenden eine der größten Deutschlands. 2023 umbenannt zu "Universität Münster".' },
   { cat:'kultur', type:'estimate', q:'Wie viele Studierende hat die Uni Münster?', answer:43000, unit:'', tolerance:8000, fact:'Rund 43.000 Studierende – fast jeder 7. Einwohner studiert!' },
   { cat:'kultur', type:'quiz', q:'Was ist "Masematte"?', answers:['Münsteraner Geheimsprache','Karnevalsverein','Stadtteil','Biermischgetränk'], correct:0, fact:'Masematte entstand im 19. Jh. aus Rotwelsch, Jiddisch und Romani. "Leeze" (Fahrrad), "jovel" (gut), "Meese" (Geld).' },
@@ -322,15 +337,22 @@ const QUESTIONS = [
   { cat:'kultur', type:'vote', q:'Was macht Münster am lebenswertesten?', options:['Fahrradkultur 🚲','Studentenszene 🎓','Historische Altstadt 🏰','Kneipen & Cafés ☕'] },
   { cat:'kultur', type:'quiz', q:'Was ist das "Schlossgarten Open Air"?', answers:['Freiluftkino im Sommer','Musikfestival','Theateraufführung','Weihnachtsmarkt'], correct:0, fact:'Open-Air-Kino im Schlossgarten – Filme unter Sternenhimmel vor der Schlosskulisse, jeden Sommer!' },
 
-  // MYTHEN
-  { cat:'mythen', type:'quiz', q:'Welchen Titel gewann Münster 2004?', answers:['Lebenswerteste Stadt der Welt','Schönste Stadt','Grünste Stadt Europas','Friedlichste Stadt'], correct:0, fact:'2004 gewann Münster den LivCom-Award als lebenswerteste Stadt der Welt. Das wird nie vergessen!' },
-  { cat:'mythen', type:'quiz', q:'Welcher Spruch beschreibt das Münsteraner Wetter?', answers:['Entweder es regnet, oder es läuten die Glocken','Morgens Sonne, abends Regen','Immer Wind vom Aasee','Drei Tage Sonne, drei Wochen Regen'], correct:0, fact:'"Entweder es regnet, oder die Glocken läuten. Wenn beides zusammen, ist Sonntag!" – der berühmte Spruch.' },
-  { cat:'mythen', type:'estimate', q:'Wie viele Regentage hat Münster pro Jahr?', answer:190, unit:'Tage', tolerance:30, fact:'Rund 190 Regentage – viel, aber nicht so extrem wie der Ruf! Viele Weststädte haben ähnliche Werte.' },
-  { cat:'mythen', type:'quiz', q:'Was ist der "Send"?', answers:['Kirmes dreimal jährlich','Radrennen','Bierfest','Flohmarkt'], correct:0, fact:'Der Send ist die große Kirmes dreimal im Jahr auf dem Schlossplatz. Der Name kommt von "Synode".' },
-  { cat:'mythen', type:'quiz', q:'Was sagt man über Münsteraner, die weggezogen sind?', answers:['Sie kommen alle zurück','Sie vermissen das Bier','Sie werden melancholisch','Sie hassen das Wetter'], correct:0, fact:'"Man kommt immer nach Münster zurück" – dieser Spruch bestätigt sich erstaunlich oft!' },
-  { cat:'mythen', type:'quiz', q:'Was passiert (angeblich), wenn man eine Münze in den Aasee wirft?', answers:['Man kommt nach Münster zurück','Man findet die Liebe','Es regnet morgen','Man besteht die Prüfung'], correct:0, fact:'Wie beim Trevi-Brunnen – eine Münze im Aasee garantiert angeblich die Rückkehr nach Münster.' },
-  { cat:'mythen', type:'vote', q:'Welcher Münster-Mythos stimmt am ehesten?', options:['Es regnet IMMER ☔','Mehr Räder als Menschen 🚲','Jeder kennt jeden 🤝','Man kommt immer zurück 🏠'] },
-  { cat:'mythen', type:'quiz', q:'Woher kommt der Name "Masematte"?', answers:['Hebräisch/Jiddisch: "Handel machen"','Plattdeutsch: "Maske tragen"','Latein: "Masse der Matte"','Niederdeutsch: "heimlich flüstern"'], correct:0, fact:'"Masematte" kommt von hebr. "massa u-mattan" (Handel treiben). Die Sprache entstand in armen Vierteln Münsters.' },
+  // ===== VIRAL & NEWS (NEU) =====
+  { cat:'viral', type:'quiz', q:'Was passierte 2018 im Aasee und ging viral?', answers:['Massenhaftes Fischsterben','Ein Schwan griff Jogger an','Der See fror komplett zu','Ein Krokodil wurde gesichtet'], correct:0, fact:'Im Sommer 2018 starben durch Hitze und Sauerstoffmangel tausende Fische im Aasee – die Bilder gingen bundesweit viral und sorgten für eine riesige Debatte über Gewässerpflege.' },
+  { cat:'viral', type:'quiz', q:'Welches Ereignis 2014 sorgte in Münster für bundesweite Schlagzeilen?', answers:['Ein verheerendes Unwetter/Tornado','Ein Großbrand am Prinzipalmarkt','Die Uni wurde besetzt','Der Dom stürzte teilweise ein'], correct:0, fact:'Am 28. Juli 2014 traf ein Tornado-artiges Unwetter Münster – entwurzelte Bäume, überflutete Straßen, Millionenschäden. Videos gingen viral.' },
+  { cat:'viral', type:'quiz', q:'Welcher Münsteraner Stadtteil wurde durch ein TikTok-Meme über "reiche Studenten" bekannt?', answers:['Kreuzviertel','Coerde','Kinderhaus','Wolbeck'], correct:0, fact:'Das Kreuzviertel wird in Social Media oft als "das Viertel, wo Studenten mit Papa-Geld wohnen" dargestellt – ein übertriebenes, aber virales Klischee.' },
+  { cat:'viral', type:'quiz', q:'Was wurde 2022 am Aasee wegen TikTok zum Problem?', answers:['Massen-Grillen und Müll','Leute schwammen illegal','Stand-Up-Paddler blockierten Boote','Drohnen störten Schwäne'], correct:0, fact:'Durch virale TikToks und Insta-Posts wurde der Aasee im Sommer SO überlaufen, dass Müll und Lärm zum echten Problem wurden.' },
+  { cat:'viral', type:'estimate', q:'Wie viele Fische starben beim Fischsterben im Aasee 2018 ungefähr?', answer:20000, unit:'Fische', tolerance:10000, fact:'Rund 20 Tonnen tote Fische mussten aus dem Aasee geborgen werden – die Feuerwehr pumpte tagelang Sauerstoff ins Wasser.' },
+  { cat:'viral', type:'quiz', q:'Welcher Münsteraner Instagram-Account dokumentiert das Stadtleben und hat über 100k Follower?', answers:['@muenster','@visit_muenster','@muenstermitte','@ms4life'], correct:0, fact:'Mehrere Münster-Accounts wie @muenster und @visit_muenster zeigen das Stadtleben – Münster ist extrem Instagram-affin dank Architektur, Aasee und Café-Kultur.' },
+  { cat:'viral', type:'quiz', q:'Was sorgte 2023 in Münster für Aufregung, als die Uni ihren Namen änderte?', answers:['Abschied vom "Wilhelms" im Namen','Einführung von Studiengebühren','Schließung der Mensa','Abriss des Schlosses'], correct:0, fact:'2023 strich die WWU das "Westfälische Wilhelms-" und heißt jetzt nur noch "Universität Münster" – viele Alumni waren empört, es trendete auf Twitter.' },
+  { cat:'viral', type:'vote', q:'Welches Münster-Thema regt die Leute online am meisten auf?', options:['Fahrrad-Chaos & Regeln 🚲','Mietpreise & Wohnungsnot 🏠','Aasee-Zustand 🐟','Party-Lärm Kreuzstraße 🔊'] },
+  { cat:'viral', type:'quiz', q:'Was passierte 2018 in Münster, das nichts mit dem Aasee zu tun hatte, aber weltweit Schlagzeilen machte?', answers:['Amokfahrt am Kiepenkerl','Großbrand im Hafen','Bombenentschärfung mit 50k Evakuierten','Hochwasser der Aa'], correct:0, fact:'Im April 2018 fuhr ein Mann mit einem Transporter in die Außengastronomie am Kiepenkerl – mehrere Menschen starben. Ein tragischer Tag für die Stadt.' },
+  { cat:'viral', type:'quiz', q:'Welches Münsteraner Phänomen wird auf Reddit und Twitter regelmäßig gepostet?', answers:['Fahrrad-Chaos am Bahnhof','Enten auf dem Prinzipalmarkt','Der schiefe Dom-Turm','Kühe in der Innenstadt'], correct:0, fact:'Bilder vom Fahrrad-Chaos rund um den Hauptbahnhof gehen regelmäßig viral – hunderte Räder, kreuz und quer, teilweise im Kanal.' },
+  { cat:'viral', type:'quiz', q:'Welcher Münster-Tatort hatte die höchste Einschaltquote aller Zeiten?', answers:['Fangschuss (2017) mit 14,5 Mio.','Der erste Folge','Schwanensee','Limbus'], correct:0, fact:'Der Münster-Tatort "Fangschuss" erreichte 2017 sensationelle 14,56 Mio. Zuschauer – absoluter Rekord der Reihe!' },
+  { cat:'viral', type:'estimate', q:'Wie viele Fahrräder werden jährlich in Münster gestohlen?', answer:5000, unit:'Räder/Jahr', tolerance:2000, fact:'Ca. 5.000 Fahrraddiebstähle pro Jahr – damit liegt Münster deutschlandweit an der Spitze. Es gibt sogar spezielle Polizei-Einheiten dafür.' },
+  { cat:'viral', type:'quiz', q:'Was wurde 2019 am Kanal gefunden und ging auf Social Media viral?', answers:['Hunderte Leih-E-Scooter im Wasser','Ein gestohlenes Auto','Eine Zeitkapsel','Ein Goldschatz'], correct:0, fact:'Als Leih-E-Scooter nach Münster kamen, landeten dutzende im Dortmund-Ems-Kanal und im Aasee – die Unterwasser-Fotos gingen viral.' },
+  { cat:'viral', type:'vote', q:'Was ist das nervigste Münster-Klischee im Internet?', options:['Immer Regen ☔','Öko-Studenten überall 🌱','Zu nett und langweilig 😴','Fahrrad-Sekte 🚲'] },
+  { cat:'viral', type:'quiz', q:'Welche Münsteraner Großveranstaltung wurde in der Pandemie zum kontroversen Online-Thema?', answers:['Der Send (Kirmes) – offen oder geschlossen?','Weihnachtsmarkt','Karneval','CSD'], correct:0, fact:'Die Frage "Darf der Send stattfinden?" spaltete Münster in den Corona-Jahren – hitzig diskutiert in jeder WhatsApp-Gruppe und auf Social Media.' },
 ];
 
 // ============================================================
@@ -450,7 +472,13 @@ function handleHostMessage(conn, data) {
   switch (data.type) {
     case 'join': {
       const color = PLAYER_COLORS[gameState.players.length % PLAYER_COLORS.length];
-      const player = { id: data.id, name: data.name, color, score: 0, connected: true, connId: conn.peer };
+      // Late join: give average score (rounded down) if game is in progress
+      let startScore = 0;
+      if (gameState.phase !== 'lobby' && gameState.phase !== 'home' && gameState.players.length > 0) {
+        const totalScore = gameState.players.reduce((sum, p) => sum + p.score, 0);
+        startScore = Math.floor(totalScore / gameState.players.length);
+      }
+      const player = { id: data.id, name: data.name, color, score: startScore, connected: true, connId: conn.peer };
       gameState.players.push(player);
       conn._playerId = data.id;
       // Send current state to new player
@@ -585,6 +613,7 @@ function selectCategory(catId) {
   gameState.usedQuestionIdxs.push(q.idx);
   gameState.usedCategories[catId] = (gameState.usedCategories[catId] || 0) + 1;
   gameState.answers = {};
+  gameState.questionPlayerIds = gameState.players.filter(p => p.connected).map(p => p.id);
   gameState.phase = 'question';
   localState.answered = false;
   localState.myAnswer = null;
@@ -607,8 +636,10 @@ function submitAnswer(answer) {
 }
 
 function checkAllAnswered() {
-  const activePlayers = gameState.players.filter(p => p.connected);
-  const allAnswered = activePlayers.every(p => gameState.answers[p.id] !== undefined);
+  // Only check players who were present when the question started
+  const relevantIds = gameState.questionPlayerIds || gameState.players.filter(p => p.connected).map(p => p.id);
+  const relevantPlayers = gameState.players.filter(p => p.connected && relevantIds.includes(p.id));
+  const allAnswered = relevantPlayers.every(p => gameState.answers[p.id] !== undefined);
   if (allAnswered) {
     evaluateRound();
   }
@@ -1131,13 +1162,19 @@ function renderError() {
 
 // SCOREBOARD
 function renderScoreboard() {
-  return `<div class="scoreboard">
-    ${gameState.players.map((p, i) => `
-      <div class="score-chip ${i === gameState.currentPlayerIdx ? 'active' : ''}" style="background:${p.color}">
-        ${p.name.slice(0,8)} <span class="pts">${p.score}</span>
+  return `
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+      <div class="scoreboard" style="margin-bottom:0;flex:1;">
+        ${gameState.players.map((p, i) => `
+          <div class="score-chip ${i === gameState.currentPlayerIdx ? 'active' : ''}" style="background:${p.color}">
+            ${p.name.slice(0,8)} <span class="pts">${p.score}</span>
+          </div>
+        `).join('')}
       </div>
-    `).join('')}
-  </div>`;
+      <div style="font-family:'Fredoka One',cursive;font-size:0.75rem;color:#999;background:#f0f4ff;padding:4px 10px;border-radius:8px;white-space:nowrap;margin-left:8px;cursor:pointer;" onclick="alert('Raum-Code: ${roomCode}\\n\\nNeue Spieler können jederzeit beitreten!')" title="Raum-Code anzeigen">
+        🔗 ${roomCode}
+      </div>
+    </div>`;
 }
 
 // HELPERS
