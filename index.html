@@ -24,11 +24,23 @@
 
   body {
     font-family: 'Nunito', sans-serif;
-    background: linear-gradient(135deg, #1d3557 0%, #457b9d 50%, #2d6a4f 100%);
+    background: #1d3557;
     min-height: 100vh; min-height: 100dvh;
     color: #1d1d1d;
     overflow-x: hidden;
     -webkit-tap-highlight-color: transparent;
+    position: relative;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/d/d7/M%C3%BCnster%2C_Prinzipalmarkt%2C_Fahrr%C3%A4der_--_2022_--_0064.jpg/1920px-M%C3%BCnster%2C_Prinzipalmarkt%2C_Fahrr%C3%A4der_--_2022_--_0064.jpg');
+    background-size: cover;
+    background-position: center;
+    filter: blur(6px) brightness(0.35);
+    z-index: -1;
   }
 
   .container {
@@ -43,12 +55,13 @@
   }
 
   .card {
-    background: var(--ms-card);
+    background: rgba(255, 255, 255, 0.96);
     border-radius: var(--ms-radius);
     box-shadow: var(--ms-shadow);
     padding: 28px 20px;
     width: 100%;
     animation: fadeIn 0.35s ease;
+    backdrop-filter: blur(4px);
   }
 
   @keyframes fadeIn { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
@@ -860,6 +873,15 @@ function onStartGame() {
 }
 
 // CATEGORY SELECT
+const CAT_IMAGES = {
+  kneipen: 'https://live.staticflickr.com/65535/48943369497_00a7752862_b.jpg',
+  fahrrad: 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d7/M%C3%BCnster%2C_Prinzipalmarkt%2C_Fahrr%C3%A4der_--_2022_--_0064.jpg/640px-M%C3%BCnster%2C_Prinzipalmarkt%2C_Fahrr%C3%A4der_--_2022_--_0064.jpg',
+  sights: 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8d/M%C3%BCnster%2C_St.-Lamberti-Kirche%2C_Westportal_--_2021_--_9082.jpg/640px-M%C3%BCnster%2C_St.-Lamberti-Kirche%2C_Westportal_--_2021_--_9082.jpg',
+  essen: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f6/M%C3%BCnster%2C_Wochenmarkt_--_2017_--_2320.jpg/640px-M%C3%BCnster%2C_Wochenmarkt_--_2017_--_2320.jpg',
+  kultur: 'https://live.staticflickr.com/504/18501292075_59e5db288d_b.jpg',
+  viral: 'https://live.staticflickr.com/4842/31299887987_c7a14994a3_b.jpg',
+};
+
 function renderCategorySelect() {
   const cp = getCurrentPlayer();
   const isMyTurn = cp.id === myId;
@@ -877,11 +899,17 @@ function renderCategorySelect() {
           ${CATEGORIES.map(c => {
             const avail = QUESTIONS.filter((q, i) => q.cat === c.id && !gameState.usedQuestionIdxs.includes(i)).length;
             const disabled = avail === 0;
+            const img = CAT_IMAGES[c.id];
             return `
-              <button style="padding:16px 8px;border:2px solid #e0e0e0;border-radius:14px;background:white;cursor:pointer;text-align:center;font-family:inherit;${disabled ? 'opacity:0.3;pointer-events:none;' : ''}" onclick="hostSelectCategory('${c.id}')">
-                <div style="font-size:1.8rem;margin-bottom:4px;">${c.icon}</div>
-                <div style="font-weight:700;font-size:0.85rem;color:var(--ms-blue);">${c.name}</div>
-                <div style="font-size:0.75rem;color:#999;">${avail} übrig</div>
+              <button style="padding:0;border:2px solid #e0e0e0;border-radius:14px;background:white;cursor:pointer;text-align:center;font-family:inherit;overflow:hidden;${disabled ? 'opacity:0.3;pointer-events:none;' : ''}" onclick="hostSelectCategory('${c.id}')">
+                <div style="height:60px;background:url('${img}') center/cover;position:relative;">
+                  <div style="position:absolute;inset:0;background:linear-gradient(transparent 30%,rgba(0,0,0,0.6));border-radius:12px 12px 0 0;"></div>
+                  <div style="position:absolute;bottom:4px;left:0;right:0;color:white;font-size:1.4rem;text-shadow:0 1px 3px rgba(0,0,0,0.5);">${c.icon}</div>
+                </div>
+                <div style="padding:8px 4px;">
+                  <div style="font-weight:700;font-size:0.8rem;color:var(--ms-blue);">${c.name}</div>
+                  <div style="font-size:0.7rem;color:#999;">${avail} übrig</div>
+                </div>
               </button>
             `;
           }).join('')}
@@ -1223,5 +1251,9 @@ function spawnConfetti() {
 // INIT
 render();
 </script>
+
+<div style="position:fixed;bottom:4px;left:0;right:0;text-align:center;font-size:0.65rem;color:rgba(255,255,255,0.5);pointer-events:none;z-index:0;">
+  Hintergrundfoto: Dietmar Rabich / Wikimedia Commons / CC BY-SA 4.0
+</div>
 </body>
 </html>
