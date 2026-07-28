@@ -348,7 +348,7 @@ let roomCode = '';
 
 // Game state (host manages, syncs to all)
 let gameState = {
-  phase: 'lobby', // lobby, categorySelect, question, waitAnswers, result, final
+  phase: 'home', // home, lobby, categorySelect, question, waitAnswers, result, final
   players: [], // { id, name, color, score, connected }
   currentPlayerIdx: 0,
   round: 0,
@@ -386,6 +386,7 @@ function createHost(name) {
 
   peer.on('open', (id) => {
     myId = id;
+    gameState.phase = 'lobby';
     gameState.players = [{ id: myId, name: myName, color: PLAYER_COLORS[0], score: 0, connected: true, isHost: true }];
     render();
   });
@@ -646,6 +647,7 @@ function nextRound() {
 // ============================================================
 function render() {
   switch (gameState.phase) {
+    case 'home': renderHome(); break;
     case 'lobby': renderLobby(); break;
     case 'categorySelect': renderCategorySelect(); break;
     case 'question': renderQuestion(); break;
@@ -693,6 +695,7 @@ function onCreateRoom() {
   const name = document.getElementById('nameInput').value.trim();
   if (!name) { document.getElementById('nameInput').focus(); return; }
   localStorage.setItem('mk-name', name);
+  app.innerHTML = `<div class="card"><div class="waiting">Erstelle Raum<span class="waiting-dots"></span></div></div>`;
   createHost(name);
 }
 
