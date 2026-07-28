@@ -1,0 +1,1115 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Münster Kenner – Multiplayer</title>
+<script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap');
+
+  :root {
+    --ms-green: #2d6a4f;
+    --ms-green-light: #40916c;
+    --ms-blue: #1d3557;
+    --ms-gold: #f4a261;
+    --ms-red: #e63946;
+    --ms-bg: #f1faee;
+    --ms-card: #ffffff;
+    --ms-shadow: 0 8px 32px rgba(0,0,0,0.12);
+    --ms-radius: 16px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: linear-gradient(135deg, #1d3557 0%, #457b9d 50%, #2d6a4f 100%);
+    min-height: 100vh; min-height: 100dvh;
+    color: #1d1d1d;
+    overflow-x: hidden;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 16px;
+    min-height: 100vh; min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .card {
+    background: var(--ms-card);
+    border-radius: var(--ms-radius);
+    box-shadow: var(--ms-shadow);
+    padding: 28px 20px;
+    width: 100%;
+    animation: fadeIn 0.35s ease;
+  }
+
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes popIn { 0% { transform: scale(0.85); opacity: 0; } 70% { transform: scale(1.04); } 100% { transform: scale(1); opacity: 1; } }
+  @keyframes shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-6px); } 75% { transform: translateX(6px); } }
+  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.5; } }
+  @keyframes confetti-fall { 0% { transform: translateY(-100vh) rotate(0deg); opacity:1; } 100% { transform: translateY(100vh) rotate(720deg); opacity:0; } }
+
+  h1 { font-family: 'Fredoka One', cursive; font-size: 2.2rem; color: var(--ms-blue); text-align: center; margin-bottom: 6px; }
+  h1 .bike { display: inline-block; animation: shake 2s ease infinite; }
+  .subtitle { text-align: center; color: var(--ms-green); font-weight: 700; font-size: 1rem; margin-bottom: 24px; }
+  h2 { font-family: 'Fredoka One', cursive; font-size: 1.4rem; color: var(--ms-blue); margin-bottom: 12px; }
+
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    padding: 14px 24px; border: none; border-radius: 12px;
+    font-family: 'Fredoka One', cursive; font-size: 1.05rem;
+    cursor: pointer; transition: all 0.2s; color: white; width: 100%;
+  }
+  .btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.15); }
+  .btn:active { transform: scale(0.97); }
+  .btn-primary { background: var(--ms-green); }
+  .btn-secondary { background: var(--ms-blue); }
+  .btn-gold { background: var(--ms-gold); color: var(--ms-blue); }
+  .btn-small { padding: 10px 16px; font-size: 0.9rem; width: auto; }
+  .btn:disabled { opacity: 0.5; pointer-events: none; }
+
+  .btn-row { display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap; }
+  .btn-row .btn { flex: 1; min-width: 140px; }
+
+  /* Room code display */
+  .room-code {
+    font-family: 'Fredoka One', cursive; font-size: 3rem; letter-spacing: 8px;
+    text-align: center; color: var(--ms-blue); padding: 16px;
+    background: #f0f4ff; border-radius: 12px; margin: 16px 0;
+    user-select: all;
+  }
+
+  /* Input */
+  .input-field {
+    width: 100%; padding: 14px 16px; border: 2px solid #ddd; border-radius: 12px;
+    font-size: 1.1rem; font-family: inherit; transition: border-color 0.2s;
+    text-align: center;
+  }
+  .input-field:focus { outline: none; border-color: var(--ms-green); }
+  .code-input {
+    font-family: 'Fredoka One', cursive; font-size: 2rem; letter-spacing: 6px;
+    text-transform: uppercase;
+  }
+
+  /* Player list */
+  .player-list { list-style: none; margin: 12px 0; }
+  .player-list li {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 14px; border-radius: 10px; margin-bottom: 6px;
+    font-weight: 700; font-size: 1rem; animation: popIn 0.3s ease;
+  }
+  .player-dot { width: 14px; height: 14px; border-radius: 50%; }
+  .player-you { font-size: 0.8rem; color: #999; font-weight: 400; }
+
+  /* Scoreboard */
+  .scoreboard { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; justify-content: center; }
+  .score-chip {
+    display: flex; align-items: center; gap: 6px;
+    padding: 6px 14px; border-radius: 24px; font-weight: 700;
+    font-size: 0.85rem; color: white; transition: all 0.3s;
+  }
+  .score-chip.active { transform: scale(1.12); box-shadow: 0 4px 14px rgba(0,0,0,0.25); }
+  .score-chip .pts { font-family: 'Fredoka One', cursive; font-size: 1rem; }
+
+  /* Question */
+  .category-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 5px 14px; border-radius: 18px; font-weight: 700;
+    font-size: 0.85rem; margin-bottom: 12px; color: white;
+  }
+  .question-type-label {
+    text-align: center; font-size: 0.8rem; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px;
+    color: var(--ms-green-light);
+  }
+  .question-text {
+    font-size: 1.2rem; font-weight: 700; color: var(--ms-blue);
+    margin-bottom: 20px; line-height: 1.4; text-align: center;
+  }
+
+  /* Answer buttons */
+  .answers { display: flex; flex-direction: column; gap: 8px; }
+  .answer-btn {
+    padding: 14px 16px; border: 2px solid #e0e0e0; border-radius: 12px;
+    background: white; font-size: 1rem; font-family: inherit;
+    cursor: pointer; transition: all 0.2s; text-align: left; font-weight: 600;
+  }
+  .answer-btn:hover { border-color: var(--ms-green); background: #f0faf4; }
+  .answer-btn:active { transform: scale(0.97); }
+  .answer-btn.selected { border-color: var(--ms-blue); background: #e8f0ff; }
+  .answer-btn.correct { border-color: var(--ms-green); background: #d4edda; }
+  .answer-btn.wrong { border-color: var(--ms-red); background: #f8d7da; }
+  .answer-btn.disabled { pointer-events: none; opacity: 0.7; }
+  .answer-btn.highlight { border-color: var(--ms-gold); background: #fff8ec; }
+
+  /* Estimate */
+  .estimate-input { display: flex; gap: 10px; align-items: center; justify-content: center; margin: 16px 0; }
+  .estimate-input input {
+    width: 140px; padding: 12px; border: 2px solid #ddd; border-radius: 12px;
+    font-size: 1.4rem; text-align: center; font-family: inherit; font-weight: 700;
+  }
+  .estimate-input input:focus { outline: none; border-color: var(--ms-green); }
+  .estimate-unit { font-weight: 700; color: #666; font-size: 1rem; }
+
+  /* Vote options */
+  .vote-btn {
+    padding: 14px 16px; border: 2px solid #e0e0e0; border-radius: 12px;
+    background: white; font-size: 1rem; font-family: inherit;
+    cursor: pointer; transition: all 0.2s; text-align: center; font-weight: 600;
+    width: 100%; margin-bottom: 8px;
+  }
+  .vote-btn:hover { border-color: var(--ms-gold); background: #fff8ec; }
+  .vote-btn:active { transform: scale(0.97); }
+  .vote-btn.selected { border-color: var(--ms-gold); background: #fff3d6; pointer-events: none; }
+
+  /* Results */
+  .result-box { text-align: center; padding: 16px; border-radius: 12px; margin: 12px 0; animation: popIn 0.4s ease; }
+  .result-box.success { background: #d4edda; color: var(--ms-green); }
+  .result-box.fail { background: #f8d7da; color: var(--ms-red); }
+  .result-box.info { background: #e8f4f8; color: var(--ms-blue); }
+  .result-big { font-family: 'Fredoka One', cursive; font-size: 1.6rem; }
+  .result-detail { font-size: 0.95rem; margin-top: 6px; font-weight: 600; }
+
+  .fun-fact {
+    margin-top: 14px; padding: 10px 14px; background: #fff8ec;
+    border-left: 4px solid var(--ms-gold); border-radius: 0 8px 8px 0;
+    font-size: 0.9rem; color: #444; text-align: left;
+  }
+  .fun-fact strong { color: var(--ms-gold); }
+
+  /* Vote results bar */
+  .vote-results { display: flex; flex-direction: column; gap: 6px; margin: 12px 0; }
+  .vote-result-row { display: flex; align-items: center; gap: 8px; }
+  .vote-result-name { width: 90px; font-weight: 700; text-align: right; font-size: 0.8rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .vote-result-bar-bg { flex: 1; height: 26px; background: #eee; border-radius: 13px; overflow: hidden; }
+  .vote-result-bar {
+    height: 100%; border-radius: 13px; transition: width 0.6s ease;
+    display: flex; align-items: center; padding: 0 8px;
+    font-size: 0.75rem; font-weight: 700; color: white; min-width: fit-content;
+  }
+
+  /* Waiting */
+  .waiting { text-align: center; color: #888; font-weight: 600; margin: 16px 0; animation: pulse 1.5s ease infinite; }
+  .waiting-dots::after { content: ''; animation: dots 1.5s steps(3) infinite; }
+  @keyframes dots { 0% { content: '.'; } 33% { content: '..'; } 66% { content: '...'; } }
+
+  /* Current player banner */
+  .turn-banner {
+    text-align: center; padding: 10px; border-radius: 12px;
+    margin-bottom: 14px; font-weight: 700; font-size: 1rem; color: white;
+  }
+
+  /* Podium */
+  .podium { display: flex; gap: 12px; justify-content: center; align-items: flex-end; margin: 24px 0; }
+  .podium-spot { text-align: center; animation: popIn 0.5s ease; }
+  .podium-block {
+    width: 90px; border-radius: 12px 12px 0 0; display: flex;
+    flex-direction: column; align-items: center; justify-content: flex-end;
+    padding: 14px 6px; color: white; font-family: 'Fredoka One', cursive;
+  }
+  .podium-rank { font-size: 1.8rem; }
+  .podium-name { font-size: 0.8rem; margin-top: 6px; word-break: break-word; }
+  .podium-score { font-size: 1.1rem; margin-top: 4px; }
+
+  .confetti-piece {
+    position: fixed; width: 10px; height: 10px;
+    animation: confetti-fall linear forwards; z-index: 1000; pointer-events: none;
+  }
+
+  .status-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 4px; }
+  .status-dot.connected { background: #2d6a4f; }
+  .status-dot.waiting { background: #f4a261; animation: pulse 1s ease infinite; }
+
+  .divider { height: 1px; background: #eee; margin: 16px 0; }
+
+  .round-info { text-align: center; margin-bottom: 12px; font-weight: 600; color: #666; font-size: 0.9rem; }
+
+  .answer-count { text-align: center; font-size: 0.85rem; color: #888; margin-top: 10px; font-weight: 600; }
+
+  @media (max-width: 400px) {
+    .card { padding: 20px 14px; }
+    h1 { font-size: 1.8rem; }
+    .room-code { font-size: 2.4rem; }
+    .question-text { font-size: 1.05rem; }
+  }
+
+  .hidden { display: none !important; }
+
+  /* Settings */
+  .settings-row { display: flex; align-items: center; justify-content: space-between; margin: 10px 0; }
+  .settings-row label { font-weight: 600; font-size: 0.95rem; }
+  .settings-row select {
+    padding: 8px 12px; border: 2px solid #ddd; border-radius: 8px;
+    font-family: inherit; font-size: 1rem;
+  }
+</style>
+</head>
+<body>
+
+<div class="container" id="app"></div>
+
+<script>
+// ============================================================
+// MÜNSTER KENNER – MULTIPLAYER (PeerJS WebRTC)
+// ============================================================
+
+const PLAYER_COLORS = ['#e63946','#457b9d','#2d6a4f','#f4a261','#6a4c93','#1982c4'];
+
+const CATEGORIES = [
+  { id: 'kneipen', name: 'Kneipen & Ausgehen', icon: '🍺', color: '#e63946' },
+  { id: 'fahrrad', name: 'Fahrrad & Mobilität', icon: '🚲', color: '#457b9d' },
+  { id: 'sights', name: 'Sehenswürdigkeiten', icon: '🏰', color: '#2d6a4f' },
+  { id: 'essen', name: 'Essen & Trinken', icon: '🥨', color: '#f4a261' },
+  { id: 'kultur', name: 'Uni & Kultur', icon: '🎭', color: '#6a4c93' },
+  { id: 'mythen', name: 'Münster-Mythen', icon: '🔮', color: '#1982c4' },
+];
+
+const QUESTIONS = [
+  // KNEIPEN
+  { cat:'kneipen', type:'quiz', q:'Welche Straße ist das Herz des Münsteraner Nachtlebens?', answers:['Kreuzstraße','Salzstraße','Ludgeristraße','Wolbecker Str.'], correct:0, fact:'Die Kreuzstraße ("Kreuz") ist DIE Kneipenmeile Münsters – Bar an Bar.' },
+  { cat:'kneipen', type:'quiz', q:'Welches ist die letzte Altbier-Brauerei Münsters?', answers:['Pinkus Müller','Rolinck','Münster Brau','Aaseebräu'], correct:0, fact:'Pinkus Müller braut seit 1816 – die letzte Altbier-Brauerei der Stadt und weltweit einziges Bio-Altbier.' },
+  { cat:'kneipen', type:'quiz', q:'Welcher Club am Hawerkamp war eine Institution für Techno?', answers:['Amp','Fusion Club','Gleis 22','Sputnikhalle'], correct:0, fact:'Das Amp am Hawerkamp war DER Club für elektronische Musik. Das Hawerkamp-Gelände ist das alternative Kulturzentrum.' },
+  { cat:'kneipen', type:'estimate', q:'Wie viele Kneipen & Restaurants gibt es in der Altstadt?', answer:300, unit:'', tolerance:80, fact:'Rund 300 gastronomische Betriebe in der Altstadt – eine der höchsten Kneipendichten Deutschlands.' },
+  { cat:'kneipen', type:'quiz', q:'Was ist ein "Kiepenkerl"?', answers:['Ein wandernder Händler','Ein Biermischgetränk','Dialektwort für Wirt','Eine Käsesorte'], correct:0, fact:'Kiepenkerle waren Wanderhändler mit Rückentragekorb (Kiepe). Die Skulptur am Spiekerhof erinnert daran.' },
+  { cat:'kneipen', type:'quiz', q:'Welches Viertel ist für Cafés und Boutiquen bekannt?', answers:['Kreuzviertel','Hansaviertel','Hafen','Gievenbeck'], correct:0, fact:'Das Kreuzviertel rund um Kreuz- und Schillerstraße ist bekannt für Café-Kultur und entspannte Atmosphäre.' },
+  { cat:'kneipen', type:'vote', q:'Bester Ort für ein erstes Date in Münster?', options:['Aasee-Spaziergang 🌅','Hafen-Viertel 🍷','Botanischer Garten 🌺','Prinzipalmarkt-Bummel 🏛️'] },
+  { cat:'kneipen', type:'quiz', q:'Wie heißt die bekannte Cocktailbar an der Kreuzstraße?', answers:['Grotemeyer','Pension Schmidt','Hot Jazz Club','Cavete'], correct:1, fact:'Die Pension Schmidt ist bekannt für kreative Cocktails in gemütlicher Atmosphäre mitten auf der Kreuzstraße.' },
+
+  // FAHRRAD
+  { cat:'fahrrad', type:'quiz', q:'Wie heißt der autofreie Ring um die Altstadt?', answers:['Promenade','Veloroute','Ringallee','Fahrradwall'], correct:0, fact:'Die 4,5 km lange Promenade ist Deutschlands längste autofreie Fahrrad-Allee rund um eine Altstadt!' },
+  { cat:'fahrrad', type:'estimate', q:'Wie viele Fahrräder gibt es in Münster?', answer:500000, unit:'', tolerance:100000, fact:'Ca. 500.000 Fahrräder bei 320.000 Einwohnern – deutlich mehr Räder als Menschen!' },
+  { cat:'fahrrad', type:'quiz', q:'Wie heißt das große Fahrrad-Parkhaus am Hauptbahnhof?', answers:['Radstation','Bike Tower','Pedaleum','Fahrradburg'], correct:0, fact:'Die Radstation bietet Platz für über 3.300 Fahrräder – eine der größten Deutschlands.' },
+  { cat:'fahrrad', type:'quiz', q:'Was ist eine "Leeze"?', answers:['Münsteraner Wort für Fahrrad','Ein Radweg','Eine Bremse','Ein Festival'], correct:0, fact:'"Leeze" ist Masematte für Fahrrad. Wer "Leeze" sagt, ist ein echter Münsteraner!' },
+  { cat:'fahrrad', type:'estimate', q:'Wie lang ist die Promenade in Kilometern?', answer:4.5, unit:'km', tolerance:1.2, fact:'Die Promenade ist exakt 4,5 km lang und folgt dem Verlauf der ehemaligen Stadtbefestigung.' },
+  { cat:'fahrrad', type:'quiz', q:'Wie viele Räder kommen auf einen Einwohner?', answers:['Ca. 1,5','Ca. 0,8','Ca. 2,5','Ca. 1,0'], correct:0, fact:'Mit ca. 1,5 Fahrrädern pro Einwohner ist Münster die fahrradfreundlichste Großstadt Deutschlands.' },
+  { cat:'fahrrad', type:'vote', q:'Was nervt Münsteraner Radfahrer am meisten?', options:['Fußgänger auf dem Radweg 🚶','Gegenverkehr auf der Promenade 🔄','Fahrraddiebstahl 🔒','Kopfsteinpflaster 🪨'] },
+  { cat:'fahrrad', type:'quiz', q:'Beim ADFC-Fahrradklima-Test belegt Münster regelmäßig...', answers:['Platz 1 bei Großstädten','Einen Mittelfeldplatz','Den letzten Platz','Platz 3'], correct:0, fact:'Münster ist seit Jahren auf Platz 1 der fahrradfreundlichsten Großstädte beim ADFC-Test.' },
+
+  // SIGHTS
+  { cat:'sights', type:'quiz', q:'Was hängt am Turm der Lambertikirche?', answers:['Drei Eisenkäfige','Eine goldene Glocke','Ein Wetterhahn','Eine Uhr'], correct:0, fact:'In den Käfigen wurden 1536 die Wiedertäufer-Anführer ausgestellt. Die Käfige hängen bis heute dort!' },
+  { cat:'sights', type:'quiz', q:'Welcher Frieden wurde 1648 in Münster geschlossen?', answers:['Westfälischer Frieden','Münsteraner Frieden','Norddeutscher Frieden','Hanseatischer Frieden'], correct:0, fact:'Der Westfälische Frieden beendete den 30-jährigen Krieg – verhandelt in Münster & Osnabrück.' },
+  { cat:'sights', type:'quiz', q:'Das barocke Schloss beherbergt heute...', answers:['Die Uni-Verwaltung','Das Rathaus','Ein Hotel','Ein Museum'], correct:0, fact:'Das Fürstbischöfliche Schloss (1767-1787) ist Sitz der Uni-Verwaltung. Davor liegt der beliebte Schlossplatz.' },
+  { cat:'sights', type:'estimate', q:'In welchem Jahr wurde der St.-Paulus-Dom geweiht?', answer:1264, unit:'', tolerance:50, fact:'Der Dom wurde 1264 geweiht – ein Meisterwerk der Übergangszeit von Romanik zu Gotik.' },
+  { cat:'sights', type:'quiz', q:'Was findet samstags auf dem Domplatz statt?', answers:['Wochenmarkt','Flohmarkt','Gottesdienst draußen','Radrennen'], correct:0, fact:'Der Wochenmarkt auf dem Domplatz ist einer der schönsten Deutschlands – mit regionalen Produkten und Pumpernickel.' },
+  { cat:'sights', type:'quiz', q:'Was sind die "Skulptur Projekte"?', answers:['Kunstausstellung alle 10 Jahre','Steinmetz-Wettbewerb','Uni-Architekturprojekt','Skulpturen-Werkstatt'], correct:0, fact:'Die Skulptur Projekte finden seit 1977 alle 10 Jahre statt und machen Münster zum Open-Air-Museum.' },
+  { cat:'sights', type:'vote', q:'Schönstes Fotomotiv in Münster?', options:['Prinzipalmarkt-Giebel 🏛️','Aasee-Sonnenuntergang 🌅','Lambertikirche nachts 🕯️','Hafen-Kräne 🏗️'] },
+  { cat:'sights', type:'quiz', q:'Wie heißt der künstliche See mitten in Münster?', answers:['Aasee','Münstersee','Schlosssee','Domteich'], correct:0, fact:'Der Aasee wurde 1934 aufgestaut und ist heute DAS Naherholungsgebiet – zum Joggen, Segeln, Grillen.' },
+
+  // ESSEN
+  { cat:'essen', type:'quiz', q:'Welches Gericht ist typisch münsterländisch?', answers:['Töttchen','Labskaus','Maultaschen','Sauerbraten'], correct:0, fact:'Töttchen ist ein süß-saures Ragout aus Kalbsfleisch – klingt seltsam, schmeckt aber großartig!' },
+  { cat:'essen', type:'quiz', q:'Welches Brot wird 16+ Stunden gebacken?', answers:['Pumpernickel','Schwarzbrot','Vollkorntoast','Roggenbrot'], correct:0, fact:'Echtes Pumpernickel wird mindestens 16 Stunden bei niedriger Temperatur gebacken. Hält sich monatelang!' },
+  { cat:'essen', type:'quiz', q:'Was sind "Struwen"?', answers:['Hefepfannkuchen mit Rosinen','Brezeln','Kartoffelpuffer','Waffeln'], correct:0, fact:'Struwen sind dicke Hefepfannkuchen mit Rosinen – traditionell am Karfreitag, aber auch an Imbissständen.' },
+  { cat:'essen', type:'estimate', q:'Wie viele Stände hat der Domplatz-Wochenmarkt?', answer:150, unit:'Stände', tolerance:40, fact:'Rund 150 Stände machen den Domplatz-Markt zu einem der größten und schönsten in ganz Deutschland.' },
+  { cat:'essen', type:'quiz', q:'Wofür ist "Westfälischer Knochenschinken" bekannt?', answers:['Luftgetrocknet & über Buche geräuchert','Gekocht in Bier','Paniert & frittiert','Süß mariniert'], correct:0, fact:'Der Westfälische Knochenschinken wird monatelang luftgetrocknet und über Buchenholz geräuchert.' },
+  { cat:'essen', type:'vote', q:'Was muss man in Münster unbedingt probieren?', options:['Pinkus Alt im Brauhaus 🍺','Töttchen beim Kiepenkerl 🍲','Struwen vom Imbiss 🥞','Käse vom Wochenmarkt 🧀'] },
+  { cat:'essen', type:'quiz', q:'Welches Getränk ist Münsters Traditionsgebräu?', answers:['Pinkus Altbier','Weizenbier','Kölsch','Exportbier'], correct:0, fact:'Pinkus Alt – obergärig, mild, süffig – ist seit 1816 DAS Münsteraner Bier.' },
+
+  // KULTUR
+  { cat:'kultur', type:'quiz', q:'Wie heißt die Universität offiziell?', answers:['Westfälische Wilhelms-Universität','Universität Münster','Friedensuni','Albertus-Magnus-Uni'], correct:0, fact:'Die WWU wurde 1780 gegründet – mit 43.000 Studierenden eine der größten Deutschlands. 2023 umbenannt zu "Universität Münster".' },
+  { cat:'kultur', type:'estimate', q:'Wie viele Studierende hat die Uni Münster?', answer:43000, unit:'', tolerance:8000, fact:'Rund 43.000 Studierende – fast jeder 7. Einwohner studiert!' },
+  { cat:'kultur', type:'quiz', q:'Was ist "Masematte"?', answers:['Münsteraner Geheimsprache','Karnevalsverein','Stadtteil','Biermischgetränk'], correct:0, fact:'Masematte entstand im 19. Jh. aus Rotwelsch, Jiddisch und Romani. "Leeze" (Fahrrad), "jovel" (gut), "Meese" (Geld).' },
+  { cat:'kultur', type:'quiz', q:'Was bedeutet "jovel"?', answers:['Gut / toll','Schlecht','Fahrrad','Bier'], correct:0, fact:'"Jovel" heißt "gut/toll" – kommt aus dem Hebräischen. Wenn was jovel ist, ist es super!' },
+  { cat:'kultur', type:'quiz', q:'Welcher Tatort-Ermittler kommt aus Münster?', answers:['Thiel & Boerne','Wallander','Derrick','Faber'], correct:0, fact:'Der Münster-Tatort mit Thiel & Boerne ist der beliebteste überhaupt – regelmäßig 14+ Mio. Zuschauer!' },
+  { cat:'kultur', type:'quiz', q:'Das Kunstmuseum Pablo Picasso zeigt vor allem...', answers:['Lithografien','Ölgemälde','Skulpturen','Fotografien'], correct:0, fact:'Das einzige Picasso-Museum Deutschlands zeigt über 800 Lithografien am Picassoplatz.' },
+  { cat:'kultur', type:'vote', q:'Was macht Münster am lebenswertesten?', options:['Fahrradkultur 🚲','Studentenszene 🎓','Historische Altstadt 🏰','Kneipen & Cafés ☕'] },
+  { cat:'kultur', type:'quiz', q:'Was ist das "Schlossgarten Open Air"?', answers:['Freiluftkino im Sommer','Musikfestival','Theateraufführung','Weihnachtsmarkt'], correct:0, fact:'Open-Air-Kino im Schlossgarten – Filme unter Sternenhimmel vor der Schlosskulisse, jeden Sommer!' },
+
+  // MYTHEN
+  { cat:'mythen', type:'quiz', q:'Welchen Titel gewann Münster 2004?', answers:['Lebenswerteste Stadt der Welt','Schönste Stadt','Grünste Stadt Europas','Friedlichste Stadt'], correct:0, fact:'2004 gewann Münster den LivCom-Award als lebenswerteste Stadt der Welt. Das wird nie vergessen!' },
+  { cat:'mythen', type:'quiz', q:'Welcher Spruch beschreibt das Münsteraner Wetter?', answers:['Entweder es regnet, oder es läuten die Glocken','Morgens Sonne, abends Regen','Immer Wind vom Aasee','Drei Tage Sonne, drei Wochen Regen'], correct:0, fact:'"Entweder es regnet, oder die Glocken läuten. Wenn beides zusammen, ist Sonntag!" – der berühmte Spruch.' },
+  { cat:'mythen', type:'estimate', q:'Wie viele Regentage hat Münster pro Jahr?', answer:190, unit:'Tage', tolerance:30, fact:'Rund 190 Regentage – viel, aber nicht so extrem wie der Ruf! Viele Weststädte haben ähnliche Werte.' },
+  { cat:'mythen', type:'quiz', q:'Was ist der "Send"?', answers:['Kirmes dreimal jährlich','Radrennen','Bierfest','Flohmarkt'], correct:0, fact:'Der Send ist die große Kirmes dreimal im Jahr auf dem Schlossplatz. Der Name kommt von "Synode".' },
+  { cat:'mythen', type:'quiz', q:'Was sagt man über Münsteraner, die weggezogen sind?', answers:['Sie kommen alle zurück','Sie vermissen das Bier','Sie werden melancholisch','Sie hassen das Wetter'], correct:0, fact:'"Man kommt immer nach Münster zurück" – dieser Spruch bestätigt sich erstaunlich oft!' },
+  { cat:'mythen', type:'quiz', q:'Was passiert (angeblich), wenn man eine Münze in den Aasee wirft?', answers:['Man kommt nach Münster zurück','Man findet die Liebe','Es regnet morgen','Man besteht die Prüfung'], correct:0, fact:'Wie beim Trevi-Brunnen – eine Münze im Aasee garantiert angeblich die Rückkehr nach Münster.' },
+  { cat:'mythen', type:'vote', q:'Welcher Münster-Mythos stimmt am ehesten?', options:['Es regnet IMMER ☔','Mehr Räder als Menschen 🚲','Jeder kennt jeden 🤝','Man kommt immer zurück 🏠'] },
+  { cat:'mythen', type:'quiz', q:'Woher kommt der Name "Masematte"?', answers:['Hebräisch/Jiddisch: "Handel machen"','Plattdeutsch: "Maske tragen"','Latein: "Masse der Matte"','Niederdeutsch: "heimlich flüstern"'], correct:0, fact:'"Masematte" kommt von hebr. "massa u-mattan" (Handel treiben). Die Sprache entstand in armen Vierteln Münsters.' },
+];
+
+// ============================================================
+// GAME ENGINE
+// ============================================================
+const app = document.getElementById('app');
+
+let role = null; // 'host' | 'player'
+let peer = null;
+let connections = []; // host: list of connections to players
+let hostConn = null; // player: connection to host
+let myName = '';
+let myId = '';
+let roomCode = '';
+
+// Game state (host manages, syncs to all)
+let gameState = {
+  phase: 'lobby', // lobby, categorySelect, question, waitAnswers, result, final
+  players: [], // { id, name, color, score, connected }
+  currentPlayerIdx: 0,
+  round: 0,
+  totalRounds: 12,
+  currentQuestion: null,
+  answers: {}, // playerId -> answer
+  usedQuestionIdxs: [],
+  usedCategories: {},
+};
+
+// Local UI state (per device)
+let localState = {
+  myAnswer: null,
+  answered: false,
+  showResult: false,
+};
+
+// ============================================================
+// NETWORKING
+// ============================================================
+function generateRoomCode() {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  let code = '';
+  for (let i = 0; i < 4; i++) code += chars[Math.floor(Math.random() * chars.length)];
+  return code;
+}
+
+function createHost(name) {
+  roomCode = generateRoomCode();
+  myName = name;
+  role = 'host';
+
+  const peerId = 'msk-' + roomCode.toLowerCase();
+  peer = new Peer(peerId, { debug: 0 });
+
+  peer.on('open', (id) => {
+    myId = id;
+    gameState.players = [{ id: myId, name: myName, color: PLAYER_COLORS[0], score: 0, connected: true, isHost: true }];
+    render();
+  });
+
+  peer.on('connection', (conn) => {
+    conn.on('open', () => {
+      connections.push(conn);
+      conn.on('data', (data) => handleHostMessage(conn, data));
+      conn.on('close', () => handleDisconnect(conn));
+    });
+  });
+
+  peer.on('error', (err) => {
+    if (err.type === 'unavailable-id') {
+      roomCode = generateRoomCode();
+      peer.destroy();
+      createHost(name);
+    } else {
+      console.error('Peer error:', err);
+    }
+  });
+}
+
+function joinRoom(name, code) {
+  myName = name;
+  roomCode = code.toUpperCase();
+  role = 'player';
+
+  peer = new Peer(undefined, { debug: 0 });
+
+  peer.on('open', (id) => {
+    myId = id;
+    const hostPeerId = 'msk-' + roomCode.toLowerCase();
+    hostConn = peer.connect(hostPeerId, { reliable: true });
+
+    hostConn.on('open', () => {
+      hostConn.send({ type: 'join', name: myName, id: myId });
+    });
+
+    hostConn.on('data', (data) => handlePlayerMessage(data));
+
+    hostConn.on('close', () => {
+      gameState.phase = 'disconnected';
+      render();
+    });
+
+    hostConn.on('error', (err) => {
+      gameState.phase = 'error';
+      render();
+    });
+  });
+
+  peer.on('error', (err) => {
+    gameState.phase = 'error';
+    render();
+  });
+}
+
+// HOST: handle messages from players
+function handleHostMessage(conn, data) {
+  switch (data.type) {
+    case 'join': {
+      const color = PLAYER_COLORS[gameState.players.length % PLAYER_COLORS.length];
+      const player = { id: data.id, name: data.name, color, score: 0, connected: true, connId: conn.peer };
+      gameState.players.push(player);
+      conn._playerId = data.id;
+      // Send current state to new player
+      broadcastState();
+      break;
+    }
+    case 'answer': {
+      gameState.answers[data.playerId] = data.answer;
+      broadcastState();
+      // Check if all answered
+      checkAllAnswered();
+      break;
+    }
+    case 'selectCategory': {
+      if (gameState.phase === 'categorySelect') {
+        const cp = getCurrentPlayer();
+        if (data.playerId === cp.id || conn._playerId === cp.id) {
+          selectCategory(data.catId);
+        }
+      }
+      break;
+    }
+    case 'nextRound': {
+      // The current player (whose turn it is) can advance
+      const cp = getCurrentPlayer();
+      if (data.playerId === cp.id) nextRound();
+      break;
+    }
+    case 'startGame': {
+      startGame(data.totalRounds);
+      break;
+    }
+  }
+}
+
+function handleDisconnect(conn) {
+  const player = gameState.players.find(p => p.id === conn._playerId);
+  if (player) player.connected = false;
+  connections = connections.filter(c => c !== conn);
+  broadcastState();
+}
+
+// HOST: broadcast state to all players
+function broadcastState() {
+  const stateMsg = { type: 'state', state: gameState };
+  connections.forEach(c => {
+    try { c.send(stateMsg); } catch(e) {}
+  });
+  render();
+}
+
+// PLAYER: handle messages from host
+function handlePlayerMessage(data) {
+  if (data.type === 'state') {
+    gameState = data.state;
+    // Reset local answer state on new question
+    if (gameState.phase === 'question' && !gameState.answers[myId]) {
+      localState.answered = false;
+      localState.myAnswer = null;
+    }
+    render();
+  }
+}
+
+// PLAYER: send message to host
+function sendToHost(msg) {
+  if (hostConn && hostConn.open) hostConn.send(msg);
+}
+
+// ============================================================
+// GAME LOGIC (HOST)
+// ============================================================
+function getHost() { return gameState.players[0]; }
+function getMe() { return gameState.players.find(p => p.id === myId); }
+function getCurrentPlayer() { return gameState.players[gameState.currentPlayerIdx]; }
+
+function startGame(totalRounds) {
+  gameState.totalRounds = totalRounds;
+  gameState.round = 0;
+  gameState.currentPlayerIdx = 0;
+  gameState.usedQuestionIdxs = [];
+  gameState.usedCategories = {};
+  CATEGORIES.forEach(c => gameState.usedCategories[c.id] = 0);
+  gameState.players.forEach(p => p.score = 0);
+  gameState.phase = 'categorySelect';
+  broadcastState();
+}
+
+function selectCategory(catId) {
+  const available = QUESTIONS.map((q, i) => ({ ...q, idx: i }))
+    .filter(q => q.cat === catId && !gameState.usedQuestionIdxs.includes(q.idx));
+  if (available.length === 0) return;
+
+  const q = available[Math.floor(Math.random() * available.length)];
+  gameState.currentQuestion = q;
+  gameState.usedQuestionIdxs.push(q.idx);
+  gameState.usedCategories[catId] = (gameState.usedCategories[catId] || 0) + 1;
+  gameState.answers = {};
+  gameState.phase = 'question';
+  localState.answered = false;
+  localState.myAnswer = null;
+  broadcastState();
+}
+
+function submitAnswer(answer) {
+  if (localState.answered) return;
+  localState.answered = true;
+  localState.myAnswer = answer;
+
+  if (role === 'host') {
+    gameState.answers[myId] = answer;
+    broadcastState();
+    checkAllAnswered();
+  } else {
+    sendToHost({ type: 'answer', playerId: myId, answer });
+  }
+  render();
+}
+
+function checkAllAnswered() {
+  const activePlayers = gameState.players.filter(p => p.connected);
+  const allAnswered = activePlayers.every(p => gameState.answers[p.id] !== undefined);
+  if (allAnswered) {
+    evaluateRound();
+  }
+}
+
+function evaluateRound() {
+  const q = gameState.currentQuestion;
+
+  if (q.type === 'quiz') {
+    // Award 2 points for correct answer
+    gameState.players.forEach(p => {
+      if (gameState.answers[p.id] === q.correct) {
+        p.score += 2;
+      }
+    });
+  } else if (q.type === 'estimate') {
+    // Best estimate gets 3 points, within tolerance gets 1
+    let bestDiff = Infinity, bestId = null;
+    gameState.players.forEach(p => {
+      const est = parseFloat(gameState.answers[p.id]);
+      if (isNaN(est)) return;
+      const diff = Math.abs(est - q.answer);
+      if (diff < bestDiff) { bestDiff = diff; bestId = p.id; }
+    });
+    if (bestId) {
+      gameState.players.find(p => p.id === bestId).score += 3;
+    }
+    gameState.players.forEach(p => {
+      if (p.id === bestId) return;
+      const est = parseFloat(gameState.answers[p.id]);
+      if (!isNaN(est) && Math.abs(est - q.answer) <= q.tolerance) {
+        p.score += 1;
+      }
+    });
+    gameState._estimateWinner = bestId;
+  } else if (q.type === 'vote') {
+    // Majority vote gets 1 point
+    const counts = {};
+    Object.values(gameState.answers).forEach(v => { counts[v] = (counts[v] || 0) + 1; });
+    let maxVotes = 0, majorityOpt = -1;
+    Object.entries(counts).forEach(([opt, cnt]) => {
+      if (cnt > maxVotes) { maxVotes = cnt; majorityOpt = +opt; }
+    });
+    gameState._voteCounts = counts;
+    gameState._majorityOption = majorityOpt;
+    gameState.players.forEach(p => {
+      if (gameState.answers[p.id] === majorityOpt) p.score += 1;
+    });
+  }
+
+  gameState.phase = 'result';
+  broadcastState();
+}
+
+function nextRound() {
+  gameState.round++;
+  if (gameState.round >= gameState.totalRounds) {
+    gameState.phase = 'final';
+    broadcastState();
+    return;
+  }
+  gameState.currentPlayerIdx = (gameState.currentPlayerIdx + 1) % gameState.players.length;
+  gameState.phase = 'categorySelect';
+  gameState.answers = {};
+  localState.answered = false;
+  localState.myAnswer = null;
+  broadcastState();
+}
+
+// ============================================================
+// RENDERING
+// ============================================================
+function render() {
+  switch (gameState.phase) {
+    case 'lobby': renderLobby(); break;
+    case 'categorySelect': renderCategorySelect(); break;
+    case 'question': renderQuestion(); break;
+    case 'result': renderResult(); break;
+    case 'final': renderFinal(); break;
+    case 'disconnected': renderDisconnected(); break;
+    case 'error': renderError(); break;
+    default: renderHome(); break;
+  }
+}
+
+function renderHome() {
+  app.innerHTML = `
+    <div class="card">
+      <h1><span class="bike">🚲</span> Münster Kenner</h1>
+      <p class="subtitle">Das Multiplayer-Partyspiel für echte Münsteraner!</p>
+
+      <div style="margin-bottom:16px;">
+        <label style="font-weight:700;display:block;margin-bottom:6px;">Dein Name:</label>
+        <input class="input-field" id="nameInput" placeholder="Wie heißt du?" maxlength="14" value="${localStorage.getItem('mk-name') || ''}" />
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="onCreateRoom()">🎮 Raum erstellen</button>
+        <button class="btn btn-secondary" onclick="onShowJoin()">🔗 Raum beitreten</button>
+      </div>
+
+      <div id="joinSection" class="hidden" style="margin-top:20px;">
+        <label style="font-weight:700;display:block;margin-bottom:6px;">Raum-Code:</label>
+        <input class="input-field code-input" id="codeInput" placeholder="ABCD" maxlength="4" />
+        <div class="btn-row">
+          <button class="btn btn-gold" onclick="onJoinRoom()">Beitreten!</button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function onShowJoin() {
+  document.getElementById('joinSection').classList.remove('hidden');
+  document.getElementById('codeInput').focus();
+}
+
+function onCreateRoom() {
+  const name = document.getElementById('nameInput').value.trim();
+  if (!name) { document.getElementById('nameInput').focus(); return; }
+  localStorage.setItem('mk-name', name);
+  createHost(name);
+}
+
+function onJoinRoom() {
+  const name = document.getElementById('nameInput').value.trim();
+  const code = document.getElementById('codeInput').value.trim().toUpperCase();
+  if (!name) { document.getElementById('nameInput').focus(); return; }
+  if (code.length !== 4) { document.getElementById('codeInput').focus(); return; }
+  localStorage.setItem('mk-name', name);
+  app.innerHTML = `<div class="card"><div class="waiting">Verbinde mit Raum ${code}<span class="waiting-dots"></span></div></div>`;
+  joinRoom(name, code);
+}
+
+// LOBBY
+function renderLobby() {
+  const isHost = role === 'host';
+  const canStart = gameState.players.length >= 2;
+
+  app.innerHTML = `
+    <div class="card">
+      <h1><span class="bike">🚲</span> Münster Kenner</h1>
+      <p class="subtitle">Warteraum</p>
+
+      <p style="text-align:center;font-weight:600;margin-bottom:6px;">Raum-Code:</p>
+      <div class="room-code">${roomCode}</div>
+      <p style="text-align:center;color:#888;font-size:0.85rem;">Teilt diesen Code, damit andere beitreten können.</p>
+
+      <div class="divider"></div>
+      <h2>👥 Spieler (${gameState.players.length})</h2>
+      <ul class="player-list">
+        ${gameState.players.map((p, i) => `
+          <li style="background:${p.color}15;">
+            <span class="player-dot" style="background:${p.color}"></span>
+            ${p.name}
+            ${p.id === myId ? '<span class="player-you">(Du)</span>' : ''}
+            ${!p.connected ? '<span class="player-you">⚠️ offline</span>' : ''}
+          </li>
+        `).join('')}
+      </ul>
+
+      ${!canStart ? '<p style="text-align:center;color:#888;font-size:0.9rem;">Mindestens 2 Spieler zum Starten nötig.</p>' : ''}
+
+      <div class="settings-row">
+        <label>Runden:</label>
+        <select id="roundsSelect">
+          <option value="8">8 (kurz, ~10 Min.)</option>
+          <option value="12" selected>12 (normal, ~15 Min.)</option>
+          <option value="18">18 (lang, ~25 Min.)</option>
+          <option value="24">24 (marathon, ~35 Min.)</option>
+        </select>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-primary" ${!canStart ? 'disabled' : ''} onclick="onStartGame()">🚀 Spiel starten!</button>
+      </div>
+    </div>
+  `;
+}
+
+function onStartGame() {
+  const totalRounds = +document.getElementById('roundsSelect').value;
+  if (role === 'host') {
+    startGame(totalRounds);
+  } else {
+    sendToHost({ type: 'startGame', totalRounds });
+  }
+}
+
+// CATEGORY SELECT
+function renderCategorySelect() {
+  const cp = getCurrentPlayer();
+  const isMyTurn = cp.id === myId;
+  const maxPerCat = Math.ceil(gameState.totalRounds / CATEGORIES.length) + 1;
+
+  app.innerHTML = `
+    <div class="card">
+      ${renderScoreboard()}
+      <div class="round-info">Runde ${gameState.round + 1} / ${gameState.totalRounds}</div>
+      <div class="turn-banner" style="background:${cp.color}">
+        ${isMyTurn ? '🎯 Du wählst eine Kategorie!' : `${cp.name} wählt...`}
+      </div>
+      ${isMyTurn ? `
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+          ${CATEGORIES.map(c => {
+            const avail = QUESTIONS.filter((q, i) => q.cat === c.id && !gameState.usedQuestionIdxs.includes(i)).length;
+            const disabled = avail === 0;
+            return `
+              <button style="padding:16px 8px;border:2px solid #e0e0e0;border-radius:14px;background:white;cursor:pointer;text-align:center;font-family:inherit;${disabled ? 'opacity:0.3;pointer-events:none;' : ''}" onclick="hostSelectCategory('${c.id}')">
+                <div style="font-size:1.8rem;margin-bottom:4px;">${c.icon}</div>
+                <div style="font-weight:700;font-size:0.85rem;color:var(--ms-blue);">${c.name}</div>
+                <div style="font-size:0.75rem;color:#999;">${avail} übrig</div>
+              </button>
+            `;
+          }).join('')}
+        </div>
+      ` : `
+        <div class="waiting">Warte auf Kategorieauswahl<span class="waiting-dots"></span></div>
+      `}
+    </div>
+  `;
+}
+
+function hostSelectCategory(catId) {
+  if (role === 'host') {
+    selectCategory(catId);
+  } else {
+    sendToHost({ type: 'selectCategory', catId, playerId: myId });
+  }
+}
+
+// QUESTION
+function renderQuestion() {
+  const q = gameState.currentQuestion;
+  if (!q) return;
+  const cat = CATEGORIES.find(c => c.id === q.cat);
+  const answeredCount = Object.keys(gameState.answers).length;
+  const totalPlayers = gameState.players.filter(p => p.connected).length;
+  const iAnswered = localState.answered || gameState.answers[myId] !== undefined;
+
+  let content = '';
+
+  if (q.type === 'quiz') {
+    content = `
+      <div class="question-type-label">🧠 Wissensfrage – Alle antworten!</div>
+      <div class="question-text">${q.q}</div>
+      <div class="answers">
+        ${q.answers.map((a, i) => `
+          <button class="answer-btn ${iAnswered && localState.myAnswer === i ? 'selected' : ''} ${iAnswered ? 'disabled' : ''}"
+            onclick="submitAnswer(${i})">
+            ${String.fromCharCode(65 + i)}) ${a}
+          </button>
+        `).join('')}
+      </div>
+    `;
+  } else if (q.type === 'estimate') {
+    content = `
+      <div class="question-type-label">🔢 Schätzfrage – Alle schätzen!</div>
+      <div class="question-text">${q.q}</div>
+      ${!iAnswered ? `
+        <div class="estimate-input">
+          <input type="number" id="estInput" placeholder="?" inputmode="decimal" />
+          ${q.unit ? `<span class="estimate-unit">${q.unit}</span>` : ''}
+        </div>
+        <button class="btn btn-primary" onclick="submitEstimateAnswer()">✓ Abgeben</button>
+      ` : `
+        <div class="result-box info">
+          <div class="result-detail">Deine Schätzung: <strong>${formatNumber(localState.myAnswer)}</strong> ${q.unit || ''}</div>
+        </div>
+      `}
+    `;
+  } else if (q.type === 'vote') {
+    content = `
+      <div class="question-type-label">🗳️ Abstimmung – Stimme ab!</div>
+      <div class="question-text">${q.q}</div>
+      <div>
+        ${q.options.map((o, i) => `
+          <button class="vote-btn ${iAnswered && localState.myAnswer === i ? 'selected' : ''} ${iAnswered ? 'disabled' : ''}"
+            onclick="submitAnswer(${i})" ${iAnswered ? 'disabled' : ''}>
+            ${o}
+          </button>
+        `).join('')}
+      </div>
+    `;
+  }
+
+  app.innerHTML = `
+    <div class="card">
+      ${renderScoreboard()}
+      <div class="round-info">Runde ${gameState.round + 1} / ${gameState.totalRounds}</div>
+      <div class="category-badge" style="background:${cat.color}">${cat.icon} ${cat.name}</div>
+      ${content}
+      <div class="answer-count">${iAnswered ? '✓ ' : ''}${answeredCount}/${totalPlayers} haben geantwortet</div>
+      ${iAnswered ? '<div class="waiting">Warte auf die anderen<span class="waiting-dots"></span></div>' : ''}
+    </div>
+  `;
+
+  if (q.type === 'estimate' && !iAnswered) {
+    setTimeout(() => { const el = document.getElementById('estInput'); if (el) el.focus(); }, 100);
+  }
+}
+
+function submitEstimateAnswer() {
+  const val = document.getElementById('estInput')?.value;
+  if (!val || isNaN(parseFloat(val))) return;
+  submitAnswer(parseFloat(val));
+}
+
+// RESULT
+function renderResult() {
+  const q = gameState.currentQuestion;
+  if (!q) return;
+  const cat = CATEGORIES.find(c => c.id === q.cat);
+
+  let resultContent = '';
+
+  if (q.type === 'quiz') {
+    const myCorrect = gameState.answers[myId] === q.correct;
+    const correctPlayers = gameState.players.filter(p => gameState.answers[p.id] === q.correct);
+
+    resultContent = `
+      <div class="result-box ${myCorrect ? 'success' : 'fail'}">
+        <div class="result-big">${myCorrect ? '✅ Richtig!' : '❌ Falsch!'}</div>
+        <div class="result-detail">Antwort: <strong>${q.answers[q.correct]}</strong></div>
+      </div>
+      ${correctPlayers.length > 0 ? `
+        <p style="text-align:center;font-weight:600;margin-top:8px;">
+          +2 Punkte für: ${correctPlayers.map(p => `<span style="color:${p.color}">${p.name}</span>`).join(', ')}
+        </p>
+      ` : '<p style="text-align:center;color:#888;">Niemand hatte recht!</p>'}
+    `;
+  } else if (q.type === 'estimate') {
+    const winner = gameState.players.find(p => p.id === gameState._estimateWinner);
+    const sorted = gameState.players
+      .map(p => ({ name: p.name, color: p.color, est: parseFloat(gameState.answers[p.id]), diff: Math.abs(parseFloat(gameState.answers[p.id]) - q.answer) }))
+      .filter(p => !isNaN(p.est))
+      .sort((a, b) => a.diff - b.diff);
+
+    resultContent = `
+      <div class="result-box info">
+        <div class="result-big">${formatNumber(q.answer)} ${q.unit || ''}</div>
+        <div class="result-detail">Die richtige Antwort</div>
+      </div>
+      <div class="vote-results">
+        ${sorted.map((s, i) => `
+          <div class="vote-result-row">
+            <div class="vote-result-name" style="color:${s.color}">${i === 0 ? '🏆' : ''} ${s.name}</div>
+            <div class="vote-result-bar-bg">
+              <div class="vote-result-bar" style="background:${s.color};width:${Math.max(15, 100 - (s.diff / Math.max(q.answer, 1) * 80))}%">
+                ${formatNumber(s.est)}
+              </div>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+      ${winner ? `<p style="text-align:center;font-weight:700;color:${winner.color};">🏆 ${winner.name} war am nächsten! +3 Punkte</p>` : ''}
+    `;
+  } else if (q.type === 'vote') {
+    const counts = gameState._voteCounts || {};
+    const majority = gameState._majorityOption;
+    const majorityPlayers = gameState.players.filter(p => gameState.answers[p.id] === majority);
+
+    resultContent = `
+      <div class="vote-results">
+        ${q.options.map((o, i) => {
+          const count = counts[i] || 0;
+          const pct = count / gameState.players.length * 100;
+          const isWin = i === majority;
+          return `
+            <div class="vote-result-row">
+              <div class="vote-result-name">${isWin ? '👑 ' : ''}${o.slice(0, 20)}</div>
+              <div class="vote-result-bar-bg">
+                <div class="vote-result-bar" style="background:${isWin ? 'var(--ms-gold)' : '#bbb'};width:${Math.max(10, pct)}%">
+                  ${count}×
+                </div>
+              </div>
+            </div>
+          `;
+        }).join('')}
+      </div>
+      <p style="text-align:center;font-weight:600;margin-top:8px;">
+        +1 Punkt für Mehrheit: ${majorityPlayers.map(p => `<span style="color:${p.color}">${p.name}</span>`).join(', ')}
+      </p>
+    `;
+  }
+
+  app.innerHTML = `
+    <div class="card">
+      ${renderScoreboard()}
+      <div class="category-badge" style="background:${cat.color}">${cat.icon} ${cat.name}</div>
+      <div class="question-text">${q.q}</div>
+      ${resultContent}
+      ${q.fact ? `<div class="fun-fact"><strong>💡 Wusstest du?</strong> ${q.fact}</div>` : ''}
+      ${getCurrentPlayer().id === myId ? `
+        <div class="btn-row">
+          <button class="btn btn-primary" onclick="onNextRound()">Weiter ➜</button>
+        </div>
+      ` : `
+        <div class="waiting" style="margin-top:14px;">${getCurrentPlayer().name} klickt weiter<span class="waiting-dots"></span></div>
+      `}
+    </div>
+  `;
+}
+
+// FINAL
+function renderFinal() {
+  const ranked = [...gameState.players].sort((a, b) => b.score - a.score);
+  const podiumOrder = ranked.length >= 3 ? [ranked[1], ranked[0], ranked[2]] : ranked.length >= 2 ? [ranked[1], ranked[0]] : [ranked[0]];
+  const heights = [140, 200, 110];
+  const medals = ['🥇','🥈','🥉'];
+
+  spawnConfetti();
+
+  app.innerHTML = `
+    <div class="card">
+      <h1>🏆 Spielende!</h1>
+      <p class="subtitle">${ranked[0].name} ist der Münster-Kenner!</p>
+
+      <div class="podium">
+        ${podiumOrder.map((p, i) => {
+          const rank = ranked.indexOf(p);
+          return `
+            <div class="podium-spot">
+              <div style="font-size:1.8rem">${medals[rank] || ''}</div>
+              <div class="podium-block" style="background:${p.color};height:${heights[i]}px">
+                <span class="podium-rank">#${rank + 1}</span>
+                <span class="podium-name">${p.name}</span>
+                <span class="podium-score">${p.score} Pkt</span>
+              </div>
+            </div>
+          `;
+        }).join('')}
+      </div>
+
+      ${ranked.length > 3 ? `
+        <ul style="list-style:none;padding:0;">
+          ${ranked.slice(3).map((p, i) => `
+            <li style="display:flex;justify-content:space-between;padding:8px 12px;border-radius:8px;margin-bottom:4px;font-weight:700;background:#f8f9fa;">
+              <span style="color:${p.color}">#${i+4} ${p.name}</span>
+              <span>${p.score} Punkte</span>
+            </li>
+          `).join('')}
+        </ul>
+      ` : ''}
+
+      ${role === 'host' ? `
+        <div class="btn-row">
+          <button class="btn btn-primary" onclick="restartGame()">🔄 Nochmal!</button>
+        </div>
+      ` : `
+        <div class="btn-row">
+          <button class="btn btn-secondary" onclick="location.reload()">↩️ Zurück zum Start</button>
+        </div>
+      `}
+    </div>
+  `;
+}
+
+function restartGame() {
+  gameState.phase = 'lobby';
+  gameState.round = 0;
+  gameState.players.forEach(p => p.score = 0);
+  gameState.usedQuestionIdxs = [];
+  broadcastState();
+}
+
+function onNextRound() {
+  if (role === 'host') {
+    nextRound();
+  } else {
+    sendToHost({ type: 'nextRound', playerId: myId });
+  }
+}
+
+function renderDisconnected() {
+  app.innerHTML = `
+    <div class="card">
+      <div class="result-box fail">
+        <div class="result-big">⚠️ Verbindung verloren</div>
+        <div class="result-detail">Die Verbindung zum Host wurde unterbrochen.</div>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-secondary" onclick="location.reload()">↩️ Zurück zum Start</button>
+      </div>
+    </div>
+  `;
+}
+
+function renderError() {
+  app.innerHTML = `
+    <div class="card">
+      <div class="result-box fail">
+        <div class="result-big">❌ Fehler</div>
+        <div class="result-detail">Konnte nicht verbinden. Ist der Raum-Code richtig?</div>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-secondary" onclick="location.reload()">↩️ Nochmal versuchen</button>
+      </div>
+    </div>
+  `;
+}
+
+// SCOREBOARD
+function renderScoreboard() {
+  return `<div class="scoreboard">
+    ${gameState.players.map((p, i) => `
+      <div class="score-chip ${i === gameState.currentPlayerIdx ? 'active' : ''}" style="background:${p.color}">
+        ${p.name.slice(0,8)} <span class="pts">${p.score}</span>
+      </div>
+    `).join('')}
+  </div>`;
+}
+
+// HELPERS
+function formatNumber(n) {
+  if (n === undefined || n === null) return '?';
+  if (Math.abs(n) >= 10000) return Math.round(n).toLocaleString('de-DE');
+  return String(n).replace('.', ',');
+}
+
+function spawnConfetti() {
+  const colors = ['#e63946','#457b9d','#2d6a4f','#f4a261','#6a4c93','#1982c4','#ff006e','#ffbe0b'];
+  for (let i = 0; i < 50; i++) {
+    const el = document.createElement('div');
+    el.className = 'confetti-piece';
+    el.style.left = Math.random() * 100 + 'vw';
+    el.style.background = colors[Math.floor(Math.random() * colors.length)];
+    el.style.width = (6 + Math.random() * 8) + 'px';
+    el.style.height = (6 + Math.random() * 8) + 'px';
+    el.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
+    el.style.animationDuration = (2 + Math.random() * 3) + 's';
+    el.style.animationDelay = Math.random() * 2 + 's';
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 6000);
+  }
+}
+
+// INIT
+render();
+</script>
+</body>
+</html>
