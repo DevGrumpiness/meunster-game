@@ -609,18 +609,28 @@ function evaluateRound() {
     });
     gameState._estimateWinner = bestId;
   } else if (q.type === 'vote') {
-    // Majority vote gets 1 point
+    // Majority vote gets 1 point – but only if there IS a clear majority (no tie)
     const counts = {};
     Object.values(gameState.answers).forEach(v => { counts[v] = (counts[v] || 0) + 1; });
-    let maxVotes = 0, majorityOpt = -1;
-    Object.entries(counts).forEach(([opt, cnt]) => {
-      if (cnt > maxVotes) { maxVotes = cnt; majorityOpt = +opt; }
-    });
+    let maxVotes = 0;
+    Object.values(counts).forEach(cnt => { if (cnt > maxVotes) maxVotes = cnt; });
+    // Check if multiple options share the max (= tie)
+    const topOptions = Object.entries(counts).filter(([opt, cnt]) => cnt === maxVotes);
     gameState._voteCounts = counts;
-    gameState._majorityOption = majorityOpt;
-    gameState.players.forEach(p => {
-      if (gameState.answers[p.id] === majorityOpt) p.score += 1;
-    });
+
+    if (topOptions.length === 1) {
+      // Clear majority – award points
+      const majorityOpt = +topOptions[0][0];
+      gameState._majorityOption = majorityOpt;
+      gameState._voteTie = false;
+      gameState.players.forEach(p => {
+        if (gameState.answers[p.id] === majorityOpt) p.score += 1;
+      });
+    } else {
+      // Tie – no points
+      gameState._majorityOption = -1;
+      gameState._voteTie = true;
+    }
   }
 
   gameState.phase = 'result';
@@ -934,14 +944,15 @@ function renderResult() {
   } else if (q.type === 'vote') {
     const counts = gameState._voteCounts || {};
     const majority = gameState._majorityOption;
-    const majorityPlayers = gameState.players.filter(p => gameState.answers[p.id] === majority);
+    const isTie = gameState._voteTie;
+    const majorityPlayers = isTie ? [] : gameState.players.filter(p => gameState.answers[p.id] === majority);
 
     resultContent = `
       <div class="vote-results">
         ${q.options.map((o, i) => {
           const count = counts[i] || 0;
           const pct = count / gameState.players.length * 100;
-          const isWin = i === majority;
+          const isWin = !isTie && i === majority;
           return `
             <div class="vote-result-row">
               <div class="vote-result-name">${isWin ? '👑 ' : ''}${o.slice(0, 20)}</div>
@@ -954,9 +965,15 @@ function renderResult() {
           `;
         }).join('')}
       </div>
-      <p style="text-align:center;font-weight:600;margin-top:8px;">
-        +1 Punkt für Mehrheit: ${majorityPlayers.map(p => `<span style="color:${p.color}">${p.name}</span>`).join(', ')}
-      </p>
+      ${isTie ? `
+        <p style="text-align:center;font-weight:600;margin-top:8px;color:#888;">
+          ⚖️ Gleichstand – keine Punkte!
+        </p>
+      ` : `
+        <p style="text-align:center;font-weight:600;margin-top:8px;">
+          +1 Punkt für Mehrheit: ${majorityPlayers.map(p => `<span style="color:${p.color}">${p.name}</span>`).join(', ')}
+        </p>
+      `}
     `;
   }
 
