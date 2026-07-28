@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>Münster Kenner – Multiplayer</title>
+<title>Münster Game – Multiplayer</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🚲</text></svg>">
 <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
 <style>
@@ -271,7 +271,7 @@
 
 <script>
 // ============================================================
-// MÜNSTER KENNER – MULTIPLAYER (PeerJS WebRTC)
+// MÜNSTER GAME – MULTIPLAYER (PeerJS WebRTC)
 // ============================================================
 
 const PLAYER_COLORS = ['#e63946','#457b9d','#2d6a4f','#f4a261','#6a4c93','#1982c4'];
@@ -815,7 +815,7 @@ function render() {
 function renderHome() {
   app.innerHTML = `
     <div class="card">
-      <h1><span class="bike">🚲</span> Münster Kenner</h1>
+      <h1><span class="bike">🚲</span> Münster Game</h1>
       <p class="subtitle">Das Multiplayer-Partyspiel für echte Münsteraner!</p>
 
       <div style="margin-bottom:16px;">
@@ -870,7 +870,7 @@ function renderLobby() {
 
   app.innerHTML = `
     <div class="card">
-      <h1><span class="bike">🚲</span> Münster Kenner</h1>
+      <h1><span class="bike">🚲</span> Münster Game</h1>
       <p class="subtitle">Warteraum</p>
 
       <p style="text-align:center;font-weight:600;margin-bottom:6px;">Raum-Code:</p>
@@ -1190,7 +1190,7 @@ function renderFinal() {
   app.innerHTML = `
     <div class="card">
       <h1>🏆 Spielende!</h1>
-      <p class="subtitle">${ranked[0].name} ist der Münster-Kenner!</p>
+      <p class="subtitle">${ranked[0].name} gewinnt das Münster Game!</p>
 
       <div class="podium">
         ${podiumOrder.map((p, i) => {
@@ -1330,7 +1330,7 @@ render();
   <div style="max-width:500px;margin:40px auto;background:white;border-radius:16px;padding:24px;">
     <h2 style="font-family:'Fredoka One',cursive;color:#1d3557;">Datenschutz</h2>
     <p style="font-size:0.9rem;line-height:1.6;margin:12px 0;">
-      <strong>Münster Kenner</strong> ist ein kostenloses Partyspiel. Wir nehmen Datenschutz ernst:
+      <strong>Münster Game</strong> ist ein kostenloses Partyspiel. Wir nehmen Datenschutz ernst:
     </p>
     <ul style="font-size:0.85rem;line-height:1.8;padding-left:20px;">
       <li>🍪 <strong>Keine Cookies</strong> – wir setzen keine Tracking-Cookies.</li>
@@ -1343,7 +1343,7 @@ render();
     <button class="btn btn-secondary" style="margin-top:16px;" onclick="document.getElementById('datenschutz-overlay').style.display='none'">Schließen</button>
   </div>
 </div>
-<script data-goatcounter="https://muenster-kenner.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
+<script data-goatcounter="https://ms-game.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
 <div style="position:fixed;bottom:4px;left:0;right:0;text-align:center;font-size:0.6rem;color:rgba(255,255,255,0.4);pointer-events:none;z-index:0;">
   Foto: Dietmar Rabich / Wikimedia Commons / CC BY-SA 4.0
 </div>
