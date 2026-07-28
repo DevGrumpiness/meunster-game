@@ -256,6 +256,33 @@
 
   .hidden { display: none !important; }
 
+  /* Glücksrad */
+  .wheel-container { position: relative; width: 220px; height: 220px; margin: 20px auto; }
+  .wheel {
+    width: 220px; height: 220px; border-radius: 50%;
+    border: 4px solid #1d3557; position: relative;
+    overflow: hidden; transition: transform 4s cubic-bezier(0.17, 0.67, 0.12, 0.99);
+  }
+  .wheel-segment {
+    position: absolute; width: 50%; height: 50%; left: 50%; top: 50%;
+    transform-origin: 0 0; display: flex; align-items: center; justify-content: center;
+    font-size: 1.8rem;
+  }
+  .wheel-pointer {
+    position: absolute; top: -16px; left: 50%; transform: translateX(-50%);
+    font-size: 1.6rem; z-index: 10; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+  }
+  .wheel-label { text-align: center; margin-top: 12px; font-weight: 600; font-size: 1.1rem; color: var(--ms-blue); min-height: 1.4em; }
+  .wheel-spin-btn {
+    display: block; margin: 12px auto 0; padding: 10px 28px;
+    background: var(--ms-blue); color: white; border: none; border-radius: 10px;
+    font-family: inherit; font-size: 1rem; font-weight: 600; cursor: pointer;
+  }
+  .wheel-spin-btn:disabled { opacity: 0.4; cursor: default; }
+
+  /* Test button (local only) */
+  .test-btn { background: #666; color: white; font-size: 0.75rem; padding: 6px 14px; border: 1px dashed #999; border-radius: 8px; cursor: pointer; font-family: inherit; margin-top: 8px; }
+
   /* Settings */
   .settings-row { display: flex; align-items: center; justify-content: space-between; margin: 10px 0; }
   .settings-row label { font-weight: 600; font-size: 0.95rem; }
@@ -549,6 +576,22 @@ function handleHostMessage(conn, data) {
       }
       break;
     }
+    case 'wheelSpin': {
+      if (gameState.phase === 'categorySelect') {
+        const cp = getCurrentPlayer();
+        if (data.playerId === cp.id || conn._playerId === cp.id) {
+          // Broadcast spin animation to all other players (and animate on host)
+          broadcastWheelSpin(data.catId, data.winnerIdx);
+          const availCats = CATEGORIES.filter(c =>
+            QUESTIONS.some((q, i) => q.cat === c.id && !gameState.usedQuestionIdxs.includes(i))
+          );
+          const segAngle = 360 / availCats.length;
+          const winnerCat = availCats[data.winnerIdx];
+          if (winnerCat) animateWheelLocal(winnerCat, data.winnerIdx, segAngle);
+        }
+      }
+      break;
+    }
     case 'nextRound': {
       // The current player (whose turn it is) can advance
       const cp = getCurrentPlayer();
@@ -592,8 +635,21 @@ function broadcastAnswerUpdate() {
   }
 }
 
+// HOST: broadcast wheel spin to all players
+function broadcastWheelSpin(winnerCatId, winnerIdx) {
+  const msg = { type: 'wheelSpin', catId: winnerCatId, winnerIdx };
+  connections.forEach(c => {
+    try { c.send(msg); } catch(e) {}
+  });
+}
+
 // PLAYER: handle messages from host
 function handlePlayerMessage(data) {
+  if (data.type === 'wheelSpin') {
+    // Animate wheel on non-host player's screen
+    animateWheelRemote(data.catId, data.winnerIdx);
+    return;
+  }
   if (data.type === 'state') {
     const oldPhase = gameState.phase;
     const oldAnswerCount = Object.keys(gameState.answers || {}).length;
@@ -836,6 +892,7 @@ function renderHome() {
         </div>
       </div>
       <p style="text-align:center;margin-top:16px;"><a href="#" onclick="document.getElementById('datenschutz-overlay').style.display='flex';return false;" style="color:#999;font-size:0.75rem;text-decoration:none;">🔒 Datenschutz</a></p>
+      ${location.protocol === 'file:' ? '<div style="text-align:center;"><button class="test-btn" onclick="onTestMode()">🧪 Testen (Solo)</button></div>' : ''}
     </div>
   `;
 }
@@ -861,6 +918,23 @@ function onJoinRoom() {
   localStorage.setItem('mk-name', name);
   app.innerHTML = `<div class="card"><div class="waiting">Verbinde mit Raum ${code}<span class="waiting-dots"></span></div></div>`;
   joinRoom(name, code);
+}
+
+function onTestMode() {
+  const name = document.getElementById('nameInput').value.trim() || 'Tester';
+  localStorage.setItem('mk-name', name);
+  role = 'host';
+  myId = 'test-host';
+  roomCode = 'TEST';
+  gameState.players = [{ id: 'test-host', name, color: PLAYER_COLORS[0], score: 0, connected: true }];
+  gameState.totalRounds = Infinity;
+  gameState.round = 0;
+  gameState.currentPlayerIdx = 0;
+  gameState.usedQuestionIdxs = [];
+  gameState.usedCategories = {};
+  CATEGORIES.forEach(c => gameState.usedCategories[c.id] = 0);
+  gameState.phase = 'categorySelect';
+  render();
 }
 
 // LOBBY
@@ -923,35 +997,114 @@ function renderCategorySelect() {
   const cp = getCurrentPlayer();
   const isMyTurn = cp.id === myId;
 
+  // Filter categories that still have questions
+  const availCats = CATEGORIES.filter(c =>
+    QUESTIONS.some((q, i) => q.cat === c.id && !gameState.usedQuestionIdxs.includes(i))
+  );
+
+  if (availCats.length === 0) {
+    // No questions left at all
+    gameState.phase = 'results';
+    if (role === 'host') broadcastState();
+    render();
+    return;
+  }
+
+  // Build wheel segments - each segment gets equal slice
+  const segCount = availCats.length;
+  const segAngle = 360 / segCount;
+
   app.innerHTML = `
     <div class="card">
       ${renderScoreboard()}
       <div class="round-info">Runde ${gameState.round + 1}${gameState.totalRounds === Infinity ? '' : ' / ' + gameState.totalRounds}</div>
       <div class="turn-banner" style="background:${cp.color}">
-        ${isMyTurn ? '🎯 Du wählst eine Kategorie!' : `${cp.name} wählt...`}
+        ${isMyTurn ? '🎯 Dreh das Glücksrad!' : `${cp.name} dreht...`}
       </div>
-      ${isMyTurn ? `
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-          ${CATEGORIES.map(c => {
-            const avail = QUESTIONS.filter((q, i) => q.cat === c.id && !gameState.usedQuestionIdxs.includes(i)).length;
-            const disabled = avail === 0;
-            return `
-              <button style="padding:14px 8px;border:2px solid ${c.color}33;border-radius:14px;background:white;cursor:pointer;text-align:center;font-family:inherit;transition:all 0.2s;${disabled ? 'opacity:0.3;pointer-events:none;' : ''}" onclick="hostSelectCategory('${c.id}')">
-                <div style="font-size:1.6rem;margin-bottom:4px;">${c.icon}</div>
-                <div style="font-weight:600;font-size:0.8rem;color:var(--ms-blue);">${c.name}</div>
-                <div style="font-size:0.7rem;color:#999;">${avail} übrig</div>
-              </button>
-            `;
+
+      <div class="wheel-container">
+        <div class="wheel-pointer">▼</div>
+        <div class="wheel" id="theWheel">
+          ${availCats.map((c, i) => {
+            const rotate = i * segAngle;
+            const skew = -(90 - segAngle);
+            return `<div class="wheel-segment" style="transform: rotate(${rotate}deg) skew(${skew}deg); background:${c.color};" data-cat="${c.id}">
+              <span style="transform: skew(${-skew}deg) rotate(${segAngle/2}deg); font-size:${segCount <= 4 ? '2rem' : '1.5rem'};">${c.icon}</span>
+            </div>`;
           }).join('')}
         </div>
-      ` : `
-        <div class="waiting">Warte auf Kategorieauswahl<span class="waiting-dots"></span></div>
-      `}
+      </div>
+      <div class="wheel-label" id="wheelLabel"></div>
+
+      ${isMyTurn ? '<button class="wheel-spin-btn" id="spinBtn" onclick="spinWheel()">🎰 Drehen!</button>' : '<div class="waiting">Warte auf Drehung<span class="waiting-dots"></span></div>'}
     </div>
   `;
 }
 
+function spinWheel() {
+  const btn = document.getElementById('spinBtn');
+  if (btn) btn.disabled = true;
+
+  const availCats = CATEGORIES.filter(c =>
+    QUESTIONS.some((q, i) => q.cat === c.id && !gameState.usedQuestionIdxs.includes(i))
+  );
+  const segCount = availCats.length;
+  const segAngle = 360 / segCount;
+
+  // Pick random winner
+  const winnerIdx = Math.floor(Math.random() * segCount);
+  const winnerCat = availCats[winnerIdx];
+
+  // Animate locally
+  animateWheelLocal(winnerCat, winnerIdx, segAngle);
+
+  if (role === 'host') {
+    // Broadcast to other players so they see the animation
+    broadcastWheelSpin(winnerCat.id, winnerIdx);
+  } else {
+    // Tell host to broadcast spin + select category after delay
+    sendToHost({ type: 'wheelSpin', catId: winnerCat.id, winnerIdx, playerId: myId });
+  }
+}
+
+function animateWheelLocal(winnerCat, winnerIdx, segAngle) {
+  const targetAngle = 360 * 5 + (360 - (winnerIdx * segAngle + segAngle / 2));
+  const wheel = document.getElementById('theWheel');
+  if (wheel) wheel.style.transform = `rotate(${targetAngle}deg)`;
+
+  setTimeout(() => {
+    const label = document.getElementById('wheelLabel');
+    if (label) label.textContent = `${winnerCat.icon} ${winnerCat.name}!`;
+  }, 2500);
+
+  setTimeout(() => {
+    if (role === 'host') {
+      selectCategory(winnerCat.id);
+    }
+  }, 4000);
+}
+
+function animateWheelRemote(catId, winnerIdx) {
+  const availCats = CATEGORIES.filter(c =>
+    QUESTIONS.some((q, i) => q.cat === c.id && !gameState.usedQuestionIdxs.includes(i))
+  );
+  const segCount = availCats.length;
+  const segAngle = 360 / segCount;
+  const winnerCat = availCats[winnerIdx] || CATEGORIES.find(c => c.id === catId);
+  if (!winnerCat) return;
+
+  const targetAngle = 360 * 5 + (360 - (winnerIdx * segAngle + segAngle / 2));
+  const wheel = document.getElementById('theWheel');
+  if (wheel) wheel.style.transform = `rotate(${targetAngle}deg)`;
+
+  setTimeout(() => {
+    const label = document.getElementById('wheelLabel');
+    if (label) label.textContent = `${winnerCat.icon} ${winnerCat.name}!`;
+  }, 2500);
+}
+
 function hostSelectCategory(catId) {
+  // Legacy - still needed for network messages
   if (role === 'host') {
     selectCategory(catId);
   } else {
