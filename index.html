@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>Münster Kenner – Multiplayer</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🚲</text></svg>">
 <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap');
@@ -36,10 +37,10 @@
     content: '';
     position: fixed;
     top: 0; left: 0; right: 0; bottom: 0;
-    background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/d/d7/M%C3%BCnster%2C_Prinzipalmarkt%2C_Fahrr%C3%A4der_--_2022_--_0064.jpg/1920px-M%C3%BCnster%2C_Prinzipalmarkt%2C_Fahrr%C3%A4der_--_2022_--_0064.jpg');
+    background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/M%C3%BCnster%2C_Prinzipalmarkt_--_2019_--_3558.jpg/1920px-M%C3%BCnster%2C_Prinzipalmarkt_--_2019_--_3558.jpg');
     background-size: cover;
     background-position: center;
-    filter: blur(6px) brightness(0.35);
+    filter: blur(8px) brightness(0.4);
     z-index: -1;
   }
 
@@ -55,13 +56,12 @@
   }
 
   .card {
-    background: rgba(255, 255, 255, 0.96);
+    background: rgba(255, 255, 255, 0.97);
     border-radius: var(--ms-radius);
     box-shadow: var(--ms-shadow);
     padding: 28px 20px;
     width: 100%;
     animation: fadeIn 0.35s ease;
-    backdrop-filter: blur(4px);
   }
 
   @keyframes fadeIn { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
@@ -70,15 +70,15 @@
   @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.5; } }
   @keyframes confetti-fall { 0% { transform: translateY(-100vh) rotate(0deg); opacity:1; } 100% { transform: translateY(100vh) rotate(720deg); opacity:0; } }
 
-  h1 { font-family: 'Fredoka One', cursive; font-size: 2.2rem; color: var(--ms-blue); text-align: center; margin-bottom: 6px; }
+  h1 { font-family: 'Fredoka One', cursive; font-size: 2.2rem; font-weight: 400; color: var(--ms-blue); text-align: center; margin-bottom: 6px; }
   h1 .bike { display: inline-block; animation: shake 2s ease infinite; }
-  .subtitle { text-align: center; color: var(--ms-green); font-weight: 700; font-size: 1rem; margin-bottom: 24px; }
+  .subtitle { text-align: center; color: var(--ms-green); font-weight: 600; font-size: 1rem; margin-bottom: 24px; }
   h2 { font-family: 'Fredoka One', cursive; font-size: 1.4rem; color: var(--ms-blue); margin-bottom: 12px; }
 
   .btn {
     display: inline-flex; align-items: center; justify-content: center; gap: 8px;
     padding: 14px 24px; border: none; border-radius: 12px;
-    font-family: 'Fredoka One', cursive; font-size: 1.05rem;
+    font-family: 'Fredoka One', cursive; font-size: 1.05rem; font-weight: 400;
     cursor: pointer; transition: all 0.2s; color: white; width: 100%;
   }
   .btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.15); }
@@ -125,12 +125,12 @@
   /* Scoreboard */
   .scoreboard { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; justify-content: center; }
   .score-chip {
-    display: flex; align-items: center; gap: 6px;
-    padding: 6px 14px; border-radius: 24px; font-weight: 700;
-    font-size: 0.85rem; color: white; transition: all 0.3s;
+    display: flex; align-items: center; gap: 5px;
+    padding: 5px 10px; border-radius: 20px; font-weight: 500;
+    font-size: 0.75rem; color: white; transition: all 0.3s;
   }
-  .score-chip.active { transform: scale(1.12); box-shadow: 0 4px 14px rgba(0,0,0,0.25); }
-  .score-chip .pts { font-family: 'Fredoka One', cursive; font-size: 1rem; }
+  .score-chip.active { transform: scale(1.08); box-shadow: 0 3px 10px rgba(0,0,0,0.2); }
+  .score-chip .pts { font-family: 'Fredoka One', cursive; font-size: 0.85rem; }
 
   /* Question */
   .category-badge {
@@ -217,7 +217,7 @@
   /* Current player banner */
   .turn-banner {
     text-align: center; padding: 10px; border-radius: 12px;
-    margin-bottom: 14px; font-weight: 700; font-size: 1rem; color: white;
+    margin-bottom: 14px; font-weight: 600; font-size: 1rem; color: white;
   }
 
   /* Podium */
@@ -294,6 +294,7 @@ const QUESTIONS = [
   { cat:'kneipen', type:'quiz', q:'Welches Viertel ist für Cafés und Boutiquen bekannt?', answers:['Kreuzviertel','Hansaviertel','Hafen','Gievenbeck'], correct:0, fact:'Das Kreuzviertel rund um Kreuz- und Schillerstraße ist bekannt für Café-Kultur und entspannte Atmosphäre.' },
   { cat:'kneipen', type:'vote', q:'Bester Ort für ein erstes Date in Münster?', options:['Aasee-Spaziergang 🌅','Hafen-Viertel 🍷','Botanischer Garten 🌺','Prinzipalmarkt-Bummel 🏛️'] },
   { cat:'kneipen', type:'quiz', q:'Wie heißt die bekannte Cocktailbar an der Kreuzstraße?', answers:['Grotemeyer','Pension Schmidt','Hot Jazz Club','Cavete'], correct:1, fact:'Die Pension Schmidt ist bekannt für kreative Cocktails in gemütlicher Atmosphäre mitten auf der Kreuzstraße.' },
+  { cat:'kneipen', type:'höher_tiefer', q:'Wie viele Cocktails hat die Pension Schmidt auf der Karte?', reference:50, answer:80, unit:'Cocktails', fact:'Die Pension Schmidt hat über 80 verschiedene Cocktails – eine der umfangreichsten Karten in Münster.' },
   { cat:'kneipen', type:'quiz', q:'Welche Studenten-Kneipe am Alten Steinweg ist für ihre Graffiti-Wände bekannt?', answers:['Cavete','Destille','Blaues Haus','Gasolin'], correct:0, fact:'Die Cavete ist eine legendäre Studentenkneipe seit 1959 – mit Biergarten, günstigen Preisen und viel Charme.' },
   { cat:'kneipen', type:'quiz', q:'Wo findet man die meisten Bars und Clubs auf engem Raum?', answers:['Kreuzstraße/Kuhviertel','Hafen','Prinzipalmarkt','Gievenbeck'], correct:0, fact:'Das Kuhviertel und die Kreuzstraße sind die zwei Hotspots – wer feiern will, kommt hier nicht vorbei.' },
   { cat:'kneipen', type:'quiz', q:'Welche Bar im Kuhviertel ist für Live-Jazz bekannt?', answers:['Hot Jazz Club','Blaues Haus','Gorilla Bar','Mata Hari'], correct:0, fact:'Der Hot Jazz Club im Kuhviertel bietet regelmäßig Live-Jazz, Blues und Soul in intimem Setting.' },
@@ -317,11 +318,14 @@ const QUESTIONS = [
   { cat:'fahrrad', type:'quiz', q:'Wie heißt der autofreie Ring um die Altstadt?', answers:['Promenade','Veloroute','Ringallee','Fahrradwall'], correct:0, fact:'Die 4,5 km lange Promenade ist Deutschlands längste autofreie Fahrrad-Allee rund um eine Altstadt!' },
   { cat:'fahrrad', type:'estimate', q:'Wie viele Fahrräder gibt es in Münster?', answer:500000, unit:'', tolerance:100000, fact:'Ca. 500.000 Fahrräder bei 320.000 Einwohnern – deutlich mehr Räder als Menschen!' },
   { cat:'fahrrad', type:'quiz', q:'Wie heißt das große Fahrrad-Parkhaus am Hauptbahnhof?', answers:['Radstation','Bike Tower','Pedaleum','Fahrradburg'], correct:0, fact:'Die Radstation bietet Platz für über 3.300 Fahrräder – eine der größten Deutschlands.' },
+  { cat:'fahrrad', type:'höher_tiefer', q:'Wie viele Fahrrad-Stellplätze hat die Radstation am Hbf?', reference:2000, answer:3300, unit:'Plätze', fact:'Die Radstation hat über 3.300 Stellplätze und ist damit eine der größten Deutschlands.' },
   { cat:'fahrrad', type:'quiz', q:'Was ist eine "Leeze"?', answers:['Münsteraner Wort für Fahrrad','Ein Radweg','Eine Bremse','Ein Festival'], correct:0, fact:'"Leeze" ist Masematte für Fahrrad. Wer "Leeze" sagt, ist ein echter Münsteraner!' },
   { cat:'fahrrad', type:'estimate', q:'Wie lang ist die Promenade in Kilometern?', answer:4.5, unit:'km', tolerance:1.2, fact:'Die Promenade ist exakt 4,5 km lang und folgt dem Verlauf der ehemaligen Stadtbefestigung.' },
   { cat:'fahrrad', type:'quiz', q:'Wie viele Räder kommen auf einen Einwohner?', answers:['Ca. 1,5','Ca. 0,8','Ca. 2,5','Ca. 1,0'], correct:0, fact:'Mit ca. 1,5 Fahrrädern pro Einwohner ist Münster die fahrradfreundlichste Großstadt Deutschlands.' },
   { cat:'fahrrad', type:'vote', q:'Was nervt Münsteraner Radfahrer am meisten?', options:['Fußgänger auf dem Radweg 🚶','Gegenverkehr auf der Promenade 🔄','Fahrraddiebstahl 🔒','Kopfsteinpflaster 🪨'] },
   { cat:'fahrrad', type:'quiz', q:'Beim ADFC-Fahrradklima-Test belegt Münster regelmäßig...', answers:['Platz 1 bei Großstädten','Einen Mittelfeldplatz','Den letzten Platz','Platz 3'], correct:0, fact:'Münster ist seit Jahren auf Platz 1 der fahrradfreundlichsten Großstädte beim ADFC-Test.' },
+  { cat:'fahrrad', type:'quiz', q:'Was passiert mit Fahrrädern, die lange am Bahnhof angekettet bleiben?', answers:['Sie werden vom Ordnungsamt entfernt','Nichts','Sie werden versteigert','Sie kommen ins Museum'], correct:0, fact:'Das Ordnungsamt markiert und entfernt regelmäßig "Fahrradleichen" – über 1.000 pro Jahr werden abgeschleppt!' },
+  { cat:'fahrrad', type:'estimate', q:'Wie viele Kilometer Radwege hat Münster insgesamt?', answer:480, unit:'km', tolerance:100, fact:'Münster hat rund 480 km Radwege – das sind mehr Radwege als manche Städte Straßen haben!' },
 
   // ===== SEHENSWÜRDIGKEITEN =====
   { cat:'sights', type:'quiz', q:'Was hängt am Turm der Lambertikirche?', answers:['Drei Eisenkäfige','Eine goldene Glocke','Ein Wetterhahn','Eine Uhr'], correct:0, fact:'In den Käfigen wurden 1536 die Wiedertäufer-Anführer ausgestellt. Die Käfige hängen bis heute dort!' },
@@ -332,10 +336,12 @@ const QUESTIONS = [
   { cat:'sights', type:'quiz', q:'Was sind die "Skulptur Projekte"?', answers:['Kunstausstellung alle 10 Jahre','Steinmetz-Wettbewerb','Uni-Architekturprojekt','Skulpturen-Werkstatt'], correct:0, fact:'Die Skulptur Projekte finden seit 1977 alle 10 Jahre statt und machen Münster zum Open-Air-Museum.' },
   { cat:'sights', type:'vote', q:'Schönstes Fotomotiv in Münster?', options:['Prinzipalmarkt-Giebel 🏛️','Aasee-Sonnenuntergang 🌅','Lambertikirche nachts 🕯️','Hafen-Kräne 🏗️'] },
   { cat:'sights', type:'quiz', q:'Wie heißt der künstliche See mitten in Münster?', answers:['Aasee','Münstersee','Schlosssee','Domteich'], correct:0, fact:'Der Aasee wurde 1934 aufgestaut und ist heute DAS Naherholungsgebiet – zum Joggen, Segeln, Grillen.' },
+  { cat:'sights', type:'höher_tiefer', q:'Wie viele Giebelhäuser stehen am Prinzipalmarkt?', reference:30, answer:48, unit:'Häuser', fact:'Am Prinzipalmarkt stehen 48 historische Giebelhäuser – nach dem Krieg originalgetreu wiederaufgebaut.' },
 
   // ===== ESSEN & TRINKEN =====
   { cat:'essen', type:'quiz', q:'Welches Gericht ist typisch münsterländisch?', answers:['Töttchen','Labskaus','Maultaschen','Sauerbraten'], correct:0, fact:'Töttchen ist ein süß-saures Ragout aus Kalbsfleisch – klingt seltsam, schmeckt aber großartig!' },
   { cat:'essen', type:'quiz', q:'Welches Brot wird 16+ Stunden gebacken?', answers:['Pumpernickel','Schwarzbrot','Vollkorntoast','Roggenbrot'], correct:0, fact:'Echtes Pumpernickel wird mindestens 16 Stunden bei niedriger Temperatur gebacken. Hält sich monatelang!' },
+  { cat:'essen', type:'höher_tiefer', q:'Wie viele Stunden wird echtes Pumpernickel mindestens gebacken?', reference:8, answer:16, unit:'Stunden', fact:'Echtes Westfälisches Pumpernickel wird mindestens 16, oft sogar 24 Stunden bei niedriger Temperatur gebacken!' },
   { cat:'essen', type:'quiz', q:'Was sind "Struwen"?', answers:['Hefepfannkuchen mit Rosinen','Brezeln','Kartoffelpuffer','Waffeln'], correct:0, fact:'Struwen sind dicke Hefepfannkuchen mit Rosinen – traditionell am Karfreitag, aber auch an Imbissständen.' },
   { cat:'essen', type:'estimate', q:'Wie viele Stände hat der Domplatz-Wochenmarkt?', answer:150, unit:'Stände', tolerance:40, fact:'Rund 150 Stände machen den Domplatz-Markt zu einem der größten und schönsten in ganz Deutschland.' },
   { cat:'essen', type:'quiz', q:'Wofür ist "Westfälischer Knochenschinken" bekannt?', answers:['Luftgetrocknet & über Buche geräuchert','Gekocht in Bier','Paniert & frittiert','Süß mariniert'], correct:0, fact:'Der Westfälische Knochenschinken wird monatelang luftgetrocknet und über Buchenholz geräuchert.' },
@@ -344,16 +350,22 @@ const QUESTIONS = [
   { cat:'essen', type:'quiz', q:'Welches günstige Restaurant am Hafen ist für seine Burger bekannt?', answers:['Flamingos','Heaven','Alex','Pier 31'], correct:0, fact:'Flamingos am Hafen ist beliebt für solide Burger, lockere Atmosphäre und faire Preise – Studenten-Treff!' },
   { cat:'essen', type:'quiz', q:'Wo bekommt man den besten Döner laut Münster-Studierenden?', answers:['Verschiedene Favoriten – aber Wolbecker Str. wird oft genannt','Prinzipalmarkt','Aasee','Handorf'], correct:0, fact:'Münster hat eine lebendige Döner-Debatte – die Wolbecker Straße und der Bahnhof werden oft genannt, aber jeder hat seinen Geheim-Tipp!' },
   { cat:'essen', type:'vote', q:'Bester Spot für günstiges Mittagessen in Münster?', options:['Mensa am Aasee 🍝','Döner Wolbecker Str. 🥙','Asia-Imbiss Altstadt 🍜','Markt am Domplatz 🥨'] },
+  { cat:'essen', type:'quiz', q:'Welches Café am Domplatz ist für seinen Kuchen stadtbekannt?', answers:['Café Kleimann','Starbucks','Café Extrablatt','McCafé'], correct:0, fact:'Café Kleimann am Domplatz ist eine Institution – Kuchen, Torten und Frühstück in traditionellem Ambiente seit Jahrzehnten.' },
+  { cat:'essen', type:'quiz', q:'Was ist ein typischer Snack auf dem Send?', answers:['Reibekuchen (Kartoffelpuffer)','Sushi','Frozen Yogurt','Baguette'], correct:0, fact:'Reibekuchen mit Apfelmus sind DER Send-Klassiker – dazu eine Bratwurst und ein Bier, perfekter Kirmes-Abend!' },
+  { cat:'essen', type:'estimate', q:'Wie viel kostet ein Pinkus Alt im Brauhaus ungefähr (0,3l)?', answer:3.5, unit:'€', tolerance:1.5, fact:'Ein kleines Pinkus Alt kostet ca. 3,50€ – für ein handgebrautes Bio-Altbier ein fairer Preis.' },
 
   // ===== UNI & KULTUR =====
   { cat:'kultur', type:'quiz', q:'Wie heißt die Universität offiziell?', answers:['Westfälische Wilhelms-Universität','Universität Münster','Friedensuni','Albertus-Magnus-Uni'], correct:0, fact:'Die WWU wurde 1780 gegründet – mit 43.000 Studierenden eine der größten Deutschlands. 2023 umbenannt zu "Universität Münster".' },
   { cat:'kultur', type:'estimate', q:'Wie viele Studierende hat die Uni Münster?', answer:43000, unit:'', tolerance:8000, fact:'Rund 43.000 Studierende – fast jeder 7. Einwohner studiert!' },
+  { cat:'kultur', type:'höher_tiefer', q:'Wie viele Fachbereiche hat die Uni Münster?', reference:10, answer:15, unit:'', fact:'Die Uni Münster hat 15 Fachbereiche – von Theologie über Medizin bis Geowissenschaften.' },
   { cat:'kultur', type:'quiz', q:'Was ist "Masematte"?', answers:['Münsteraner Geheimsprache','Karnevalsverein','Stadtteil','Biermischgetränk'], correct:0, fact:'Masematte entstand im 19. Jh. aus Rotwelsch, Jiddisch und Romani. "Leeze" (Fahrrad), "jovel" (gut), "Meese" (Geld).' },
   { cat:'kultur', type:'quiz', q:'Was bedeutet "jovel"?', answers:['Gut / toll','Schlecht','Fahrrad','Bier'], correct:0, fact:'"Jovel" heißt "gut/toll" – kommt aus dem Hebräischen. Wenn was jovel ist, ist es super!' },
   { cat:'kultur', type:'quiz', q:'Welcher Tatort-Ermittler kommt aus Münster?', answers:['Thiel & Boerne','Wallander','Derrick','Faber'], correct:0, fact:'Der Münster-Tatort mit Thiel & Boerne ist der beliebteste überhaupt – regelmäßig 14+ Mio. Zuschauer!' },
   { cat:'kultur', type:'quiz', q:'Das Kunstmuseum Pablo Picasso zeigt vor allem...', answers:['Lithografien','Ölgemälde','Skulpturen','Fotografien'], correct:0, fact:'Das einzige Picasso-Museum Deutschlands zeigt über 800 Lithografien am Picassoplatz.' },
   { cat:'kultur', type:'vote', q:'Was macht Münster am lebenswertesten?', options:['Fahrradkultur 🚲','Studentenszene 🎓','Historische Altstadt 🏰','Kneipen & Cafés ☕'] },
   { cat:'kultur', type:'quiz', q:'Was ist das "Schlossgarten Open Air"?', answers:['Freiluftkino im Sommer','Musikfestival','Theateraufführung','Weihnachtsmarkt'], correct:0, fact:'Open-Air-Kino im Schlossgarten – Filme unter Sternenhimmel vor der Schlosskulisse, jeden Sommer!' },
+  { cat:'kultur', type:'quiz', q:'Welches Festival findet jeden Sommer am Hawerkamp statt?', answers:['Vainstream Rockfest','Rock am Ring','Wacken','Parookaville'], correct:0, fact:'Das Vainstream Rockfest am Hawerkamp ist eines der größten Rock- und Punk-Festivals in NRW mit über 10.000 Besuchern.' },
+  { cat:'kultur', type:'quiz', q:'Was ist der "Mühlenhof"?', answers:['Freilichtmuseum','Nachtclub','Restaurant','Studentenwohnheim'], correct:0, fact:'Der Mühlenhof am Aasee ist ein Freilichtmuseum mit historischen Gebäuden aus dem Münsterland – Windmühle, Bauernhof, Schmiede.' },
 
   // ===== VIRAL & NEWS (NEU) =====
   { cat:'viral', type:'quiz', q:'Was passierte 2018 im Aasee und ging viral?', answers:['Massenhaftes Fischsterben','Ein Schwan griff Jogger an','Der See fror komplett zu','Ein Krokodil wurde gesichtet'], correct:0, fact:'Im Sommer 2018 starben durch Hitze und Sauerstoffmangel tausende Fische im Aasee – die Bilder gingen bundesweit viral und sorgten für eine riesige Debatte über Gewässerpflege.' },
@@ -361,6 +373,7 @@ const QUESTIONS = [
   { cat:'viral', type:'quiz', q:'Welcher Münsteraner Stadtteil wurde durch ein TikTok-Meme über "reiche Studenten" bekannt?', answers:['Kreuzviertel','Coerde','Kinderhaus','Wolbeck'], correct:0, fact:'Das Kreuzviertel wird in Social Media oft als "das Viertel, wo Studenten mit Papa-Geld wohnen" dargestellt – ein übertriebenes, aber virales Klischee.' },
   { cat:'viral', type:'quiz', q:'Was wurde 2022 am Aasee wegen TikTok zum Problem?', answers:['Massen-Grillen und Müll','Leute schwammen illegal','Stand-Up-Paddler blockierten Boote','Drohnen störten Schwäne'], correct:0, fact:'Durch virale TikToks und Insta-Posts wurde der Aasee im Sommer SO überlaufen, dass Müll und Lärm zum echten Problem wurden.' },
   { cat:'viral', type:'estimate', q:'Wie viele Fische starben beim Fischsterben im Aasee 2018 ungefähr?', answer:20000, unit:'Fische', tolerance:10000, fact:'Rund 20 Tonnen tote Fische mussten aus dem Aasee geborgen werden – die Feuerwehr pumpte tagelang Sauerstoff ins Wasser.' },
+  { cat:'viral', type:'höher_tiefer', q:'Wie viele Tonnen tote Fische wurden 2018 aus dem Aasee geholt?', reference:10, answer:20, unit:'Tonnen', fact:'Rund 20 Tonnen tote Fische mussten aus dem Aasee geborgen werden – die Feuerwehr pumpte tagelang Sauerstoff ins Wasser.' },
   { cat:'viral', type:'quiz', q:'Welcher Münsteraner Instagram-Account dokumentiert das Stadtleben und hat über 100k Follower?', answers:['@muenster','@visit_muenster','@muenstermitte','@ms4life'], correct:0, fact:'Mehrere Münster-Accounts wie @muenster und @visit_muenster zeigen das Stadtleben – Münster ist extrem Instagram-affin dank Architektur, Aasee und Café-Kultur.' },
   { cat:'viral', type:'quiz', q:'Was sorgte 2023 in Münster für Aufregung, als die Uni ihren Namen änderte?', answers:['Abschied vom "Wilhelms" im Namen','Einführung von Studiengebühren','Schließung der Mensa','Abriss des Schlosses'], correct:0, fact:'2023 strich die WWU das "Westfälische Wilhelms-" und heißt jetzt nur noch "Universität Münster" – viele Alumni waren empört, es trendete auf Twitter.' },
   { cat:'viral', type:'vote', q:'Welches Münster-Thema regt die Leute online am meisten auf?', options:['Fahrrad-Chaos & Regeln 🚲','Mietpreise & Wohnungsnot 🏠','Aasee-Zustand 🐟','Party-Lärm Kreuzstraße 🔊'] },
@@ -371,6 +384,23 @@ const QUESTIONS = [
   { cat:'viral', type:'quiz', q:'Was wurde 2019 am Kanal gefunden und ging auf Social Media viral?', answers:['Hunderte Leih-E-Scooter im Wasser','Ein gestohlenes Auto','Eine Zeitkapsel','Ein Goldschatz'], correct:0, fact:'Als Leih-E-Scooter nach Münster kamen, landeten dutzende im Dortmund-Ems-Kanal und im Aasee – die Unterwasser-Fotos gingen viral.' },
   { cat:'viral', type:'vote', q:'Was ist das nervigste Münster-Klischee im Internet?', options:['Immer Regen ☔','Öko-Studenten überall 🌱','Zu nett und langweilig 😴','Fahrrad-Sekte 🚲'] },
   { cat:'viral', type:'quiz', q:'Welche Münsteraner Großveranstaltung wurde in der Pandemie zum kontroversen Online-Thema?', answers:['Der Send (Kirmes) – offen oder geschlossen?','Weihnachtsmarkt','Karneval','CSD'], correct:0, fact:'Die Frage "Darf der Send stattfinden?" spaltete Münster in den Corona-Jahren – hitzig diskutiert in jeder WhatsApp-Gruppe und auf Social Media.' },
+  { cat:'viral', type:'quiz', q:'Welcher Münsteraner Karneval-Moment ging viral?', answers:['Rosenmontagszug trotz Sturm abgesagt','Bürgermeister stürzt vom Wagen','Pferd auf der Promenade','Prinz wird ohnmächtig'], correct:0, fact:'Der Rosenmontagszug wurde mehrfach wegen Unwetter-Warnungen abgesagt – jedes Mal eine hitzige Social-Media-Debatte, ob berechtigt oder übertrieben.' },
+  { cat:'viral', type:'estimate', q:'Wie viele Follower hat der Instagram-Account @muenster ungefähr?', answer:80000, unit:'', tolerance:40000, fact:'Der offizielle @muenster-Account hat eine riesige Following – Münster ist extrem fotogen und die Community sehr aktiv.' },
+
+  // ===== KULTUR ZUSATZFRAGEN =====
+  { cat:'kultur', type:'quiz', q:'Top 5 meistbesuchte Orte in Münster: Gehört der Aasee dazu?', answers:['Ja, Top 5','Nein, nicht Top 5'], correct:0, fact:'Der Aasee ist mit Abstand einer der meistbesuchten Orte – Jogger, Radfahrer, Griller, Segler, alle treffen sich hier.' },
+  { cat:'kultur', type:'quiz', q:'Top 5 älteste Kneipen Münsters: Gehört die Cavete dazu?', answers:['Ja, Top 5','Nein, nicht Top 5'], correct:0, fact:'Die Cavete gibt es seit 1959 – eine der ältesten noch aktiven Studentenkneipen der Stadt.' },
+  { cat:'kultur', type:'quiz', q:'Top 5 Fahrraddiebstahl-Städte in Deutschland: Gehört Münster dazu?', answers:['Ja, Top 5','Nein, nicht Top 5'], correct:0, fact:'Münster liegt beim Fahrraddiebstahl pro Kopf regelmäßig auf Platz 1-3 in Deutschland.' },
+  { cat:'kultur', type:'quiz', q:'Top 5 größte Unis Deutschlands: Gehört die Uni Münster dazu?', answers:['Ja, Top 5','Nein, nicht Top 5'], correct:0, fact:'Mit ~43.000 Studierenden ist die Uni Münster unter den Top 5 der größten deutschen Universitäten.' },
+  { cat:'kultur', type:'quiz', q:'Top 5 regenreichste Großstädte Deutschlands: Gehört Münster dazu?', answers:['Nein, nicht Top 5','Ja, Top 5'], correct:0, fact:'Überraschung! Münster hat zwar viele Regentage, aber die Niederschlagsmenge ist gar nicht so hoch – Städte wie Wuppertal oder München haben mehr Regen!' },
+  { cat:'kultur', type:'quiz', q:'Top 5 Studentenstädte Deutschlands (nach Anteil): Gehört Münster dazu?', answers:['Ja, Top 5','Nein, nicht Top 5'], correct:0, fact:'Fast jeder 7. Einwohner studiert – das macht Münster zu einer der Städte mit dem höchsten Studierenden-Anteil.' },
+  { cat:'kultur', type:'quiz', q:'Top 5 größte Jahrmärkte in NRW: Gehört der Send dazu?', answers:['Ja, Top 5','Nein, nicht Top 5'], correct:0, fact:'Der Send auf dem Schlossplatz ist einer der größten Jahrmärkte in NRW und zieht dreimal jährlich hunderttausende Besucher an.' },
+  { cat:'kultur', type:'quiz', q:'Top 5 einwohnerstärkste Städte in NRW: Gehört Münster dazu?', answers:['Nein, nicht Top 5','Ja, Top 5'], correct:0, fact:'Münster hat ~320.000 Einwohner und liegt damit hinter Köln, Düsseldorf, Dortmund, Essen und Duisburg – also knapp nicht Top 5.' },
+  { cat:'kultur', type:'quiz', q:'Top 5 Tatort-Folgen mit den meisten Zuschauern: Ist ein Münster-Tatort dabei?', answers:['Ja, Top 5','Nein, nicht Top 5'], correct:0, fact:'Der Münster-Tatort "Fangschuss" (2017) mit 14,56 Mio. Zuschauern gehört zu den meistgesehenen Tatort-Folgen überhaupt!' },
+  { cat:'kultur', type:'quiz', q:'Top 5 fahrradfreundlichste Großstädte weltweit: Gehört Münster dazu?', answers:['Nein, nicht Top 5','Ja, Top 5'], correct:0, fact:'Im globalen Ranking dominieren Kopenhagen, Amsterdam, Utrecht etc. – Münster ist zwar Deutschlands Nr. 1, weltweit aber nicht ganz Top 5.' },
+  { cat:'kultur', type:'quiz', q:'Top 5 beliebteste Wochenmärkte Deutschlands: Gehört der Domplatz-Markt dazu?', answers:['Ja, Top 5','Nein, nicht Top 5'], correct:0, fact:'Der Wochenmarkt auf dem Domplatz wird regelmäßig unter den schönsten und beliebtesten Deutschlands gelistet.' },
+  { cat:'kultur', type:'quiz', q:'Top 5 Städte mit dem besten Nachtleben in NRW: Gehört Münster dazu?', answers:['Ja, Top 5','Nein, nicht Top 5'], correct:0, fact:'Dank Kreuzstraße, Kuhviertel, Hawerkamp und einer der höchsten Kneipendichten gehört Münster definitiv zur NRW-Nightlife-Elite.' },
+  { cat:'kultur', type:'vote', q:'Top oder Flop: Welcher Münster-Spot ist am meisten überbewertet?', options:['Aasee (zu voll im Sommer) 🌊','Hafen (zu teuer) 💸','Prinzipalmarkt (nur Touristen) 📸','Kreuzstraße (zu laut) 🔊'] },
 ];
 
 // ============================================================
@@ -610,7 +640,7 @@ function getMe() { return gameState.players.find(p => p.id === myId); }
 function getCurrentPlayer() { return gameState.players[gameState.currentPlayerIdx]; }
 
 function startGame(totalRounds) {
-  gameState.totalRounds = totalRounds;
+  gameState.totalRounds = totalRounds === 0 ? Infinity : totalRounds;
   gameState.round = 0;
   gameState.currentPlayerIdx = 0;
   gameState.usedQuestionIdxs = [];
@@ -707,6 +737,15 @@ function evaluateRound() {
       }
     });
     gameState._estimateWinner = bestId;
+  } else if (q.type === 'höher_tiefer') {
+    const correctAnswer = q.answer > q.reference ? 'höher' : 'tiefer';
+    gameState._hotCorrectAnswer = correctAnswer;
+    gameState._hotRealValue = q.answer;
+    gameState.players.forEach(p => {
+      if (gameState.answers[p.id] === correctAnswer) {
+        p.score += 2;
+      }
+    });
   } else if (q.type === 'vote') {
     // Majority vote gets 1 point – but only if there IS a clear majority (no tie)
     const counts = {};
@@ -742,6 +781,11 @@ function nextRound() {
     gameState.phase = 'final';
     broadcastState();
     return;
+  }
+  if (gameState.totalRounds === Infinity && gameState.usedQuestionIdxs.length >= QUESTIONS.length) {
+    gameState.usedQuestionIdxs = [];
+    gameState.usedCategories = {};
+    CATEGORIES.forEach(c => gameState.usedCategories[c.id] = 0);
   }
   gameState.currentPlayerIdx = (gameState.currentPlayerIdx + 1) % gameState.players.length;
   gameState.phase = 'categorySelect';
@@ -791,6 +835,7 @@ function renderHome() {
           <button class="btn btn-gold" onclick="onJoinRoom()">Beitreten!</button>
         </div>
       </div>
+      <p style="text-align:center;margin-top:16px;"><a href="#" onclick="document.getElementById('datenschutz-overlay').style.display='flex';return false;" style="color:#999;font-size:0.75rem;text-decoration:none;">🔒 Datenschutz</a></p>
     </div>
   `;
 }
@@ -850,6 +895,7 @@ function renderLobby() {
       <div class="settings-row">
         <label>Runden:</label>
         <select id="roundsSelect">
+          <option value="0">∞ (Endlos)</option>
           <option value="8">8 (kurz, ~10 Min.)</option>
           <option value="12" selected>12 (normal, ~15 Min.)</option>
           <option value="18">18 (lang, ~25 Min.)</option>
@@ -873,24 +919,14 @@ function onStartGame() {
 }
 
 // CATEGORY SELECT
-const CAT_IMAGES = {
-  kneipen: 'https://live.staticflickr.com/65535/48943369497_00a7752862_b.jpg',
-  fahrrad: 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d7/M%C3%BCnster%2C_Prinzipalmarkt%2C_Fahrr%C3%A4der_--_2022_--_0064.jpg/640px-M%C3%BCnster%2C_Prinzipalmarkt%2C_Fahrr%C3%A4der_--_2022_--_0064.jpg',
-  sights: 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8d/M%C3%BCnster%2C_St.-Lamberti-Kirche%2C_Westportal_--_2021_--_9082.jpg/640px-M%C3%BCnster%2C_St.-Lamberti-Kirche%2C_Westportal_--_2021_--_9082.jpg',
-  essen: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f6/M%C3%BCnster%2C_Wochenmarkt_--_2017_--_2320.jpg/640px-M%C3%BCnster%2C_Wochenmarkt_--_2017_--_2320.jpg',
-  kultur: 'https://live.staticflickr.com/504/18501292075_59e5db288d_b.jpg',
-  viral: 'https://live.staticflickr.com/4842/31299887987_c7a14994a3_b.jpg',
-};
-
 function renderCategorySelect() {
   const cp = getCurrentPlayer();
   const isMyTurn = cp.id === myId;
-  const maxPerCat = Math.ceil(gameState.totalRounds / CATEGORIES.length) + 1;
 
   app.innerHTML = `
     <div class="card">
       ${renderScoreboard()}
-      <div class="round-info">Runde ${gameState.round + 1} / ${gameState.totalRounds}</div>
+      <div class="round-info">Runde ${gameState.round + 1}${gameState.totalRounds === Infinity ? '' : ' / ' + gameState.totalRounds}</div>
       <div class="turn-banner" style="background:${cp.color}">
         ${isMyTurn ? '🎯 Du wählst eine Kategorie!' : `${cp.name} wählt...`}
       </div>
@@ -899,17 +935,11 @@ function renderCategorySelect() {
           ${CATEGORIES.map(c => {
             const avail = QUESTIONS.filter((q, i) => q.cat === c.id && !gameState.usedQuestionIdxs.includes(i)).length;
             const disabled = avail === 0;
-            const img = CAT_IMAGES[c.id];
             return `
-              <button style="padding:0;border:2px solid #e0e0e0;border-radius:14px;background:white;cursor:pointer;text-align:center;font-family:inherit;overflow:hidden;${disabled ? 'opacity:0.3;pointer-events:none;' : ''}" onclick="hostSelectCategory('${c.id}')">
-                <div style="height:60px;background:url('${img}') center/cover;position:relative;">
-                  <div style="position:absolute;inset:0;background:linear-gradient(transparent 30%,rgba(0,0,0,0.6));border-radius:12px 12px 0 0;"></div>
-                  <div style="position:absolute;bottom:4px;left:0;right:0;color:white;font-size:1.4rem;text-shadow:0 1px 3px rgba(0,0,0,0.5);">${c.icon}</div>
-                </div>
-                <div style="padding:8px 4px;">
-                  <div style="font-weight:700;font-size:0.8rem;color:var(--ms-blue);">${c.name}</div>
-                  <div style="font-size:0.7rem;color:#999;">${avail} übrig</div>
-                </div>
+              <button style="padding:14px 8px;border:2px solid ${c.color}33;border-radius:14px;background:white;cursor:pointer;text-align:center;font-family:inherit;transition:all 0.2s;${disabled ? 'opacity:0.3;pointer-events:none;' : ''}" onclick="hostSelectCategory('${c.id}')">
+                <div style="font-size:1.6rem;margin-bottom:4px;">${c.icon}</div>
+                <div style="font-weight:600;font-size:0.8rem;color:var(--ms-blue);">${c.name}</div>
+                <div style="font-size:0.7rem;color:#999;">${avail} übrig</div>
               </button>
             `;
           }).join('')}
@@ -969,6 +999,25 @@ function renderQuestion() {
         </div>
       `}
     `;
+  } else if (q.type === 'höher_tiefer') {
+    content = `
+      <div class="question-type-label">⬆️⬇️ Höher oder Tiefer?</div>
+      <div class="question-text">${q.q}</div>
+      <div class="result-box info" style="margin-bottom:16px;">
+        <div class="result-big">${formatNumber(q.reference)} ${q.unit || ''}</div>
+        <div class="result-detail">Ist die echte Antwort höher oder tiefer?</div>
+      </div>
+      ${!iAnswered ? `
+        <div style="display:flex;gap:10px;">
+          <button class="answer-btn" style="flex:1;text-align:center;font-size:1.1rem;" onclick="submitAnswer('höher')">⬆️ Höher</button>
+          <button class="answer-btn" style="flex:1;text-align:center;font-size:1.1rem;" onclick="submitAnswer('tiefer')">⬇️ Tiefer</button>
+        </div>
+      ` : `
+        <div class="result-box info">
+          <div class="result-detail">Deine Antwort: <strong>${localState.myAnswer === 'höher' ? '⬆️ Höher' : '⬇️ Tiefer'}</strong></div>
+        </div>
+      `}
+    `;
   } else if (q.type === 'vote') {
     content = `
       <div class="question-type-label">🗳️ Abstimmung – Stimme ab!</div>
@@ -985,9 +1034,9 @@ function renderQuestion() {
   }
 
   app.innerHTML = `
-    <div class="card">
+    <div class="card" style="border:3px solid ${cat.color}">
       ${renderScoreboard()}
-      <div class="round-info">Runde ${gameState.round + 1} / ${gameState.totalRounds}</div>
+      <div class="round-info">Runde ${gameState.round + 1}${gameState.totalRounds === Infinity ? '' : ' / ' + gameState.totalRounds}</div>
       <div class="category-badge" style="background:${cat.color}">${cat.icon} ${cat.name}</div>
       ${content}
       <div class="answer-count">${iAnswered ? '✓ ' : ''}${answeredCount}/${totalPlayers} haben geantwortet</div>
@@ -1055,6 +1104,26 @@ function renderResult() {
       </div>
       ${winner ? `<p style="text-align:center;font-weight:700;color:${winner.color};">🏆 ${winner.name} war am nächsten! +3 Punkte</p>` : ''}
     `;
+  } else if (q.type === 'höher_tiefer') {
+    const correctAnswer = gameState._hotCorrectAnswer;
+    const realValue = gameState._hotRealValue;
+    const myCorrect = gameState.answers[myId] === correctAnswer;
+    const correctPlayers = gameState.players.filter(p => gameState.answers[p.id] === correctAnswer);
+
+    resultContent = `
+      <div class="result-box info">
+        <div class="result-big">${formatNumber(realValue)} ${q.unit || ''}</div>
+        <div class="result-detail">Die echte Antwort → ${correctAnswer === 'höher' ? '⬆️ Höher' : '⬇️ Tiefer'} als ${formatNumber(q.reference)}</div>
+      </div>
+      <div class="result-box ${myCorrect ? 'success' : 'fail'}">
+        <div class="result-big">${myCorrect ? '✅ Richtig!' : '❌ Falsch!'}</div>
+      </div>
+      ${correctPlayers.length > 0 ? `
+        <p style="text-align:center;font-weight:600;margin-top:8px;">
+          +2 Punkte für: ${correctPlayers.map(p => '<span style="color:' + p.color + '">' + p.name + '</span>').join(', ')}
+        </p>
+      ` : '<p style="text-align:center;color:#888;">Niemand hatte recht!</p>'}
+    `;
   } else if (q.type === 'vote') {
     const counts = gameState._voteCounts || {};
     const majority = gameState._majorityOption;
@@ -1092,7 +1161,7 @@ function renderResult() {
   }
 
   app.innerHTML = `
-    <div class="card">
+    <div class="card" style="border:3px solid ${cat.color}">
       ${renderScoreboard()}
       <div class="category-badge" style="background:${cat.color}">${cat.icon} ${cat.name}</div>
       <div class="question-text">${q.q}</div>
@@ -1209,14 +1278,19 @@ function renderError() {
 
 // SCOREBOARD
 function renderScoreboard() {
+  const maxScore = Math.max(...gameState.players.map(p => p.score));
+  const hasScores = maxScore > 0;
   return `
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
       <div class="scoreboard" style="margin-bottom:0;flex:1;">
-        ${gameState.players.map((p, i) => `
+        ${gameState.players.map((p, i) => {
+          const isLeader = hasScores && p.score === maxScore;
+          return `
           <div class="score-chip ${i === gameState.currentPlayerIdx ? 'active' : ''}" style="background:${p.color}">
-            ${p.name.slice(0,8)} <span class="pts">${p.score}</span>
+            ${isLeader ? '👑 ' : ''}${p.name.slice(0,8)} <span class="pts">${p.score}</span>
           </div>
-        `).join('')}
+        `;
+        }).join('')}
       </div>
       <div style="font-family:'Fredoka One',cursive;font-size:0.75rem;color:#999;background:#f0f4ff;padding:4px 10px;border-radius:8px;white-space:nowrap;margin-left:8px;cursor:pointer;" onclick="alert('Raum-Code: ${roomCode}\\n\\nNeue Spieler können jederzeit beitreten!')" title="Raum-Code anzeigen">
         🔗 ${roomCode}
@@ -1252,8 +1326,26 @@ function spawnConfetti() {
 render();
 </script>
 
-<div style="position:fixed;bottom:4px;left:0;right:0;text-align:center;font-size:0.65rem;color:rgba(255,255,255,0.5);pointer-events:none;z-index:0;">
-  Hintergrundfoto: Dietmar Rabich / Wikimedia Commons / CC BY-SA 4.0
+<div id="datenschutz-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:9999;padding:20px;overflow-y:auto;">
+  <div style="max-width:500px;margin:40px auto;background:white;border-radius:16px;padding:24px;">
+    <h2 style="font-family:'Fredoka One',cursive;color:#1d3557;">Datenschutz</h2>
+    <p style="font-size:0.9rem;line-height:1.6;margin:12px 0;">
+      <strong>Münster Kenner</strong> ist ein kostenloses Partyspiel. Wir nehmen Datenschutz ernst:
+    </p>
+    <ul style="font-size:0.85rem;line-height:1.8;padding-left:20px;">
+      <li>🍪 <strong>Keine Cookies</strong> – wir setzen keine Tracking-Cookies.</li>
+      <li>👤 <strong>Keine persönlichen Daten</strong> – wir speichern weder Namen, IP-Adressen noch Geräte-IDs.</li>
+      <li>📊 <strong>Anonyme Nutzungsstatistik</strong> – wir zählen anonym, wie oft das Spiel aufgerufen wird (ohne Rückschluss auf einzelne Personen). Rechtsgrundlage: Berechtigtes Interesse (Art. 6 Abs. 1 lit. f DSGVO).</li>
+      <li>🔗 <strong>WebRTC-Verbindung</strong> – die Multiplayer-Verbindung läuft direkt zwischen den Geräten (Peer-to-Peer). Der PeerJS-Server vermittelt nur den Verbindungsaufbau.</li>
+      <li>💾 <strong>Lokale Speicherung</strong> – dein Spielername wird nur in deinem Browser (localStorage) gespeichert.</li>
+    </ul>
+    <p style="font-size:0.85rem;margin-top:12px;">Kontakt: GitHub-Repository des Projekts</p>
+    <button class="btn btn-secondary" style="margin-top:16px;" onclick="document.getElementById('datenschutz-overlay').style.display='none'">Schließen</button>
+  </div>
+</div>
+<script data-goatcounter="https://muenster-kenner.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
+<div style="position:fixed;bottom:4px;left:0;right:0;text-align:center;font-size:0.6rem;color:rgba(255,255,255,0.4);pointer-events:none;z-index:0;">
+  Foto: Dietmar Rabich / Wikimedia Commons / CC BY-SA 4.0
 </div>
 </body>
 </html>
