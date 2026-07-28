@@ -256,29 +256,22 @@
 
   .hidden { display: none !important; }
 
-  /* Glücksrad */
-  .wheel-container { position: relative; width: 220px; height: 220px; margin: 20px auto; }
-  .wheel {
-    width: 220px; height: 220px; border-radius: 50%;
-    border: 4px solid #1d3557; position: relative;
-    overflow: hidden; transition: transform 4s cubic-bezier(0.17, 0.67, 0.12, 0.99);
+  /* Glücksrad → Kachel-Highlight-Animation */
+  .cat-tile {
+    padding: 14px 8px; border-radius: 14px; background: white; text-align: center;
+    font-family: inherit; transition: all 0.15s; border: 3px solid transparent;
   }
-  .wheel-segment {
-    position: absolute; width: 50%; height: 50%; left: 50%; top: 50%;
-    transform-origin: 0 0; display: flex; align-items: center; justify-content: center;
-    font-size: 1.8rem;
+  .cat-tile.highlight {
+    transform: scale(1.08);
+    border-color: var(--ms-blue) !important;
+    box-shadow: 0 0 16px rgba(29,53,87,0.4);
   }
-  .wheel-pointer {
-    position: absolute; top: -16px; left: 50%; transform: translateX(-50%);
-    font-size: 1.6rem; z-index: 10; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+  .cat-tile.winner {
+    transform: scale(1.12);
+    border-color: var(--ms-gold) !important;
+    box-shadow: 0 0 20px rgba(244,162,97,0.6);
+    background: #fffbf0;
   }
-  .wheel-label { text-align: center; margin-top: 12px; font-weight: 600; font-size: 1.1rem; color: var(--ms-blue); min-height: 1.4em; }
-  .wheel-spin-btn {
-    display: block; margin: 12px auto 0; padding: 10px 28px;
-    background: var(--ms-blue); color: white; border: none; border-radius: 10px;
-    font-family: inherit; font-size: 1rem; font-weight: 600; cursor: pointer;
-  }
-  .wheel-spin-btn:disabled { opacity: 0.4; cursor: default; }
 
   /* Test button (local only) */
   .test-btn { background: #666; color: white; font-size: 0.75rem; padding: 6px 14px; border: 1px dashed #999; border-radius: 8px; cursor: pointer; font-family: inherit; margin-top: 8px; }
@@ -580,14 +573,10 @@ function handleHostMessage(conn, data) {
       if (gameState.phase === 'categorySelect') {
         const cp = getCurrentPlayer();
         if (data.playerId === cp.id || conn._playerId === cp.id) {
-          // Broadcast spin animation to all other players (and animate on host)
           broadcastWheelSpin(data.catId, data.winnerIdx);
-          const availCats = CATEGORIES.filter(c =>
+          runHighlightAnimation(data.winnerIdx, CATEGORIES.filter(c =>
             QUESTIONS.some((q, i) => q.cat === c.id && !gameState.usedQuestionIdxs.includes(i))
-          );
-          const segAngle = 360 / availCats.length;
-          const winnerCat = availCats[data.winnerIdx];
-          if (winnerCat) animateWheelLocal(winnerCat, data.winnerIdx, segAngle);
+          ).length);
         }
       }
       break;
@@ -646,7 +635,6 @@ function broadcastWheelSpin(winnerCatId, winnerIdx) {
 // PLAYER: handle messages from host
 function handlePlayerMessage(data) {
   if (data.type === 'wheelSpin') {
-    // Animate wheel on non-host player's screen
     animateWheelRemote(data.catId, data.winnerIdx);
     return;
   }
@@ -997,46 +985,33 @@ function renderCategorySelect() {
   const cp = getCurrentPlayer();
   const isMyTurn = cp.id === myId;
 
-  // Filter categories that still have questions
   const availCats = CATEGORIES.filter(c =>
     QUESTIONS.some((q, i) => q.cat === c.id && !gameState.usedQuestionIdxs.includes(i))
   );
 
   if (availCats.length === 0) {
-    // No questions left at all
     gameState.phase = 'results';
     if (role === 'host') broadcastState();
     render();
     return;
   }
 
-  // Build wheel segments - each segment gets equal slice
-  const segCount = availCats.length;
-  const segAngle = 360 / segCount;
-
   app.innerHTML = `
     <div class="card">
       ${renderScoreboard()}
       <div class="round-info">Runde ${gameState.round + 1}${gameState.totalRounds === Infinity ? '' : ' / ' + gameState.totalRounds}</div>
       <div class="turn-banner" style="background:${cp.color}">
-        ${isMyTurn ? '🎯 Dreh das Glücksrad!' : `${cp.name} dreht...`}
+        ${isMyTurn ? '🎯 Deine Runde!' : `${cp.name} ist dran...`}
       </div>
-
-      <div class="wheel-container">
-        <div class="wheel-pointer">▼</div>
-        <div class="wheel" id="theWheel">
-          ${availCats.map((c, i) => {
-            const rotate = i * segAngle;
-            const skew = -(90 - segAngle);
-            return `<div class="wheel-segment" style="transform: rotate(${rotate}deg) skew(${skew}deg); background:${c.color};" data-cat="${c.id}">
-              <span style="transform: skew(${-skew}deg) rotate(${segAngle/2}deg); font-size:${segCount <= 4 ? '2rem' : '1.5rem'};">${c.icon}</span>
-            </div>`;
-          }).join('')}
-        </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;" id="catGrid">
+        ${availCats.map((c, i) => `
+          <div class="cat-tile" id="cat-${i}" style="border-color:${c.color}33;">
+            <div style="font-size:1.6rem;margin-bottom:4px;">${c.icon}</div>
+            <div style="font-weight:600;font-size:0.8rem;color:var(--ms-blue);">${c.name}</div>
+          </div>
+        `).join('')}
       </div>
-      <div class="wheel-label" id="wheelLabel"></div>
-
-      ${isMyTurn ? '<button class="wheel-spin-btn" id="spinBtn" onclick="spinWheel()">🎰 Drehen!</button>' : '<div class="waiting">Warte auf Drehung<span class="waiting-dots"></span></div>'}
+      ${isMyTurn ? '<div style="text-align:center;margin-top:14px;"><button class="btn btn-primary" id="spinBtn" onclick="spinWheel()">🎰 Los!</button></div>' : '<div class="waiting">Warte auf Auswahl<span class="waiting-dots"></span></div>'}
     </div>
   `;
 }
@@ -1049,62 +1024,75 @@ function spinWheel() {
     QUESTIONS.some((q, i) => q.cat === c.id && !gameState.usedQuestionIdxs.includes(i))
   );
   const segCount = availCats.length;
-  const segAngle = 360 / segCount;
 
   // Pick random winner
   const winnerIdx = Math.floor(Math.random() * segCount);
   const winnerCat = availCats[winnerIdx];
 
-  // Animate locally
-  animateWheelLocal(winnerCat, winnerIdx, segAngle);
+  // Start highlight animation
+  runHighlightAnimation(winnerIdx, segCount);
 
   if (role === 'host') {
-    // Broadcast to other players so they see the animation
     broadcastWheelSpin(winnerCat.id, winnerIdx);
   } else {
-    // Tell host to broadcast spin + select category after delay
     sendToHost({ type: 'wheelSpin', catId: winnerCat.id, winnerIdx, playerId: myId });
   }
 }
 
-function animateWheelLocal(winnerCat, winnerIdx, segAngle) {
-  const targetAngle = 360 * 5 + (360 - (winnerIdx * segAngle + segAngle / 2));
-  const wheel = document.getElementById('theWheel');
-  if (wheel) wheel.style.transform = `rotate(${targetAngle}deg)`;
+function runHighlightAnimation(winnerIdx, segCount) {
+  // Cycle through tiles: fast → slow, land on winnerIdx
+  // Total steps: 2-3 full cycles + land on winner
+  const totalCycles = 2 + Math.random();
+  const totalSteps = Math.floor(totalCycles * segCount) + winnerIdx;
+  let step = 0;
+  let prevHighlight = -1;
 
-  setTimeout(() => {
-    const label = document.getElementById('wheelLabel');
-    if (label) label.textContent = `${winnerCat.icon} ${winnerCat.name}!`;
-  }, 2500);
-
-  setTimeout(() => {
-    if (role === 'host') {
-      selectCategory(winnerCat.id);
+  function tick() {
+    // Remove previous highlight
+    if (prevHighlight >= 0) {
+      const prev = document.getElementById('cat-' + prevHighlight);
+      if (prev) prev.classList.remove('highlight');
     }
-  }, 4000);
+
+    const currentTile = step % segCount;
+    const el = document.getElementById('cat-' + currentTile);
+    if (el) el.classList.add('highlight');
+    prevHighlight = currentTile;
+
+    step++;
+    if (step <= totalSteps) {
+      // Easing: start at 60ms, end at ~400ms
+      const progress = step / totalSteps;
+      const delay = 60 + progress * progress * 340;
+      setTimeout(tick, delay);
+    } else {
+      // Final: mark winner
+      if (el) {
+        el.classList.remove('highlight');
+        el.classList.add('winner');
+      }
+      // Proceed to question after brief pause
+      setTimeout(() => {
+        if (role === 'host') {
+          const availCats = CATEGORIES.filter(c =>
+            QUESTIONS.some((q, i) => q.cat === c.id && !gameState.usedQuestionIdxs.includes(i))
+          );
+          if (availCats[winnerIdx]) selectCategory(availCats[winnerIdx].id);
+        }
+      }, 1200);
+    }
+  }
+  tick();
 }
 
 function animateWheelRemote(catId, winnerIdx) {
   const availCats = CATEGORIES.filter(c =>
     QUESTIONS.some((q, i) => q.cat === c.id && !gameState.usedQuestionIdxs.includes(i))
   );
-  const segCount = availCats.length;
-  const segAngle = 360 / segCount;
-  const winnerCat = availCats[winnerIdx] || CATEGORIES.find(c => c.id === catId);
-  if (!winnerCat) return;
-
-  const targetAngle = 360 * 5 + (360 - (winnerIdx * segAngle + segAngle / 2));
-  const wheel = document.getElementById('theWheel');
-  if (wheel) wheel.style.transform = `rotate(${targetAngle}deg)`;
-
-  setTimeout(() => {
-    const label = document.getElementById('wheelLabel');
-    if (label) label.textContent = `${winnerCat.icon} ${winnerCat.name}!`;
-  }, 2500);
+  runHighlightAnimation(winnerIdx, availCats.length);
 }
 
 function hostSelectCategory(catId) {
-  // Legacy - still needed for network messages
   if (role === 'host') {
     selectCategory(catId);
   } else {
