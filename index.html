@@ -459,7 +459,7 @@ function handleHostMessage(conn, data) {
     }
     case 'answer': {
       gameState.answers[data.playerId] = data.answer;
-      broadcastState();
+      broadcastAnswerUpdate();
       // Check if all answered
       checkAllAnswered();
       break;
@@ -502,10 +502,37 @@ function broadcastState() {
   render();
 }
 
+// HOST: lightweight broadcast that only updates answer count on clients (and host)
+function broadcastAnswerUpdate() {
+  const stateMsg = { type: 'state', state: gameState };
+  connections.forEach(c => {
+    try { c.send(stateMsg); } catch(e) {}
+  });
+  // On host side, only update the counter if we haven't changed phase
+  if (gameState.phase === 'question') {
+    updateAnswerCount();
+  } else {
+    render();
+  }
+}
+
 // PLAYER: handle messages from host
 function handlePlayerMessage(data) {
   if (data.type === 'state') {
+    const oldPhase = gameState.phase;
+    const oldAnswerCount = Object.keys(gameState.answers || {}).length;
     gameState = data.state;
+
+    // If we're still in the question phase and only the answer count changed,
+    // just update the counter instead of full re-render (preserves local input state)
+    if (oldPhase === 'question' && gameState.phase === 'question') {
+      const newAnswerCount = Object.keys(gameState.answers || {}).length;
+      if (newAnswerCount !== oldAnswerCount) {
+        updateAnswerCount();
+        return;
+      }
+    }
+
     // Reset local answer state on new question
     if (gameState.phase === 'question' && !gameState.answers[myId]) {
       localState.answered = false;
@@ -513,6 +540,15 @@ function handlePlayerMessage(data) {
     }
     render();
   }
+}
+
+function updateAnswerCount() {
+  const el = document.querySelector('.answer-count');
+  if (!el) return;
+  const answeredCount = Object.keys(gameState.answers).length;
+  const totalPlayers = gameState.players.filter(p => p.connected).length;
+  const iAnswered = localState.answered || gameState.answers[myId] !== undefined;
+  el.innerHTML = `${iAnswered ? '✓ ' : ''}${answeredCount}/${totalPlayers} haben geantwortet`;
 }
 
 // PLAYER: send message to host
@@ -562,7 +598,7 @@ function submitAnswer(answer) {
 
   if (role === 'host') {
     gameState.answers[myId] = answer;
-    broadcastState();
+    broadcastAnswerUpdate();
     checkAllAnswered();
   } else {
     sendToHost({ type: 'answer', playerId: myId, answer });
