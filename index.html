@@ -294,6 +294,11 @@ const QUESTIONS = [
   { cat:'kneipen', type:'quiz', q:'Welcher Biergarten liegt direkt am Aasee mit Blick aufs Wasser?', answers:['Martinihof / Seeterrassen','Pinkus Müller','Schlossgarten','Kiepenkerl'], correct:0, fact:'Die Seeterrassen am Aasee sind im Sommer DER Spot – Bier, Sonnenuntergang, Wasserblick.' },
   { cat:'kneipen', type:'estimate', q:'Wie viele Cocktailbars gibt es ungefähr in der Innenstadt?', answer:25, unit:'', tolerance:10, fact:'Münster hat rund 25 dedizierte Cocktailbars – von der Pension Schmidt über die Gorilla Bar bis zum Lux.' },
   { cat:'kneipen', type:'quiz', q:'Was ist das Besondere an der "Sputnikhalle"?', answers:['Konzerthalle in ehem. Industriehalle','Russisches Restaurant','Bowlingbahn','Kegelhalle'], correct:0, fact:'Die Sputnikhalle ist eine Konzert- und Partylocation in einer ehemaligen Industriehalle am Hawerkamp – Rock, Indie, Elektro.' },
+  { cat:'kneipen', type:'quiz', q:'Was ist "Tom&Polly"?', answers:['Bar & Restaurant am Hafen','Eine Bäckerei','Ein Florist am Prinzipalmarkt','Ein Second-Hand-Laden'], correct:0, fact:'Tom&Polly am Kreativkai/Hafen ist super beliebt für Drinks, Bowls und entspannte Abende – gehobener Casual-Vibe mit Kanalblick.' },
+  { cat:'kneipen', type:'quiz', q:'Wofür ist Tom&Polly am Hafen besonders bekannt?', answers:['Bowls, Cocktails & Hafen-Atmosphäre','Pizza vom Holzofen','Craft Beer Brauerei','Karaoke-Abende'], correct:0, fact:'Tom&Polly verbindet gutes Essen (Bowls, Sharing-Plates) mit Bar-Atmosphäre direkt am Wasser – perfekt für Feierabend-Drinks.' },
+  { cat:'kneipen', type:'quiz', q:'Was ist "Casa Vazquez"?', answers:['Spanisches Restaurant & Tapas-Bar','Ein Hostel','Ein Fahrradladen','Eine Tanzschule'], correct:0, fact:'Casa Vazquez ist die beliebte Tapas-Bar in Münster – authentisch spanisch, guter Wein, lebhafte Atmosphäre und faire Preise.' },
+  { cat:'kneipen', type:'quiz', q:'Wofür ist Casa Vazquez bei Münsteranern bekannt?', answers:['Tapas, spanischer Wein & lebhaftes Ambiente','Mexikanische Burritos','Deutsche Hausmannskost','Sushi-Variationen'], correct:0, fact:'Casa Vazquez bringt echtes spanisches Flair nach Münster – von Patatas Bravas über Gambas bis zu Rioja. Reservierung empfohlen!' },
+  { cat:'kneipen', type:'vote', q:'Wo geht ihr am liebsten mit Freunden essen?', options:['Tom&Polly am Hafen 🍹','Casa Vazquez (Tapas) 🇪🇸','Pinkus Müller (Brauhaus) 🍺','Kreuzstraße spontan 🎲'] },
 
   // ===== FAHRRAD & MOBILITÄT =====
   { cat:'fahrrad', type:'quiz', q:'Wie heißt der autofreie Ring um die Altstadt?', answers:['Promenade','Veloroute','Ringallee','Fahrradwall'], correct:0, fact:'Die 4,5 km lange Promenade ist Deutschlands längste autofreie Fahrrad-Allee rund um eine Altstadt!' },
@@ -608,7 +613,21 @@ function selectCategory(catId) {
     .filter(q => q.cat === catId && !gameState.usedQuestionIdxs.includes(q.idx));
   if (available.length === 0) return;
 
-  const q = available[Math.floor(Math.random() * available.length)];
+  const q = { ...available[Math.floor(Math.random() * available.length)] };
+
+  // Shuffle quiz answers so the correct one isn't always first
+  if (q.type === 'quiz' && q.answers) {
+    const correctAnswer = q.answers[q.correct];
+    const shuffled = [...q.answers];
+    // Fisher-Yates shuffle
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    q.answers = shuffled;
+    q.correct = shuffled.indexOf(correctAnswer);
+  }
+
   gameState.currentQuestion = q;
   gameState.usedQuestionIdxs.push(q.idx);
   gameState.usedCategories[catId] = (gameState.usedCategories[catId] || 0) + 1;
