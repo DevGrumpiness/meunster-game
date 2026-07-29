@@ -479,7 +479,7 @@ const QUESTIONS = [
   { cat:'ausgehen', type:'vote', q:'Was muss man in Münster unbedingt probieren?', options:['Pinkus Alt im Brauhaus 🍺','Töttchen beim Kiepenkerl 🍲','Struwen vom Imbiss 🥞','Käse vom Wochenmarkt 🧀'] },
   { cat:'ausgehen', type:'quiz', q:'Welches Getränk ist Münsters Traditionsgebräu?', answers:['Pinkus Altbier','Weizenbier','Kölsch','Exportbier'], correct:0, fact:'Pinkus Alt – obergärig, mild, süffig – ist seit 1816 DAS Münsteraner Bier.' },
   { cat:'ausgehen', type:'quiz', q:'Welches günstige Restaurant am Hafen ist für seine Burger bekannt?', answers:['Flamingos','Heaven','Alex','Pier 31'], correct:0, fact:'Flamingos am Hafen ist beliebt für solide Burger, lockere Atmosphäre und faire Preise – Studenten-Treff!' },
-  { cat:'ausgehen', type:'quiz', q:'Wo bekommt man den besten Döner laut Münster-Studierenden?', answers:['Verschiedene Favoriten – aber Wolbecker Str. wird oft genannt','Prinzipalmarkt','Aasee','Handorf'], correct:0, fact:'Münster hat eine lebendige Döner-Debatte – die Wolbecker Straße und der Bahnhof werden oft genannt, aber jeder hat seinen Geheim-Tipp!' },
+  { cat:'ausgehen', type:'quiz', q:'Was ist KEIN echtes Masematte-Wort?', answers:['Knötterig','Schofel','Talpe','Pansen'], correct:0, fact:'Schofel (schlecht), Talpe (Nacht) und Pansen (essen) sind echte Masematte-Wörter aus Münster. "Knötterig" gibt es nicht.' },
   { cat:'ausgehen', type:'vote', q:'Bester Spot für günstiges Mittagessen in Münster?', options:['Mensa am Aasee 🍝','Döner Wolbecker Str. 🥙','Asia-Imbiss Altstadt 🍜','Markt am Domplatz 🥨'] },
   { cat:'ausgehen', type:'quiz', q:'Welches Café am Domplatz ist für seinen Kuchen stadtbekannt?', answers:['Café Kleimann','Starbucks','Café Extrablatt','McCafé'], correct:0, fact:'Café Kleimann am Domplatz ist eine Institution – Kuchen, Torten und Frühstück in traditionellem Ambiente seit Jahrzehnten.' },
   { cat:'ausgehen', type:'quiz', q:'Was ist ein typischer Snack auf dem Send?', answers:['Reibekuchen (Kartoffelpuffer)','Sushi','Frozen Yogurt','Baguette'], correct:0, fact:'Reibekuchen mit Apfelmus sind DER Send-Klassiker – dazu eine Bratwurst und ein Bier, perfekter Kirmes-Abend!' },
@@ -723,7 +723,7 @@ const QUESTIONS = [
   { cat:'allgemein', type:'quiz', q:'Wie viele Bundesländer hat Deutschland?', answers:['16','15','14','17'], correct:0, fact:'Seit der Wiedervereinigung 1990 hat Deutschland 16 Bundesländer – darunter 3 Stadtstaaten (Berlin, Hamburg, Bremen).' },
   { cat:'allgemein', type:'quiz', q:'Welcher Ozean ist der größte der Welt?', answers:['Pazifik','Atlantik','Indischer Ozean','Arktischer Ozean'], correct:0, fact:'Der Pazifische Ozean bedeckt mehr Fläche als alle Landmassen der Erde zusammen – rund 165 Millionen km².' },
   { cat:'allgemein', type:'quiz', q:'Wer schrieb "Faust"?', answers:['Johann Wolfgang von Goethe','Friedrich Schiller','Heinrich Heine','Thomas Mann'], correct:0, fact:'Goethe arbeitete über 60 Jahre an seinem Lebenswerk "Faust" – von 1772 bis kurz vor seinem Tod 1832.' },
-  { cat:'allgemein', type:'quiz', q:'Was ist die Währung in Japan?', answers:['Yen','Won','Yuan','Rupie'], correct:0, fact:'Der japanische Yen (¥) ist die drittwichtigste Reservewährung der Welt nach Dollar und Euro.' },
+  { cat:'allgemein', type:'quiz', q:'Was ist die offizielle Währung von Thailand?', answers:['Baht','Ringgit','Dong','Rupiah'], correct:0, fact:'Der Thailändische Baht (฿) ist seit 1897 die Währung Thailands. Ringgit = Malaysia, Dong = Vietnam, Rupiah = Indonesien.' },
   { cat:'allgemein', type:'quiz', q:'Welches Gas nehmen Pflanzen bei der Photosynthese auf?', answers:['CO₂','O₂','N₂','H₂'], correct:0, fact:'Pflanzen wandeln CO₂ und Wasser mithilfe von Sonnenlicht in Zucker und Sauerstoff um – die Basis allen Lebens.' },
   { cat:'allgemein', type:'quiz', q:'Welcher Fluss ist der längste in Europa?', answers:['Wolga','Donau','Rhein','Elbe'], correct:0, fact:'Die Wolga fließt über 3.530 km durch Russland und mündet ins Kaspische Meer – deutlich länger als die Donau (2.857 km).' },
   { cat:'allgemein', type:'quiz', q:'In welchem Jahr fiel die Berliner Mauer?', answers:['1989','1990','1988','1991'], correct:0, fact:'Am 9. November 1989 fiel die Mauer – ein Ereignis, das die Welt veränderte und zur deutschen Wiedervereinigung führte.' },
@@ -1738,21 +1738,26 @@ function renderLobby() {
       <div class="settings-row">
         <label>Runden:</label>
         <select id="roundsSelect">
-          <option value="0">∞ (Endlos)</option>
+          <option value="0" selected>∞ (Endlos)</option>
           <option value="8">8 (kurz, ~10 Min.)</option>
-          <option value="12" selected>12 (normal, ~15 Min.)</option>
+          <option value="12">12 (normal, ~15 Min.)</option>
           <option value="18">18 (lang, ~25 Min.)</option>
           <option value="24">24 (marathon, ~35 Min.)</option>
         </select>
       </div>
       ${isHost ? `
-      <div class="settings-row">
-        <label>Modus:</label>
-        <select id="modeSelect" onchange="gameState.includeAllgemein = this.value === 'allgemein'">
-          <option value="muenster">🏰 Nur Münster</option>
-          <option value="allgemein">🌍 Münster + Allgemeinwissen</option>
-        </select>
+      <div class="settings-row" style="justify-content:space-between;">
+        <label>🌍 + Allgemeinwissen</label>
+        <label style="position:relative;display:inline-block;width:48px;height:26px;margin:0;">
+          <input type="checkbox" id="modeToggle" onchange="gameState.includeAllgemein = this.checked" style="opacity:0;width:0;height:0;">
+          <span style="position:absolute;cursor:pointer;inset:0;background:#ccc;border-radius:26px;transition:.3s;" onclick="this.previousElementSibling.click()"></span>
+          <span style="position:absolute;left:3px;top:3px;width:20px;height:20px;background:white;border-radius:50%;transition:.3s;pointer-events:none;" id="modeToggleKnob"></span>
+        </label>
       </div>
+      <style>
+        #modeToggle:checked + span { background: var(--ms-green); }
+        #modeToggle:checked ~ #modeToggleKnob { left: 25px; }
+      </style>
       ` : ''}
       <div class="btn-row">
         <button class="btn btn-primary" ${!canStart ? 'disabled' : ''} onclick="onStartGame()">🚀 Spiel starten!</button>
@@ -1763,8 +1768,8 @@ function renderLobby() {
 
 function onStartGame() {
   const totalRounds = +document.getElementById('roundsSelect').value;
-  const modeSelect = document.getElementById('modeSelect');
-  if (modeSelect) gameState.includeAllgemein = modeSelect.value === 'allgemein';
+  const modeToggle = document.getElementById('modeToggle');
+  if (modeToggle) gameState.includeAllgemein = modeToggle.checked;
   if (role === 'host') {
     startGame(totalRounds);
   } else {
