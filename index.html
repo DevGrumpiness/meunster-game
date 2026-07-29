@@ -130,7 +130,7 @@
     font-size: 0.75rem; color: white; transition: all 0.3s;
   }
   .score-chip.active { transform: scale(1.08); box-shadow: 0 3px 10px rgba(0,0,0,0.2); }
-  .score-chip.me { box-shadow: 0 0 0 2px white, 0 4px 8px rgba(0,0,0,0.15); }
+  .score-chip.me { box-shadow: 0 0 0 2px white, 0 0 0 4px rgba(0,0,0,0.5); }
   .score-chip .pts { font-family: 'Fredoka One', cursive; font-size: 0.85rem; }
 
   /* Question */
@@ -569,7 +569,7 @@ const QUESTIONS = [
 
   // --- Essen & Trinken ---
   { cat:'ausgehen', type:'quiz', q:'Welches Restaurant an der Kreuzstraße ist für Tapas bekannt?', answers:['Casa Vazquez','Casa Nostra','La Bodega','Tapas y Mas'], correct:0, fact:'Casa Vazquez ist eine Institution für spanische Tapas in Münster – immer voll, immer gut, sehr beliebt bei Studenten.' },
-  { cat:'ausgehen', type:'quiz', q:'Was bekommt man bei Tom&Polly NICHT?', answers:['Sushi','Frozen Yogurt','Currywurst','Bier'], correct:0, fact:'Tom&Polly bietet Frozen Yogurt, Currywurst, Bier und mehr – aber kein Sushi. Gemütlicher Biergarten am Südpark!' },
+  { cat:'ausgehen', type:'quiz', q:'Was bekommt man bei Tom&Polly NICHT?', answers:['Pommes','Frozen Yogurt','Currywurst','Bier'], correct:0, fact:'Tom&Polly bietet Frozen Yogurt, Currywurst, Bier und mehr – aber keine Pommes. Gemütlicher Biergarten am Südpark!' },
   { cat:'ausgehen', type:'quiz', q:'Welche Mensa gilt als die beste der Uni?', answers:['Mensa am Aasee','Mensa am Ring','Bistro Domplatz','Mensa Bispinghof'], correct:0, fact:'Die Mensa am Aasee (auch "Mensa 1") ist die größte und beliebteste – mit Blick auf den See und überraschend gutem Essen für den Preis.' },
   { cat:'ausgehen', type:'estimate', q:'Wie viel kostet ein Studierenden-Mittagessen in der Mensa?', answer:3.5, unit:'€', tolerance:1.5, fact:'Ein Hauptgericht in der Mensa kostet für Studierende nur 2,50-4,50€ – günstig und ordentlich!' },
   { cat:'ausgehen', type:'quiz', q:'Welches Lokal am Prinzipalmarkt ist für seinen Westfälischen Grünkohl bekannt?', answers:['Großer Kiepenkerl','Stuhlmacher','Pinkus Müller','Altes Gasthaus Leve'], correct:0, fact:'Der Große Kiepenkerl und das Alte Gasthaus Leve servieren traditionelle Westfälische Küche – Grünkohl, Mettwurst, Pumpernickel.' },
@@ -704,6 +704,7 @@ let gameState = {
   answers: {}, // playerId -> answer
   questionPlayerIds: [],
   smart10State: null,
+  readyPlayers: [], // player IDs who pressed "Bereit"
   usedQuestionIdxs: [],
   usedCategories: {},
 };
@@ -869,6 +870,14 @@ function handleHostMessage(conn, data) {
     case 'nextRound': {
       // Any player can advance to next round
       if (gameState.phase === 'result') nextRound();
+      break;
+    }
+    case 'ready': {
+      if (gameState.phase === 'result' && !gameState.readyPlayers.includes(data.playerId)) {
+        gameState.readyPlayers.push(data.playerId);
+        broadcastState();
+        checkAllReady();
+      }
       break;
     }
     case 'startGame': {
@@ -1216,6 +1225,8 @@ function startGame(totalRounds) {
   gameState.usedCategories = {};
   gameState.questionPlayerIds = [];
   gameState.smart10State = null;
+  gameState.readyPlayers = [];
+  gameState._wheelSpinning = false;
   CATEGORIES.forEach(c => gameState.usedCategories[c.id] = 0);
   gameState.players.forEach(p => p.score = 0);
   gameState.phase = 'categorySelect';
@@ -1369,13 +1380,18 @@ function nextRound() {
     gameState.usedCategories = {};
     CATEGORIES.forEach(c => gameState.usedCategories[c.id] = 0);
   }
-  gameState.currentPlayerIdx = (gameState.currentPlayerIdx + 1) % gameState.players.length;
-  advanceToNextConnectedPlayer();
+  // Only advance turn index after turn-relevant questions (Smart10)
+  if (gameState.currentQuestion && gameState.currentQuestion.type === 'smart10') {
+    gameState.currentPlayerIdx = (gameState.currentPlayerIdx + 1) % gameState.players.length;
+    advanceToNextConnectedPlayer();
+  }
   gameState.phase = 'categorySelect';
   gameState.answers = {};
   gameState.questionPlayerIds = [];
   gameState.smart10State = null;
   gameState.currentQuestion = null;
+  gameState.readyPlayers = [];
+  gameState._wheelSpinning = false;
   localState.answered = false;
   localState.myAnswer = null;
   broadcastState();
@@ -1466,6 +1482,8 @@ function onTestMode() {
   gameState.usedCategories = {};
   gameState.questionPlayerIds = [];
   gameState.smart10State = null;
+  gameState.readyPlayers = [];
+  gameState._wheelSpinning = false;
   CATEGORIES.forEach(c => gameState.usedCategories[c.id] = 0);
   gameState.phase = 'categorySelect';
   render();
@@ -1531,9 +1549,6 @@ function onStartGame() {
 
 // CATEGORY SELECT
 function renderCategorySelect() {
-  const cp = getCurrentPlayer();
-  const isMyTurn = cp.id === myId;
-
   const connectedCount = gameState.players.filter(p => p.connected).length;
   const isPlayable = (q, i) =>
     !gameState.usedQuestionIdxs.includes(i) &&
@@ -1555,9 +1570,6 @@ function renderCategorySelect() {
     <div class="card">
       ${renderScoreboard()}
       <div class="round-info">Runde ${gameState.round + 1}${gameState.totalRounds === Infinity ? '' : ' / ' + gameState.totalRounds}</div>
-      <div class="turn-banner" style="background:${cp.color}">
-        ${isMyTurn ? '🎯 Deine Runde!' : `${cp.name} ist dran...`}
-      </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;" id="catGrid">
         ${availCats.map((c, i) => `
           <div class="cat-tile" id="cat-${i}" style="border-color:${c.color}33;">
@@ -1566,9 +1578,15 @@ function renderCategorySelect() {
           </div>
         `).join('')}
       </div>
-      ${isMyTurn ? '<div style="text-align:center;margin-top:14px;"><button class="btn btn-primary" id="spinBtn" onclick="spinWheel()">🎰 Los!</button></div>' : '<div class="waiting">Warte auf Auswahl<span class="waiting-dots"></span></div>'}
+      <div class="waiting" style="margin-top:14px;">Kategorie wird ausgelost<span class="waiting-dots"></span></div>
     </div>
   `;
+
+  // Host auto-spins after a brief delay
+  if (role === 'host' && !gameState._wheelSpinning) {
+    gameState._wheelSpinning = true;
+    setTimeout(() => spinWheel(), 600);
+  }
 }
 
 function spinWheel() {
@@ -2020,8 +2038,32 @@ function renderResult() {
       <div class="question-text">${q.q}</div>
       ${resultContent}
       ${q.fact ? `<div class="fun-fact"><strong>💡 Wusstest du?</strong> ${q.fact}</div>` : ''}
-      <div class="btn-row">
-        <button class="btn btn-primary" onclick="onNextRound()">Weiter ➜</button>
+      ${renderReadySection()}
+    </div>
+  `;
+}
+
+function renderReadySection() {
+  const connectedPlayers = gameState.players.filter(p => p.connected);
+  const readyCount = gameState.readyPlayers ? gameState.readyPlayers.length : 0;
+  const totalCount = connectedPlayers.length;
+  const iAmReady = gameState.readyPlayers && gameState.readyPlayers.includes(myId);
+
+  // Solo mode: just show Weiter button
+  if (myId === 'test-host') {
+    return `<div class="btn-row"><button class="btn btn-primary" onclick="onReady()">Weiter ➜</button></div>`;
+  }
+
+  return `
+    <div style="text-align:center;margin-top:14px;">
+      ${!iAmReady ? `
+        <button class="btn btn-primary" onclick="onReady()">✅ Bereit!</button>
+      ` : `
+        <div style="color:#2d6a4f;font-weight:600;">✅ Du bist bereit</div>
+      `}
+      <div style="color:#888;font-size:0.85rem;margin-top:8px;">
+        ${readyCount}/${totalCount} bereit
+        ${readyCount > 0 && readyCount < totalCount ? ` – warte auf ${connectedPlayers.filter(p => !gameState.readyPlayers.includes(p.id)).map(p => p.name).join(', ')}` : ''}
       </div>
     </div>
   `;
@@ -2092,11 +2134,23 @@ function restartGame() {
   broadcastState();
 }
 
-function onNextRound() {
+function onReady() {
   if (role === 'host') {
-    nextRound();
+    if (!gameState.readyPlayers.includes(myId)) {
+      gameState.readyPlayers.push(myId);
+      broadcastState();
+      checkAllReady();
+    }
   } else {
-    sendToHost({ type: 'nextRound', playerId: myId });
+    sendToHost({ type: 'ready', playerId: myId });
+  }
+}
+
+function checkAllReady() {
+  if (role !== 'host' || gameState.phase !== 'result') return;
+  const connectedPlayers = gameState.players.filter(p => p.connected);
+  if (connectedPlayers.every(p => gameState.readyPlayers.includes(p.id))) {
+    nextRound();
   }
 }
 
@@ -2152,8 +2206,8 @@ function renderScoreboard() {
         ${gameState.players.map((p, i) => {
           const isLeader = hasScores && p.score === maxScore;
           return `
-          <div class="score-chip ${i === gameState.currentPlayerIdx ? 'active' : ''} ${p.id === myId ? 'me' : ''}" style="background:${p.color}">
-           ${isLeader ? '👑 ' : ''}${p.id === myId ? '★ ' : ''}${p.name.slice(0,8)} <span class="pts">${p.score}</span>
+          <div class="score-chip ${gameState.phase === 'smart10' && i === gameState.currentPlayerIdx ? 'active' : ''} ${p.id === myId ? 'me' : ''}" style="background:${p.color}">
+           ${isLeader ? '👑 ' : ''}${p.name.slice(0,8)} <span class="pts">${p.score}</span>
           </div>
         `;
         }).join('')}
