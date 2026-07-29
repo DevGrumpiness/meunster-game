@@ -524,6 +524,17 @@
       color: #5f6b76;
     }
 
+    .smart10-tile.fehlversuch {
+      border-color: #e07070;
+      background: #fde8e8;
+    }
+
+    .smart10-tile.not-revealed {
+      border-color: #dee2e6;
+      background: #f8f9fa;
+      opacity: 0.6;
+    }
+
     .smart10-option-text {
       font-weight: 700;
       color: var(--ms-blue);
@@ -539,6 +550,14 @@
     .smart10-tile.guess-wrong .smart10-option-text,
     .smart10-tile.truth-false .smart10-option-text {
       color: inherit;
+    }
+
+    .smart10-tile.fehlversuch .smart10-option-text {
+      color: #c0392b;
+    }
+
+    .smart10-tile.not-revealed .smart10-option-text {
+      color: #adb5bd;
     }
 
     .smart10-actions {
@@ -2863,12 +2882,22 @@
           const actualTrue = !!q.correct[i];
           const solver = gameState.players.find(p => p.id === smart10.resolvedBy?.[i]);
           const attempter = gameState.players.find(p => p.id === smart10.attemptedBy?.[i]);
+          const wasPicked = !!solver || !!attempter;
+          if (!wasPicked) {
+            return `
+              <div class="smart10-tile not-revealed">
+                <div class="smart10-option-text">${option}</div>
+                <div class="smart10-tile-note" style="color:#adb5bd;">Nicht aufgedeckt</div>
+              </div>
+            `;
+          }
+          const tileClass = solver ? 'truth-true' : 'fehlversuch';
           return `
-            <div class="smart10-tile ${actualTrue ? 'truth-true' : 'truth-false'}">
+            <div class="smart10-tile ${tileClass}">
               <div class="smart10-option-text">${option}</div>
               <div class="smart10-tile-note">${actualTrue ? '✓ Gehört dazu' : '✗ Gehört nicht dazu'}</div>
               <div class="smart10-tile-meta">
-                ${solver ? `+1 für <span style="color:${solver.color}">${solver.name}</span>` : attempter ? `Fehlversuch: <span style="color:${attempter.color}">${attempter.name}</span>` : 'Nicht gewählt'}
+                ${solver ? `+1 für <span style="color:${solver.color}">${solver.name}</span>` : `Fehlversuch: <span style="color:${attempter.color}">${attempter.name}</span>`}
               </div>
             </div>
           `;
