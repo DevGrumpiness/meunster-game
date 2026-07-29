@@ -2005,16 +2005,14 @@
       gameState.totalRounds = totalRounds === 0 ? 0 : totalRounds;
       gameState.round = 0;
       gameState.currentPlayerIdx = 0;
-      // Restore used questions from localStorage for cross-session variety
-      const stored = localStorage.getItem('mk-used-questions');
-      const storedArr = stored ? JSON.parse(stored) : [];
-      // Only restore if not all questions used
+      // Restore used questions from localStorage (fingerprint-based, survives reorderings)
+      const restoredIdxs = restoreUsedQuestions();
       const activeQs = getActiveQuestions();
-      if (storedArr.length < activeQs.length * 0.9) {
-        gameState.usedQuestionIdxs = storedArr.filter(i => i < QUESTIONS.length);
+      if (restoredIdxs.length < activeQs.length * 0.9) {
+        gameState.usedQuestionIdxs = restoredIdxs;
       } else {
         gameState.usedQuestionIdxs = [];
-        localStorage.removeItem('mk-used-questions');
+        localStorage.removeItem('mk-used-q2');
       }
       gameState.usedCategories = {};
       gameState.questionPlayerIds = [];
@@ -2059,8 +2057,30 @@
       return CATEGORIES.filter(c => c.id !== 'allgemein');
     }
 
+    // Stable question fingerprint (survives index changes when questions are added/reordered)
+    function qFingerprint(q) {
+      return q.q.substring(0, 40);
+    }
+
     function persistUsedQuestions() {
-      localStorage.setItem('mk-used-questions', JSON.stringify(gameState.usedQuestionIdxs));
+      const hashes = gameState.usedQuestionIdxs.map(i => qFingerprint(QUESTIONS[i]));
+      localStorage.setItem('mk-used-q2', JSON.stringify(hashes));
+    }
+
+    function restoreUsedQuestions() {
+      // New format: fingerprints
+      const stored2 = localStorage.getItem('mk-used-q2');
+      if (stored2) {
+        const hashes = JSON.parse(stored2);
+        const indices = [];
+        QUESTIONS.forEach((q, i) => {
+          if (hashes.includes(qFingerprint(q))) indices.push(i);
+        });
+        return indices;
+      }
+      // Clear legacy index-based storage
+      localStorage.removeItem('mk-used-questions');
+      return [];
     }
 
     function selectCategory(catId) {
@@ -2230,7 +2250,7 @@
       }
       if (gameState.totalRounds === 0 && gameState.usedQuestionIdxs.length >= getActiveQuestions().length) {
         gameState.usedQuestionIdxs = [];
-        localStorage.removeItem('mk-used-questions');
+        localStorage.removeItem('mk-used-q2');
         gameState.usedCategories = {};
         CATEGORIES.forEach(c => gameState.usedCategories[c.id] = 0);
       }
@@ -2353,14 +2373,13 @@
       gameState.round = 0;
       gameState.currentPlayerIdx = 0;
       gameState.includeAllgemein = true; // solo test includes all questions
-      // Restore used questions from localStorage
-      const stored = localStorage.getItem('mk-used-questions');
-      const storedArr = stored ? JSON.parse(stored) : [];
-      if (storedArr.length < QUESTIONS.length * 0.9) {
-        gameState.usedQuestionIdxs = storedArr.filter(i => i < QUESTIONS.length);
+      // Restore used questions from localStorage (fingerprint-based)
+      const restoredIdxs = restoreUsedQuestions();
+      if (restoredIdxs.length < QUESTIONS.length * 0.9) {
+        gameState.usedQuestionIdxs = restoredIdxs;
       } else {
         gameState.usedQuestionIdxs = [];
-        localStorage.removeItem('mk-used-questions');
+        localStorage.removeItem('mk-used-q2');
       }
       gameState.usedCategories = {};
       gameState.questionPlayerIds = [];
