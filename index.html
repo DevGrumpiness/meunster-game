@@ -406,6 +406,7 @@ const CATEGORIES = [
   { id: 'kultur', name: 'Uni & Kultur', icon: '🎭', color: '#6a4c93' },
   { id: 'viral', name: 'Viral & News', icon: '📱', color: '#ff006e' },
   { id: 'wissen', name: 'Wissen & Kurioses', icon: '🧠', color: '#f4a261' },
+  { id: 'allgemein', name: 'Allgemeinwissen', icon: '📚', color: '#3a86a8' },
 ];
 
 const QUESTIONS = [
@@ -684,6 +685,146 @@ const QUESTIONS = [
   // --- Sights extra ---
   { cat:'sights', type:'quiz', q:'Was ist das "Stadthaus 1"?', answers:['Moderner Verwaltungsbau – Architektur-Kontroverse','Shopping-Center','Hotel','Parkhaus'], correct:0, fact:'Das Stadthaus 1 an der Klemensstraße ist wegen seiner modernen Architektur umstritten – manche lieben es, viele hassen es.' },
   { cat:'sights', type:'quiz', q:'Was kann man am "Kreativkai" machen?', answers:['Galerien besuchen, Essen gehen, Kreativbüros entdecken','Segeln','Schwimmen','Angeln'], correct:0, fact:'Der Kreativkai am Hafen ist die kulturelle Seite des Hafenviertels – Galerien, Design-Büros, und das Cinema am Hafen.' },
+
+  // ===== SCHWERE MÜNSTER-FRAGEN =====
+  { cat:'wissen', type:'quiz', q:'Wofür stehen die drei eisernen Käfige an der Lambertikirche?', answers:['Dort hingen die Leichen der hingerichteten Wiedertäufer','Alte Laternenhalter','Glockenspiel-Gehäuse','Vogelnester für Turmfalken'], correct:0, fact:'1536 wurden die Anführer der Wiedertäufer hingerichtet und ihre Leichen in Eisenkäfigen am Turm aufgehängt. Die Käfige hängen bis heute dort.' },
+  { cat:'wissen', type:'quiz', q:'Wer war der "Löwe von Münster"?', answers:['Clemens August Graf von Galen','Friedrich von Bodelschwingh','Annette von Droste-Hülshoff','Johann Conrad Schlaun'], correct:0, fact:'Bischof von Galen predigte 1941 öffentlich gegen die NS-Euthanasieprogramme – ein mutiger Akt des Widerstands. Er wurde 2005 seliggesprochen.' },
+  { cat:'sights', type:'quiz', q:'Welcher Barockarchitekt entwarf das Fürstbischöfliche Schloss?', answers:['Johann Conrad Schlaun','Balthasar Neumann','Karl Friedrich Schinkel','Georg W. von Knobelsdorff'], correct:0, fact:'Schlaun prägte Münsters Barock wie kein anderer – Schloss, Erbdrostenhof und die Clemenskirche stammen von ihm.' },
+  { cat:'wissen', type:'quiz', q:'Welche Dichterin wurde auf Burg Hülshoff bei Münster geboren?', answers:['Annette von Droste-Hülshoff','Bettina von Arnim','Else Lasker-Schüler','Ricarda Huch'], correct:0, fact:'Die Autorin der "Judenbuche" wurde 1797 auf Burg Hülshoff geboren – heute ein beliebtes Ausflugsziel mit Literaturmuseum.' },
+  { cat:'wissen', type:'estimate', q:'In welchem Jahr wurde der Westfälische Frieden geschlossen?', answer:1648, unit:'', tolerance:15, fact:'1648 beendete der Westfälische Frieden den Dreißigjährigen Krieg. Die Verhandlungen fanden in Münster und Osnabrück statt.' },
+  { cat:'wissen', type:'quiz', q:'Wer rief sich 1534 in Münster zum "König von Zion" aus?', answers:['Jan van Leiden','Martin Luther','Thomas Müntzer','Bernhard Knipperdolling'], correct:0, fact:'Der Wiedertäufer Jan van Leiden herrschte über ein Jahr als selbsternannter König in Münster, bis die Stadt 1535 zurückerobert wurde.' },
+  { cat:'wissen', type:'estimate', q:'In welchem Jahr wurde Preußen Münster gegründet?', answer:1906, unit:'', tolerance:10, fact:'Der SC Preußen 06 Münster wurde 1906 gegründet und war 1963 Gründungsmitglied der Fußball-Bundesliga!' },
+  { cat:'wissen', type:'quiz', q:'Wie heißt das Stadion von Preußen Münster?', answers:['Preußenstadion','Westfalenstadion','Arena Münsterland','Schlosspark-Stadion'], correct:0, fact:'Das Preußenstadion an der Hammer Straße fasst rund 15.000 Zuschauer und ist die Heimat der Adler.' },
+  { cat:'sights', type:'quiz', q:'Was kann man im Friedenssaal des Rathauses sehen?', answers:['Den original erhaltenen Saal des Westfälischen Friedens','Eine moderne Kunstgalerie','Das Bürgermeisterbüro','Einen Konzertsaal'], correct:0, fact:'Im Friedenssaal wurde 1648 der Spanisch-Niederländische Frieden beschworen. Die originale Holzvertäfelung ist erhalten.' },
+  { cat:'kultur', type:'quiz', q:'Welcher Münsteraner Entertainer ist für Jazz und TV-Shows bekannt?', answers:['Götz Alsmann','Jan Delay','Helge Schneider','Max Mutzke'], correct:0, fact:'Götz Alsmann studierte in Münster, lebt dort und ist als Jazzmusiker und TV-Moderator bundesweit bekannt.' },
+  { cat:'wissen', type:'quiz', q:'Was bedeutet "Jovel" in der Masematte?', answers:['Gut / toll','Schnell','Betrunken','Fahrrad'], correct:0, fact:'"Jovel" heißt "gut" oder "toll" in der Masematte – daher auch der Name der Jovel Music Hall.' },
+  { cat:'sights', type:'quiz', q:'Welche Besonderheit hat die Promenade in Münster?', answers:['Autofreier Grünring auf der ehemaligen Stadtmauer','Radverbot auf der gesamten Strecke','Beleuchtete Wasserfontänen','Unterirdische Einkaufspassage'], correct:0, fact:'Die 4,5 km lange Promenade verläuft auf dem Wall der ehemaligen Stadtbefestigung – komplett autofrei, dafür voller Radfahrer.' },
+  { cat:'wissen', type:'quiz', q:'In welcher Liga spielte Preußen Münster in der allerersten Bundesliga-Saison 1963/64?', answers:['1. Bundesliga – als Gründungsmitglied','2. Bundesliga','Regionalliga West','Oberliga'], correct:0, fact:'Preußen Münster war eines der 16 Gründungsmitglieder der Bundesliga 1963! In der Premierensaison belegte man den letzten Platz.' },
+  { cat:'wissen', type:'quiz', q:'Was ist die Masematte?', answers:['Eine Geheimsprache / Soziolekt aus Münster','Ein westfälisches Kartenspiel','Ein Tanzstil','Ein Gericht'], correct:0, fact:'Die Masematte entstand im 19. Jh. in Münsters Unterschicht. Bekannte Wörter: "Leeze" (Fahrrad), "Jovel" (gut), "Meese" (Geld).' },
+  { cat:'wissen', type:'quiz', q:'Wie oft findet der Send pro Jahr statt?', answers:['Dreimal','Einmal','Zweimal','Viermal'], correct:0, fact:'Den Send gibt es dreimal im Jahr: Frühjahrssend, Sommersend und Herbstsend – immer auf dem Schlossplatz.' },
+  { cat:'sights', type:'quiz', q:'In welchem Jahrhundert wurde der Aasee angelegt?', answers:['20. Jahrhundert (1930er)','18. Jahrhundert','Mittelalter','Er ist ein natürlicher See'], correct:0, fact:'Der Aasee wurde in den 1930er Jahren als Hochwasserschutz und Naherholungsgebiet angelegt – er ist also keine 100 Jahre alt!' },
+  { cat:'kultur', type:'quiz', q:'Wie heißt die Universität Münster seit 2023 offiziell?', answers:['Universität Münster','Westfälische Wilhelms-Universität','Friedens-Universität','Hochschule Münster'], correct:0, fact:'Seit Oktober 2023 heißt sie offiziell nur noch "Universität Münster" – der alte Name "Westfälische Wilhelms-Universität" wurde abgelegt.' },
+  { cat:'fahrrad', type:'estimate', q:'Wie viele Fahrräder gibt es schätzungsweise in Münster?', answer:500000, unit:'', tolerance:100000, fact:'In Münster gibt es geschätzt rund 500.000 Fahrräder – das sind mehr als Einwohner! Deutschlands Fahrradhauptstadt.' },
+  { cat:'sights', type:'quiz', q:'Was zeigt die astronomische Uhr im St.-Paulus-Dom?', answers:['Kalender, Planetenbahnen und Uhrzeit seit 1540','Nur die Uhrzeit','Das Wetter','Den Gottesdienstplan'], correct:0, fact:'Die astronomische Uhr im Dom stammt von 1540 und zeigt Kalenderdaten, Planetenlauf und die Uhrzeit – ein Meisterwerk der Renaissance.' },
+  { cat:'wissen', type:'quiz', q:'Wer sind Thiel und Boerne?', answers:['Die fiktiven Tatort-Ermittler aus Münster','Zwei Bürgermeister','Gründer von Preußen Münster','Wiedertäufer-Anführer'], correct:0, fact:'Kommissar Thiel und Prof. Boerne sind das beliebteste Tatort-Duo Deutschlands – mit 12-14 Mio. Zuschauern pro Folge.' },
+  { cat:'wissen', type:'estimate', q:'Wie lang ist die Promenade rund um die Altstadt?', answer:4.5, unit:'km', tolerance:1, fact:'Die Promenade ist ca. 4,5 km lang – Deutschlands einziger durchgehend autofreier Innenstadtring.' },
+  { cat:'wissen', type:'quiz', q:'Welcher Vertrag wurde im Rathaus zu Münster beschworen?', answers:['Friede von Münster (Teil des Westf. Friedens)','Vertrag von Versailles','Wiener Kongress','NATO-Vertrag'], correct:0, fact:'1648 wurde im Rathaus der Friede zwischen Spanien und den Niederlanden beschworen – Teil des Westfälischen Friedens.' },
+  { cat:'wissen', type:'smart10', q:'Welche dieser Persönlichkeiten haben einen Bezug zu Münster?', options:['Annette von Droste-Hülshoff','Johann Wolfgang von Goethe','Götz Alsmann','Johann Conrad Schlaun','Ludwig van Beethoven','Clemens August von Galen','Otto von Bismarck','Die Tatort-Ermittler Thiel & Boerne'], correct:[true,false,true,true,false,true,false,true], fact:'Droste-Hülshoff (geboren bei MS), Alsmann (lebt dort), Schlaun (Barockarchitekt), von Galen (Bischof) und Thiel & Boerne (Tatort) haben alle Münster-Bezug.' },
+  { cat:'wissen', type:'smart10', q:'Welche historischen Ereignisse fanden in Münster statt?', options:['Westfälischer Friede 1648','Wiedertäufer-Herrschaft 1534','Gründung der Universität 1780','Erste Bundesliga-Saison mit Preußen 1963','LivCom-Award 2004','Olympische Spiele 1972','NATO-Gründung 1949','Reformation durch Martin Luther'], correct:[true,true,true,true,true,false,false,false], fact:'All diese Ereignisse (außer Olympia/München, NATO/Washington, Reformation/Wittenberg) fanden tatsächlich in Münster statt.' },
+  { cat:'wissen', type:'quiz', q:'Welches Gebäude beherbergt das LWL-Museum für Kunst und Kultur?', answers:['Ein moderner Neubau am Domplatz','Das Schloss','Den alten Bahnhof','Das Rathaus'], correct:0, fact:'Das LWL-Museum wurde 2014 mit einem spektakulären Neubau am Domplatz eröffnet – eines der bedeutendsten Kunstmuseen Westfalens.' },
+
+  // ===== ALLGEMEINWISSEN =====
+  // --- Quiz ---
+  { cat:'allgemein', type:'quiz', q:'Wie heißt die Hauptstadt von Australien?', answers:['Canberra','Sydney','Melbourne','Brisbane'], correct:0, fact:'Nicht Sydney! Canberra wurde 1913 als Kompromiss zwischen den Rivalen Sydney und Melbourne zur Hauptstadt bestimmt.' },
+  { cat:'allgemein', type:'quiz', q:'Welches chemische Element hat das Symbol "Au"?', answers:['Gold','Silber','Aluminium','Argon'], correct:0, fact:'Au kommt vom lateinischen "Aurum" – Gold ist eines der ältesten bekannten Elemente der Menschheit.' },
+  { cat:'allgemein', type:'quiz', q:'Wer malte die Mona Lisa?', answers:['Leonardo da Vinci','Michelangelo','Raffael','Rembrandt'], correct:0, fact:'Leonardo malte die Mona Lisa vermutlich zwischen 1503 und 1506. Sie hängt heute im Louvre in Paris.' },
+  { cat:'allgemein', type:'quiz', q:'Welcher Planet ist der größte im Sonnensystem?', answers:['Jupiter','Saturn','Neptun','Uranus'], correct:0, fact:'Jupiter ist so groß, dass alle anderen Planeten zusammen hineinpassen würden – sein Durchmesser beträgt ca. 140.000 km.' },
+  { cat:'allgemein', type:'quiz', q:'In welchem Land steht die Akropolis?', answers:['Griechenland','Italien','Türkei','Ägypten'], correct:0, fact:'Die Akropolis in Athen wurde im 5. Jh. v. Chr. erbaut und ist eines der bekanntesten Bauwerke der Antike.' },
+  { cat:'allgemein', type:'quiz', q:'Wie viele Bundesländer hat Deutschland?', answers:['16','15','14','17'], correct:0, fact:'Seit der Wiedervereinigung 1990 hat Deutschland 16 Bundesländer – darunter 3 Stadtstaaten (Berlin, Hamburg, Bremen).' },
+  { cat:'allgemein', type:'quiz', q:'Welcher Ozean ist der größte der Welt?', answers:['Pazifik','Atlantik','Indischer Ozean','Arktischer Ozean'], correct:0, fact:'Der Pazifische Ozean bedeckt mehr Fläche als alle Landmassen der Erde zusammen – rund 165 Millionen km².' },
+  { cat:'allgemein', type:'quiz', q:'Wer schrieb "Faust"?', answers:['Johann Wolfgang von Goethe','Friedrich Schiller','Heinrich Heine','Thomas Mann'], correct:0, fact:'Goethe arbeitete über 60 Jahre an seinem Lebenswerk "Faust" – von 1772 bis kurz vor seinem Tod 1832.' },
+  { cat:'allgemein', type:'quiz', q:'Was ist die Währung in Japan?', answers:['Yen','Won','Yuan','Rupie'], correct:0, fact:'Der japanische Yen (¥) ist die drittwichtigste Reservewährung der Welt nach Dollar und Euro.' },
+  { cat:'allgemein', type:'quiz', q:'Welches Gas nehmen Pflanzen bei der Photosynthese auf?', answers:['CO₂','O₂','N₂','H₂'], correct:0, fact:'Pflanzen wandeln CO₂ und Wasser mithilfe von Sonnenlicht in Zucker und Sauerstoff um – die Basis allen Lebens.' },
+  { cat:'allgemein', type:'quiz', q:'Welcher Fluss ist der längste in Europa?', answers:['Wolga','Donau','Rhein','Elbe'], correct:0, fact:'Die Wolga fließt über 3.530 km durch Russland und mündet ins Kaspische Meer – deutlich länger als die Donau (2.857 km).' },
+  { cat:'allgemein', type:'quiz', q:'In welchem Jahr fiel die Berliner Mauer?', answers:['1989','1990','1988','1991'], correct:0, fact:'Am 9. November 1989 fiel die Mauer – ein Ereignis, das die Welt veränderte und zur deutschen Wiedervereinigung führte.' },
+  { cat:'allgemein', type:'quiz', q:'Welches ist das größte lebende Landtier?', answers:['Afrikanischer Elefant','Nashorn','Nilpferd','Giraffe'], correct:0, fact:'Afrikanische Elefanten können bis zu 6 Tonnen wiegen und 3,3 Meter groß werden – die größten an Land lebenden Tiere.' },
+  { cat:'allgemein', type:'quiz', q:'Wer entwickelte die Relativitätstheorie?', answers:['Albert Einstein','Isaac Newton','Max Planck','Niels Bohr'], correct:0, fact:'Einstein veröffentlichte seine Spezielle Relativitätstheorie 1905 und die Allgemeine 1915 – sie revolutionierten die Physik.' },
+  { cat:'allgemein', type:'quiz', q:'Was ist die Hauptstadt von Kanada?', answers:['Ottawa','Toronto','Montreal','Vancouver'], correct:0, fact:'Ottawa wurde 1857 von Queen Victoria als Hauptstadt gewählt – ein Kompromiss zwischen dem englischen Toronto und dem französischen Montreal.' },
+  { cat:'allgemein', type:'quiz', q:'Welcher Kontinent hat die meisten Länder?', answers:['Afrika','Asien','Europa','Südamerika'], correct:0, fact:'Afrika hat 54 anerkannte Staaten – mehr als jeder andere Kontinent. Asien kommt mit 49 auf den zweiten Platz.' },
+  { cat:'allgemein', type:'quiz', q:'Wer komponierte die "Neunte Symphonie" mit der "Ode an die Freude"?', answers:['Ludwig van Beethoven','Mozart','Bach','Schubert'], correct:0, fact:'Beethovens Neunte (1824) war die erste große Symphonie mit Chor – die "Ode an die Freude" ist heute die Europahymne.' },
+  { cat:'allgemein', type:'quiz', q:'Welches Organ im menschlichen Körper ist das größte?', answers:['Die Haut','Die Leber','Die Lunge','Der Darm'], correct:0, fact:'Die Haut ist mit ca. 1,7 m² das größte Organ – sie wiegt bei Erwachsenen 3-4 kg und schützt vor Umwelteinflüssen.' },
+  { cat:'allgemein', type:'quiz', q:'In welchem Land liegt Machu Picchu?', answers:['Peru','Bolivien','Ecuador','Kolumbien'], correct:0, fact:'Die Inka-Ruinenstadt Machu Picchu liegt auf 2.430 m Höhe in den Anden Perus und wurde erst 1911 wiederentdeckt.' },
+  { cat:'allgemein', type:'quiz', q:'Was ist der härteste natürliche Stoff?', answers:['Diamant','Stahl','Titan','Granit'], correct:0, fact:'Diamant erreicht die Höchststufe 10 auf der Mohs-Härteskala – er kann jedes andere Material ritzen.' },
+  { cat:'allgemein', type:'quiz', q:'Wer schrieb "Romeo und Julia"?', answers:['William Shakespeare','Charles Dickens','Jane Austen','Oscar Wilde'], correct:0, fact:'Shakespeare schrieb die berühmteste Liebesgeschichte der Welt um 1597. Das Stück spielt in Verona, Italien.' },
+  { cat:'allgemein', type:'quiz', q:'Welches Land gewann die Fußball-WM 2014?', answers:['Deutschland','Argentinien','Brasilien','Spanien'], correct:0, fact:'Deutschland gewann 2014 in Brasilien mit dem legendären 1:0-Tor von Götze in der Verlängerung gegen Argentinien.' },
+  { cat:'allgemein', type:'quiz', q:'Welche Stadt wird "Big Apple" genannt?', answers:['New York','Los Angeles','Chicago','San Francisco'], correct:0, fact:'Der Spitzname "Big Apple" für New York City stammt aus den 1920er Jahren – er wurde von Sportjournalisten populär gemacht.' },
+  { cat:'allgemein', type:'quiz', q:'Welcher dieser Vögel kann NICHT fliegen?', answers:['Strauß','Adler','Kolibri','Albatros'], correct:0, fact:'Der Strauß ist der größte lebende Vogel und kann nicht fliegen – dafür rennt er mit bis zu 70 km/h.' },
+  { cat:'allgemein', type:'quiz', q:'Wie viele Zähne hat ein erwachsener Mensch normalerweise?', answers:['32','28','36','24'], correct:0, fact:'32 Zähne inklusive der 4 Weisheitszähne – viele Menschen lassen letztere allerdings entfernen.' },
+  { cat:'allgemein', type:'quiz', q:'Welches Land hat die Form eines Stiefels?', answers:['Italien','Griechenland','Portugal','Kroatien'], correct:0, fact:'Italien ist seit jeher für seine markante Stiefelform bekannt – der "Absatz" ist Apulien, die "Spitze" Kalabrien.' },
+  { cat:'allgemein', type:'quiz', q:'Was ist die Hauptstadt der Türkei?', answers:['Ankara','Istanbul','Izmir','Antalya'], correct:0, fact:'Nicht Istanbul! Ankara wurde 1923 von Atatürk zur Hauptstadt der neuen Türkischen Republik bestimmt.' },
+  { cat:'allgemein', type:'quiz', q:'Welcher deutsche Kanzler führte die Wiedervereinigung herbei?', answers:['Helmut Kohl','Willy Brandt','Helmut Schmidt','Gerhard Schröder'], correct:0, fact:'Helmut Kohl (CDU) war 1989/90 Bundeskanzler und gilt als "Kanzler der Einheit" – er regierte 16 Jahre.' },
+  { cat:'allgemein', type:'quiz', q:'Wer erfand den Buchdruck mit beweglichen Lettern in Europa?', answers:['Johannes Gutenberg','Martin Luther','Galileo Galilei','Leonardo da Vinci'], correct:0, fact:'Gutenberg revolutionierte um 1450 in Mainz den Buchdruck – seine Erfindung gilt als eine der wichtigsten der Menschheitsgeschichte.' },
+  { cat:'allgemein', type:'quiz', q:'Was misst ein Barometer?', answers:['Luftdruck','Temperatur','Windgeschwindigkeit','Luftfeuchtigkeit'], correct:0, fact:'Barometer messen den atmosphärischen Druck. Fallender Luftdruck deutet oft auf schlechtes Wetter hin.' },
+  { cat:'allgemein', type:'quiz', q:'Welches Vitamin produziert der Körper durch Sonnenlicht?', answers:['Vitamin D','Vitamin C','Vitamin B12','Vitamin A'], correct:0, fact:'Bei Sonneneinstrahlung auf die Haut bildet der Körper Vitamin D – wichtig für Knochen, Immunsystem und Stimmung.' },
+  { cat:'allgemein', type:'quiz', q:'Welcher Stoff macht Chilischoten scharf?', answers:['Capsaicin','Menthol','Piperin','Allicin'], correct:0, fact:'Capsaicin reizt Schmerzrezeptoren im Mund – die Schärfe wird in Scoville-Einheiten gemessen. Carolina Reaper: über 2 Mio. Scoville!' },
+  { cat:'allgemein', type:'quiz', q:'Was ist die Hauptstadt von Brasilien?', answers:['Brasília','Rio de Janeiro','São Paulo','Salvador'], correct:0, fact:'Brasília wurde 1960 als Planstadt im Landesinneren als neue Hauptstadt eingeweiht – entworfen von Oscar Niemeyer.' },
+  { cat:'allgemein', type:'quiz', q:'Welches Metall ist bei Raumtemperatur flüssig?', answers:['Quecksilber','Gallium','Blei','Zinn'], correct:0, fact:'Quecksilber (Hg) ist das einzige Metall, das bei Raumtemperatur flüssig ist – der Schmelzpunkt liegt bei -39°C.' },
+  { cat:'allgemein', type:'quiz', q:'Welche Farbe hat der Nil aus dem Weltall betrachtet?', answers:['Grün (Vegetation) in einem braunen Wüstenband','Blau','Rot','Schwarz'], correct:0, fact:'Aus dem All sieht man den Nil als grünes Vegetationsband, das sich durch die braune Sahara schlängelt.' },
+  { cat:'allgemein', type:'quiz', q:'Was ist der Unterschied zwischen einem Asteroid und einem Kometen?', answers:['Kometen haben einen Schweif aus Gas und Staub','Asteroiden sind größer','Kometen bestehen aus Metall','Es gibt keinen Unterschied'], correct:0, fact:'Kometen bestehen aus Eis und Gestein – wenn sie sich der Sonne nähern, verdampft das Eis und bildet den typischen Schweif.' },
+  { cat:'allgemein', type:'quiz', q:'Welches Tier hat das größte Gehirn?', answers:['Pottwal','Blauwal','Elefant','Mensch'], correct:0, fact:'Das Gehirn eines Pottwals wiegt ca. 8 kg – das schwerste aller Lebewesen. Das menschliche Gehirn wiegt nur ca. 1,4 kg.' },
+  { cat:'allgemein', type:'quiz', q:'Wer war der erste Mensch im Weltraum?', answers:['Juri Gagarin','Neil Armstrong','Buzz Aldrin','John Glenn'], correct:0, fact:'Der sowjetische Kosmonaut Juri Gagarin umrundete am 12. April 1961 als erster Mensch die Erde im Weltraum.' },
+  { cat:'allgemein', type:'quiz', q:'Was bedeutet "pH-Wert"?', answers:['Maß für Säure/Base einer Lösung','Prozentualer Wassergehalt','Phosphor-Gehalt','Druckeinheit'], correct:0, fact:'Der pH-Wert reicht von 0 (sehr sauer) bis 14 (sehr basisch). Reines Wasser hat pH 7 (neutral).' },
+  { cat:'allgemein', type:'quiz', q:'Welches ist das kleinste Land der Welt?', answers:['Vatikanstadt','Monaco','San Marino','Liechtenstein'], correct:0, fact:'Vatikanstadt ist mit nur 0,44 km² der kleinste anerkannte Staat der Welt – kleiner als viele Stadtparks.' },
+  { cat:'allgemein', type:'quiz', q:'Was ist das meistgesprochene Muttersprache der Welt?', answers:['Mandarin-Chinesisch','Englisch','Spanisch','Hindi'], correct:0, fact:'Mandarin-Chinesisch hat über 900 Mio. Muttersprachler. Englisch ist erst an dritter Stelle – wird aber am meisten als Zweitsprache gesprochen.' },
+  { cat:'allgemein', type:'quiz', q:'Welcher Muskel im menschlichen Körper ist der stärkste?', answers:['Kaumuskel (Masseter)','Bizeps','Herz','Oberschenkel'], correct:0, fact:'Der Kaumuskel kann eine Beißkraft von über 80 kg erzeugen – gemessen an der Kraft pro Querschnitt der stärkste Muskel.' },
+  { cat:'allgemein', type:'quiz', q:'Welches Land hat die längste Küstenlinie der Welt?', answers:['Kanada','Australien','Indonesien','Russland'], correct:0, fact:'Kanada hat mit ca. 202.000 km die längste Küstenlinie – dank tausender Inseln in der Arktis und an den Küsten.' },
+  { cat:'allgemein', type:'quiz', q:'Was passiert bei einer Sonnenfinsternis?', answers:['Der Mond schiebt sich zwischen Erde und Sonne','Die Erde dreht sich schneller','Die Sonne explodiert kurz','Der Mond verdunkelt sich'], correct:0, fact:'Bei einer totalen Sonnenfinsternis verdeckt der Mond die Sonne komplett – ein Zufall, da Mond und Sonne am Himmel fast gleich groß erscheinen.' },
+  { cat:'allgemein', type:'quiz', q:'Wer gilt als Begründer der modernen Krankenpflege?', answers:['Florence Nightingale','Marie Curie','Clara Barton','Hildegard von Bingen'], correct:0, fact:'Florence Nightingale revolutionierte die Krankenpflege im Krimkrieg (1853-56) und führte Hygienestandards ein.' },
+  { cat:'allgemein', type:'quiz', q:'Welches Gas macht den größten Teil der Erdatmosphäre aus?', answers:['Stickstoff (N₂)','Sauerstoff (O₂)','CO₂','Argon'], correct:0, fact:'Die Atmosphäre besteht zu 78% aus Stickstoff, 21% aus Sauerstoff und nur zu 0,04% aus CO₂.' },
+  { cat:'allgemein', type:'quiz', q:'Was ist die Fibonacci-Folge?', answers:['Jede Zahl ist die Summe der zwei vorherigen','Jede Zahl wird verdoppelt','Alle Primzahlen der Reihe nach','Eine zufällige Zahlenfolge'], correct:0, fact:'1, 1, 2, 3, 5, 8, 13, 21... Die Fibonacci-Folge kommt überall in der Natur vor: Blütenblätter, Schneckenhäuser, Sonnenblumen.' },
+  { cat:'allgemein', type:'quiz', q:'Welches Instrument hat 88 Tasten?', answers:['Klavier','Orgel','Akkordeon','Cembalo'], correct:0, fact:'Ein modernes Klavier hat 88 Tasten – 52 weiße und 36 schwarze, die zusammen 7¼ Oktaven umfassen.' },
+  { cat:'allgemein', type:'quiz', q:'Was ist der Äquator?', answers:['Eine gedachte Linie um die Erdmitte','Ein Fluss in Afrika','Ein Gebirge','Ein Wüstengürtel'], correct:0, fact:'Der Äquator teilt die Erde in Nord- und Südhalbkugel und ist ca. 40.075 km lang – die längste aller Breitenkreise.' },
+  { cat:'allgemein', type:'quiz', q:'Wie heißt das höchste Gebäude der Welt?', answers:['Burj Khalifa','Empire State Building','Shanghai Tower','Taipei 101'], correct:0, fact:'Der Burj Khalifa in Dubai ist mit 828 Metern das höchste Gebäude der Welt – fast doppelt so hoch wie der Eiffelturm.' },
+  { cat:'allgemein', type:'quiz', q:'Was ist der Treibhauseffekt?', answers:['Gase in der Atmosphäre halten Wärme zurück','Die Erde wird von einer Glaskuppel bedeckt','Pflanzen heizen den Boden auf','Vulkane erwärmen die Atmosphäre'], correct:0, fact:'CO₂ und andere Treibhausgase absorbieren Wärmestrahlung und halten sie in der Atmosphäre – natürlich notwendig, aber der Mensch verstärkt den Effekt.' },
+
+  // --- Allgemeinwissen Schätzfragen ---
+  { cat:'allgemein', type:'estimate', q:'Wie hoch ist der Mount Everest in Metern?', answer:8849, unit:'m', tolerance:200, fact:'Der Mount Everest ist mit 8.849 m der höchste Berg der Welt. Die exakte Höhe wurde 2020 von Nepal und China gemeinsam festgelegt.' },
+  { cat:'allgemein', type:'estimate', q:'Wie viele Knochen hat der menschliche Körper?', answer:206, unit:'', tolerance:20, fact:'Ein erwachsener Mensch hat 206 Knochen. Babys werden mit ca. 270 geboren – viele verwachsen im Laufe der Kindheit.' },
+  { cat:'allgemein', type:'estimate', q:'Wie viele Länder sind UN-Mitglieder?', answer:193, unit:'', tolerance:10, fact:'193 Staaten sind Mitglied der Vereinten Nationen – der jüngste Beitritt war der Südsudan 2011.' },
+  { cat:'allgemein', type:'estimate', q:'Wie lang ist die Chinesische Mauer in Kilometern?', answer:21196, unit:'km', tolerance:5000, fact:'Die Chinesische Mauer erstreckt sich über 21.196 km – inklusive aller Verzweigungen und Abschnitte.' },
+  { cat:'allgemein', type:'estimate', q:'In welchem Jahr landete der erste Mensch auf dem Mond?', answer:1969, unit:'', tolerance:3, fact:'Am 20. Juli 1969 betrat Neil Armstrong als erster Mensch den Mond – "Ein kleiner Schritt für einen Menschen..."' },
+  { cat:'allgemein', type:'estimate', q:'Wie viele Einwohner hat Deutschland ungefähr (in Millionen)?', answer:84, unit:'Mio.', tolerance:5, fact:'Deutschland hat ca. 84 Millionen Einwohner und ist damit das bevölkerungsreichste Land der EU.' },
+  { cat:'allgemein', type:'estimate', q:'Wie schnell kann ein Gepard maximal laufen (km/h)?', answer:120, unit:'km/h', tolerance:15, fact:'Der Gepard ist das schnellste Landtier – er erreicht bis zu 120 km/h, kann dieses Tempo aber nur wenige Sekunden halten.' },
+  { cat:'allgemein', type:'estimate', q:'Wie viele Tasten hat ein Klavier?', answer:88, unit:'', tolerance:5, fact:'Ein Standard-Klavier hat 88 Tasten. Die tiefste Note ist ein A, die höchste ein C.' },
+  { cat:'allgemein', type:'estimate', q:'In welchem Jahr wurde das iPhone erstmals verkauft?', answer:2007, unit:'', tolerance:2, fact:'Steve Jobs stellte das erste iPhone im Januar 2007 vor. Es revolutionierte die Smartphone-Branche komplett.' },
+  { cat:'allgemein', type:'estimate', q:'Wie hoch ist der Kölner Dom in Metern?', answer:157, unit:'m', tolerance:15, fact:'Der Kölner Dom ist 157 m hoch und war von 1880 bis 1884 das höchste Gebäude der Welt.' },
+  { cat:'allgemein', type:'estimate', q:'Wie viele Liter Blut hat ein erwachsener Mensch?', answer:5, unit:'Liter', tolerance:1.5, fact:'Ein Erwachsener hat ca. 5-6 Liter Blut. Das Herz pumpt es etwa einmal pro Minute komplett durch den Körper.' },
+  { cat:'allgemein', type:'estimate', q:'Wie viele Zeitzonen gibt es auf der Erde?', answer:24, unit:'', tolerance:3, fact:'Es gibt 24 Zeitzonen, basierend auf der Einteilung der Erde in 15°-Längengradstreifen. In der Praxis sind es sogar mehr durch halbe/viertel Stunden.' },
+  { cat:'allgemein', type:'estimate', q:'Wie alt wurde Queen Elizabeth II.?', answer:96, unit:'Jahre', tolerance:3, fact:'Queen Elizabeth II. wurde 96 Jahre alt (1926-2022). Sie regierte 70 Jahre lang – die längste Amtszeit eines britischen Monarchen.' },
+  { cat:'allgemein', type:'estimate', q:'Wie viele Sprachen werden weltweit gesprochen?', answer:7000, unit:'', tolerance:1000, fact:'Es gibt ca. 7.000 lebende Sprachen weltweit – viele davon sind vom Aussterben bedroht. Über die Hälfte hat weniger als 10.000 Sprecher.' },
+  { cat:'allgemein', type:'estimate', q:'Wie viel Prozent der Erdoberfläche sind mit Wasser bedeckt?', answer:71, unit:'%', tolerance:5, fact:'Rund 71% der Erdoberfläche sind von Wasser bedeckt – deshalb wird die Erde auch "Blauer Planet" genannt.' },
+
+  // --- Allgemeinwissen Höher oder Tiefer ---
+  { cat:'allgemein', type:'höher_tiefer', q:'Die Sahara ist ca. 9 Millionen km² groß. Ist Australien größer oder kleiner?', reference:9000000, answer:7692000, unit:'km²', fact:'Australien ist mit ca. 7,7 Mio. km² tatsächlich kleiner als die Sahara!' },
+  { cat:'allgemein', type:'höher_tiefer', q:'Der Mensch hat 206 Knochen. Hat ein Huhn mehr oder weniger?', reference:206, answer:120, unit:'Knochen', fact:'Ein Huhn hat nur ca. 120 Knochen – viele davon sind hohl, damit es leichter fliegen kann.' },
+  { cat:'allgemein', type:'höher_tiefer', q:'Ein Blauwal wiegt ca. 150 Tonnen. Wiegt ein ausgewachsener Elefant mehr oder weniger als 6 Tonnen?', reference:6, answer:6, unit:'Tonnen', fact:'Ein afrikanischer Elefant wiegt tatsächlich ca. 6 Tonnen – genau der Referenzwert!' },
+  { cat:'allgemein', type:'höher_tiefer', q:'Die Erde ist ca. 4,5 Milliarden Jahre alt. Sind die ältesten Fossilien älter oder jünger als 3,5 Mrd. Jahre?', reference:3500, answer:3500, unit:'Mio. Jahre', fact:'Die ältesten bekannten Fossilien (Stromatolithen) sind tatsächlich ca. 3,5 Milliarden Jahre alt!' },
+  { cat:'allgemein', type:'höher_tiefer', q:'Der Rhein ist 1.230 km lang. Ist die Donau länger oder kürzer?', reference:1230, answer:2857, unit:'km', fact:'Die Donau ist mit 2.857 km mehr als doppelt so lang wie der Rhein – sie ist der zweitlängste Fluss Europas.' },
+  { cat:'allgemein', type:'höher_tiefer', q:'Deutschland hat ca. 84 Millionen Einwohner. Hat Frankreich mehr oder weniger?', reference:84, answer:68, unit:'Mio.', fact:'Frankreich hat ca. 68 Millionen Einwohner – deutlich weniger als Deutschland, aber auf größerer Fläche.' },
+
+  // --- Allgemeinwissen Abstimmungen ---
+  { cat:'allgemein', type:'vote', q:'Welche Superkraft hättest du am liebsten?', options:['Fliegen ✈️','Unsichtbarkeit 👻','Zeitreisen ⏰','Gedankenlesen 🧠'] },
+  { cat:'allgemein', type:'vote', q:'Welche Erfindung hat die Welt am meisten verändert?', options:['Internet 💻','Buchdruck 📖','Elektrizität ⚡','Antibiotika 💊'] },
+  { cat:'allgemein', type:'vote', q:'Auf welchen Kontinent würdet ihr am liebsten reisen?', options:['Asien 🏯','Südamerika 🌎','Afrika 🦁','Ozeanien 🏝️'] },
+  { cat:'allgemein', type:'vote', q:'Was ist wichtiger?', options:['Freiheit 🗽','Sicherheit 🔒','Gerechtigkeit ⚖️','Wohlstand 💰'] },
+  { cat:'allgemein', type:'vote', q:'Bestes Fast Food?', options:['Pizza 🍕','Burger 🍔','Döner 🥙','Sushi 🍣'] },
+
+  // --- Allgemeinwissen Wahr oder Falsch ---
+  { cat:'allgemein', type:'smart10', q:'Welche dieser Tiere sind Säugetiere?', options:['Delfin','Fledermaus','Pinguin','Wal','Krokodil','Faultier','Hai','Schnabeltier'], correct:[true,true,false,true,false,true,false,true], fact:'Delfin, Fledermaus, Wal, Faultier und Schnabeltier sind alles Säugetiere – ja, auch das Schnabeltier!' },
+  { cat:'allgemein', type:'smart10', q:'Welche dieser Länder liegen in Südamerika?', options:['Kolumbien','Mexiko','Peru','Portugal','Chile','Costa Rica','Argentinien','Kuba'], correct:[true,false,true,false,true,false,true,false], fact:'Kolumbien, Peru, Chile und Argentinien liegen in Südamerika. Mexiko, Costa Rica und Kuba gehören zu Mittel-/Nordamerika.' },
+  { cat:'allgemein', type:'smart10', q:'Welche dieser Aussagen stimmen?', options:['Wasser kocht bei 100°C auf Meereshöhe','Licht ist schneller als Schall','Die Erde dreht sich um den Mond','Gold ist schwerer als Silber','Diamanten bestehen aus Kohlenstoff','Die Sonne ist ein Stern','Mars ist größer als die Erde','Glas ist eine Flüssigkeit'], correct:[true,true,false,true,true,true,false,false], fact:'Wasser bei 100°C, Licht schneller als Schall, Gold schwerer als Silber, Diamant aus C, Sonne ist ein Stern – alles korrekt.' },
+  { cat:'allgemein', type:'smart10', q:'Welche dieser Hauptstädte stimmen?', options:['Paris → Frankreich','Rom → Italien','Sydney → Australien','Tokio → Japan','Istanbul → Türkei','Ottawa → Kanada','Bern → Schweiz','Mumbai → Indien'], correct:[true,true,false,true,false,true,true,false], fact:'Sydney und Istanbul sind NICHT Hauptstädte. Australiens Hauptstadt ist Canberra, die der Türkei Ankara, und Indiens ist Neu-Delhi.' },
+  { cat:'allgemein', type:'smart10', q:'Welche dieser Erfindungen stammen aus dem 20. Jahrhundert?', options:['Internet','Telefon','Fernsehen','Flugzeug','Buchdruck','Penicillin','Dampfmaschine','Smartphone'], correct:[true,false,true,true,false,true,false,true], fact:'Internet, TV, Flugzeug (1903), Penicillin (1928) und Smartphone kamen im 20./21. Jh. – Telefon (1876), Buchdruck (1450), Dampfmaschine (18. Jh.) waren früher.' },
+  { cat:'allgemein', type:'smart10', q:'Welche dieser Elemente stehen im Periodensystem?', options:['Sauerstoff (O)','Kryptonit (Kr)','Eisen (Fe)','Unobtanium (Ub)','Helium (He)','Adamantium (Ad)','Neon (Ne)','Vibranium (Vb)'], correct:[true,false,true,false,true,false,true,false], fact:'Sauerstoff, Eisen, Helium und Neon sind echte Elemente. Kryptonit, Unobtanium, Adamantium und Vibranium sind fiktiv!' },
+  { cat:'allgemein', type:'smart10', q:'Welche dieser Fakten über den menschlichen Körper stimmen?', options:['Das Herz schlägt ca. 100.000 mal pro Tag','Der Mensch hat mehr Bakterien als eigene Zellen','Fingernägel wachsen nach dem Tod weiter','Das Gehirn besteht zu ca. 75% aus Wasser','Blut ist im Körper blau','Knochen sind härter als Beton','Haare bestehen aus Keratin','Der Blinddarm hat keine Funktion'], correct:[true,true,false,true,false,true,true,false], fact:'Fingernägel wachsen nicht nach dem Tod (die Haut schrumpft). Blut ist nie blau. Der Blinddarm hat eine Immunfunktion.' },
+  { cat:'allgemein', type:'smart10', q:'Welche dieser Tiere können schwimmen?', options:['Tiger','Elefant','Gorilla','Pferd','Katze','Huhn','Hund','Kuh'], correct:[true,true,false,true,true,false,true,true], fact:'Die meisten Säugetiere können instinktiv schwimmen! Gorillas und Hühner gehören zu den wenigen Ausnahmen.' },
+  { cat:'allgemein', type:'smart10', q:'Welche dieser Filme haben einen Oscar für den besten Film gewonnen?', options:['Titanic','Der Pate','Avatar','Schindlers Liste','Inception','Forrest Gump','Star Wars (1977)','The Shawshank Redemption'], correct:[true,true,false,true,false,true,false,false], fact:'Titanic, Der Pate, Schindlers Liste und Forrest Gump gewannen den besten Film. Shawshank Redemption wurde 7x nominiert, gewann aber keinen.' },
+  { cat:'allgemein', type:'smart10', q:'Welche Aussagen über Planeten unseres Sonnensystems stimmen?', options:['Venus ist heißer als Merkur','Saturn hat Ringe','Jupiter hat einen roten Fleck','Mars hat Ozeane','Uranus rotiert auf der Seite','Neptun ist der sonnennächste Planet','Die Erde hat einen Mond','Pluto ist ein Planet'], correct:[true,true,true,false,true,false,true,false], fact:'Venus ist durch ihren Treibhauseffekt heißer als Merkur. Pluto wurde 2006 zum Zwergplaneten herabgestuft.' },
+  { cat:'allgemein', type:'smart10', q:'Welche dieser Lebensmittel sind Obst (botanisch)?', options:['Tomate','Avocado','Erdbeere','Gurke','Paprika','Rhabarber','Banane','Zucchini'], correct:[true,true,false,true,true,false,true,true], fact:'Tomaten, Avocados, Gurken, Paprika, Bananen und Zucchini sind botanisch gesehen Früchte! Erdbeeren sind Scheinfrüchte, Rhabarber ist Gemüse.' },
+  { cat:'allgemein', type:'smart10', q:'Welche dieser Sprachen haben mehr als 100 Mio. Muttersprachler?', options:['Mandarin','Spanisch','Deutsch','Hindi','Arabisch','Schwedisch','Portugiesisch','Japanisch'], correct:[true,true,false,true,true,false,true,true], fact:'Deutsch (~100 Mio.) ist an der Grenze, Schwedisch (~10 Mio.) klar darunter. Die anderen haben alle über 100 Mio. Muttersprachler.' },
+  { cat:'allgemein', type:'smart10', q:'Welche dieser Rekorde stimmen?', options:['Der Pazifik ist der größte Ozean','China hat die meisten Einwohner','Russland ist das flächengrößte Land','Der Nil ist der längste Fluss','Mount Everest ist der höchste Berg','Die Antarktis ist der wärmste Kontinent','Der Vatikan ist der kleinste Staat','Grönland ist der größte Kontinent'], correct:[true,false,true,true,true,false,true,false], fact:'Seit 2023 hat Indien mehr Einwohner als China. Die Antarktis ist der kälteste Kontinent. Grönland ist eine Insel, kein Kontinent.' },
+  { cat:'allgemein', type:'smart10', q:'Welche dieser Sportarten sind olympisch (Sommerspiele)?', options:['Fußball','Surfen','Cricket','Skateboarding','Bowling','Breakdance','Klettern','Polo'], correct:[true,true,false,true,false,true,true,false], fact:'Surfen, Skateboarding, Breakdance und Klettern wurden in den letzten Jahren als neue olympische Sportarten aufgenommen!' },
+  { cat:'allgemein', type:'smart10', q:'Welche dieser berühmten Persönlichkeiten waren Deutsche?', options:['Albert Einstein','Marie Curie','Ludwig van Beethoven','Sigmund Freud','Karl Marx','Nikola Tesla','Martin Luther','Wolfgang Amadeus Mozart'], correct:[true,false,true,false,true,false,true,false], fact:'Curie war Polin, Freud Österreicher, Tesla Serbe, Mozart Österreicher. Einstein, Beethoven, Marx und Luther waren Deutsche.' },
+  { cat:'allgemein', type:'smart10', q:'Welche dieser Aussagen über Tiere stimmen?', options:['Oktopusse haben drei Herzen','Elefanten können nicht springen','Kolibris können rückwärts fliegen','Goldifsche haben ein 3-Sekunden-Gedächtnis','Haie müssen ständig schwimmen um zu atmen','Kamele speichern Wasser im Höcker','Krokodile können nicht kauen','Pinguine leben nur am Südpol'], correct:[true,true,true,false,false,false,true,false], fact:'Goldfische merken sich Dinge monatelang, viele Haie können stillstehen, Höcker speichern Fett, Pinguine leben auch in wärmeren Regionen.' },
+  { cat:'allgemein', type:'smart10', q:'Welche Städte liegen am Meer?', options:['Barcelona','München','Lissabon','Wien','Kapstadt','Prag','Dubai','Zürich'], correct:[true,false,true,false,true,false,true,false], fact:'Barcelona, Lissabon, Kapstadt und Dubai liegen am Meer. München, Wien, Prag und Zürich sind Binnenstädte.' },
+  { cat:'allgemein', type:'smart10', q:'Welche dieser Musikinstrumente sind Saiteninstrumente?', options:['Gitarre','Klavier','Trompete','Geige','Harfe','Trommel','Cello','Flöte'], correct:[true,true,false,true,true,false,true,false], fact:'Auch das Klavier zählt zu den Saiteninstrumenten – es hat 230 Stahlsaiten, die von Hämmern angeschlagen werden.' },
+  { cat:'allgemein', type:'smart10', q:'Welche dieser Aussagen über die Erde stimmen?', options:['Die Erde ist leicht abgeflacht an den Polen','Ein Tag dauert exakt 24 Stunden','Der Kern der Erde ist heißer als die Sonnenoberfläche','Die Sahara war einmal grün','Es gibt mehr Bäume als Sterne in der Milchstraße','Mount Everest ist der höchste Punkt über dem Meeresspiegel','Die Ozeane sind komplett erforscht','Blitze schlagen nie zweimal an der gleichen Stelle ein'], correct:[true,false,true,true,true,true,false,false], fact:'Ein Tag dauert genau genommen 23h 56min 4s. Nur 5% der Ozeane sind erforscht. Blitze treffen häufig dieselben Stellen.' },
+  { cat:'allgemein', type:'smart10', q:'Welche dieser Marken stammen aus Deutschland?', options:['Adidas','Nike','BMW','Samsung','SAP','IKEA','Siemens','Nestlé'], correct:[true,false,true,false,true,false,true,false], fact:'Adidas, BMW, SAP und Siemens sind deutsche Unternehmen. Nike (USA), Samsung (Südkorea), IKEA (Schweden), Nestlé (Schweiz).' },
+  { cat:'allgemein', type:'smart10', q:'Welche Aussagen über Weltmeere stimmen?', options:['Der Marianengraben ist die tiefste Stelle','Im Toten Meer kann man nicht untergehen','Der Atlantik wird breiter','Haie leben nur in warmem Wasser','Korallen sind Tiere','Der Pazifik hat mehr Fläche als alle Landmassen','Salzwasser friert nicht','Es gibt Süßwasserquellen auf dem Meeresboden'], correct:[true,true,true,false,true,true,false,true], fact:'Haie leben auch in kaltem Wasser. Salzwasser friert – nur bei tieferer Temperatur (ca. -2°C). Unterseeische Süßwasserquellen existieren.' },
+  { cat:'allgemein', type:'smart10', q:'Welche dieser historischen Personen lebten im selben Jahrhundert?', options:['Napoleon & Beethoven (19. Jh.)','Caesar & Jesus (Zeitenwende)','Einstein & Picasso (20. Jh.)','Shakespeare & Mozart (18. Jh.)','Da Vinci & Kolumbus (15./16. Jh.)','Kleopatra & Julius Caesar (1. Jh. v.Chr.)','Newton & Darwin (19. Jh.)','Gutenberg & Galileo (15. Jh.)'], correct:[true,true,true,false,true,true,false,false], fact:'Shakespeare lebte im 16./17. Jh., Mozart im 18. Newton (17. Jh.) und Darwin (19. Jh.) lebten nicht gleichzeitig.' },
+  { cat:'allgemein', type:'smart10', q:'Welche Flaggen haben die Farbe Rot?', options:['Deutschland','Frankreich','Japan','Schweden','Türkei','Irland','China','Brasilien'], correct:[true,true,true,false,true,false,true,false], fact:'Schweden (blau-gelb), Irland (grün-weiß-orange ohne Rot) und Brasilien (grün-gelb-blau) haben kein Rot in der Flagge.' },
+  { cat:'allgemein', type:'smart10', q:'Welche Aussagen über das Weltall stimmen?', options:['Im Weltall herrscht Stille','Ein Jahr auf dem Mars dauert ca. 687 Erdtage','Die Sonne macht über 99% der Masse des Sonnensystems aus','Schwarze Löcher saugen alles in ihrer Nähe ein','Auf der Venus regnet es Schwefelsäure','Der Mond hat eine eigene Atmosphäre','Licht braucht ca. 8 Minuten von der Sonne zur Erde','Die ISS umkreist die Erde in 24 Stunden'], correct:[true,true,true,false,true,false,true,false], fact:'Schwarze Löcher "saugen" nicht aktiv – sie wirken durch Gravitation. Der Mond hat quasi keine Atmosphäre. Die ISS umkreist die Erde in ca. 90 Minuten.' },
+  { cat:'allgemein', type:'smart10', q:'Welche dieser Gewürze kommen ursprünglich aus Asien?', options:['Pfeffer','Vanille','Zimt','Chili','Ingwer','Oregano','Kurkuma','Petersilie'], correct:[true,false,true,false,true,false,true,false], fact:'Pfeffer (Indien), Zimt (Sri Lanka), Ingwer und Kurkuma (Südasien) kommen aus Asien. Vanille (Mexiko), Chili (Südamerika), Oregano und Petersilie (Mittelmeer) nicht.' },
 ];
 
 // ============================================================
@@ -713,6 +854,7 @@ let gameState = {
   readyPlayers: [], // player IDs who pressed "Bereit"
   usedQuestionIdxs: [],
   usedCategories: {},
+  includeAllgemein: false, // mode toggle: Nur Münster vs Auch Allgemeinwissen
 };
 
 // Local UI state (per device)
@@ -866,8 +1008,8 @@ function handleHostMessage(conn, data) {
         const cp = getCurrentPlayer();
         if (data.playerId === cp.id || conn._playerId === cp.id) {
           broadcastWheelSpin(data.catId, data.winnerIdx);
-          runHighlightAnimation(data.winnerIdx, CATEGORIES.filter(c =>
-            QUESTIONS.some((q, i) => q.cat === c.id && !gameState.usedQuestionIdxs.includes(i))
+          runHighlightAnimation(data.winnerIdx, getActiveCategories().filter(c =>
+            QUESTIONS.some((q, i) => q.cat === c.id && !gameState.usedQuestionIdxs.includes(i) && (gameState.includeAllgemein || q.cat !== 'allgemein'))
           ).length);
         }
       }
@@ -1256,7 +1398,17 @@ function startGame(totalRounds) {
   gameState.totalRounds = totalRounds === 0 ? Infinity : totalRounds;
   gameState.round = 0;
   gameState.currentPlayerIdx = 0;
-  gameState.usedQuestionIdxs = [];
+  // Restore used questions from localStorage for cross-session variety
+  const stored = localStorage.getItem('mk-used-questions');
+  const storedArr = stored ? JSON.parse(stored) : [];
+  // Only restore if not all questions used
+  const activeQs = getActiveQuestions();
+  if (storedArr.length < activeQs.length * 0.9) {
+    gameState.usedQuestionIdxs = storedArr.filter(i => i < QUESTIONS.length);
+  } else {
+    gameState.usedQuestionIdxs = [];
+    localStorage.removeItem('mk-used-questions');
+  }
   gameState.usedCategories = {};
   gameState.questionPlayerIds = [];
   gameState.smart10State = null;
@@ -1266,6 +1418,22 @@ function startGame(totalRounds) {
   gameState.players.forEach(p => p.score = 0);
   gameState.phase = 'categorySelect';
   broadcastState();
+}
+
+// Get questions filtered by current mode
+function getActiveQuestions() {
+  if (gameState.includeAllgemein) return QUESTIONS;
+  return QUESTIONS.filter(q => q.cat !== 'allgemein');
+}
+
+// Get active categories filtered by current mode
+function getActiveCategories() {
+  if (gameState.includeAllgemein) return CATEGORIES;
+  return CATEGORIES.filter(c => c.id !== 'allgemein');
+}
+
+function persistUsedQuestions() {
+  localStorage.setItem('mk-used-questions', JSON.stringify(gameState.usedQuestionIdxs));
 }
 
 function selectCategory(catId) {
@@ -1293,6 +1461,7 @@ function selectCategory(catId) {
 
   gameState.currentQuestion = q;
   gameState.usedQuestionIdxs.push(q.idx);
+  persistUsedQuestions();
   gameState.usedCategories[catId] = (gameState.usedCategories[catId] || 0) + 1;
   gameState.answers = {};
   gameState.questionPlayerIds = gameState.players.filter(p => p.connected).map(p => p.id);
@@ -1410,8 +1579,9 @@ function nextRound() {
     broadcastState();
     return;
   }
-  if (gameState.totalRounds === Infinity && gameState.usedQuestionIdxs.length >= QUESTIONS.length) {
+  if (gameState.totalRounds === Infinity && gameState.usedQuestionIdxs.length >= getActiveQuestions().length) {
     gameState.usedQuestionIdxs = [];
+    localStorage.removeItem('mk-used-questions');
     gameState.usedCategories = {};
     CATEGORIES.forEach(c => gameState.usedCategories[c.id] = 0);
   }
@@ -1513,7 +1683,16 @@ function onTestMode() {
   gameState.totalRounds = Infinity;
   gameState.round = 0;
   gameState.currentPlayerIdx = 0;
-  gameState.usedQuestionIdxs = [];
+  gameState.includeAllgemein = true; // solo test includes all questions
+  // Restore used questions from localStorage
+  const stored = localStorage.getItem('mk-used-questions');
+  const storedArr = stored ? JSON.parse(stored) : [];
+  if (storedArr.length < QUESTIONS.length * 0.9) {
+    gameState.usedQuestionIdxs = storedArr.filter(i => i < QUESTIONS.length);
+  } else {
+    gameState.usedQuestionIdxs = [];
+    localStorage.removeItem('mk-used-questions');
+  }
   gameState.usedCategories = {};
   gameState.questionPlayerIds = [];
   gameState.smart10State = null;
@@ -1566,6 +1745,15 @@ function renderLobby() {
           <option value="24">24 (marathon, ~35 Min.)</option>
         </select>
       </div>
+      ${isHost ? `
+      <div class="settings-row">
+        <label>Modus:</label>
+        <select id="modeSelect" onchange="gameState.includeAllgemein = this.value === 'allgemein'">
+          <option value="muenster">🏰 Nur Münster</option>
+          <option value="allgemein">🌍 Münster + Allgemeinwissen</option>
+        </select>
+      </div>
+      ` : ''}
       <div class="btn-row">
         <button class="btn btn-primary" ${!canStart ? 'disabled' : ''} onclick="onStartGame()">🚀 Spiel starten!</button>
       </div>
@@ -1575,6 +1763,8 @@ function renderLobby() {
 
 function onStartGame() {
   const totalRounds = +document.getElementById('roundsSelect').value;
+  const modeSelect = document.getElementById('modeSelect');
+  if (modeSelect) gameState.includeAllgemein = modeSelect.value === 'allgemein';
   if (role === 'host') {
     startGame(totalRounds);
   } else {
@@ -1585,12 +1775,14 @@ function onStartGame() {
 // CATEGORY SELECT
 function renderCategorySelect() {
   const connectedCount = gameState.players.filter(p => p.connected).length;
+  const activeCats = getActiveCategories();
   const isPlayable = (q, i) =>
     !gameState.usedQuestionIdxs.includes(i) &&
     (q.type !== 'vote' || connectedCount >= 3) &&
-    (q.type !== 'smart10' || connectedCount >= 2);
+    (q.type !== 'smart10' || connectedCount >= 2) &&
+    (gameState.includeAllgemein || q.cat !== 'allgemein');
 
-  const availCats = CATEGORIES.filter(c =>
+  const availCats = activeCats.filter(c =>
     QUESTIONS.some((q, i) => q.cat === c.id && isPlayable(q, i))
   );
 
@@ -1629,12 +1821,14 @@ function spinWheel() {
   if (btn) btn.disabled = true;
 
   const connectedCount = gameState.players.filter(p => p.connected).length;
+  const activeCats = getActiveCategories();
   const isPlayable = (q, i) =>
     !gameState.usedQuestionIdxs.includes(i) &&
     (q.type !== 'vote' || connectedCount >= 3) &&
-    (q.type !== 'smart10' || connectedCount >= 2);
+    (q.type !== 'smart10' || connectedCount >= 2) &&
+    (gameState.includeAllgemein || q.cat !== 'allgemein');
 
-  const availCats = CATEGORIES.filter(c =>
+  const availCats = activeCats.filter(c =>
     QUESTIONS.some((q, i) => q.cat === c.id && isPlayable(q, i))
   );
   const segCount = availCats.length;
@@ -1694,8 +1888,9 @@ function runHighlightAnimation(winnerIdx, segCount) {
       // Proceed to question after brief pause
       setTimeout(() => {
         if (role === 'host') {
-          const availCats = CATEGORIES.filter(c =>
-            QUESTIONS.some((q, i) => q.cat === c.id && !gameState.usedQuestionIdxs.includes(i))
+          const activeCats = getActiveCategories();
+          const availCats = activeCats.filter(c =>
+            QUESTIONS.some((q, i) => q.cat === c.id && !gameState.usedQuestionIdxs.includes(i) && (gameState.includeAllgemein || q.cat !== 'allgemein'))
           );
           if (availCats[winnerIdx]) selectCategory(availCats[winnerIdx].id);
         }
@@ -1706,8 +1901,8 @@ function runHighlightAnimation(winnerIdx, segCount) {
 }
 
 function animateWheelRemote(catId, winnerIdx) {
-  const availCats = CATEGORIES.filter(c =>
-    QUESTIONS.some((q, i) => q.cat === c.id && !gameState.usedQuestionIdxs.includes(i))
+  const availCats = getActiveCategories().filter(c =>
+    QUESTIONS.some((q, i) => q.cat === c.id && !gameState.usedQuestionIdxs.includes(i) && (gameState.includeAllgemein || q.cat !== 'allgemein'))
   );
   runHighlightAnimation(winnerIdx, availCats.length);
 }
