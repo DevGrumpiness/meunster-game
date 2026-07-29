@@ -2482,8 +2482,8 @@
 
     function runHighlightAnimation(winnerIdx, segCount, winnerCatId) {
       const isSolo = myId === 'test-host';
-      const totalCycles = isSolo ? 0.5 : 2 + Math.random();
-      const totalSteps = Math.floor(totalCycles * segCount) + winnerIdx;
+      const fullCycles = isSolo ? 1 : 2 + Math.ceil(Math.random() * 2);
+      const totalSteps = fullCycles * segCount + winnerIdx;
       let step = 0;
       let prevHighlight = -1;
 
