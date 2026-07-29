@@ -2393,7 +2393,7 @@
 
       ${!canStart ? '<p style="text-align:center;color:#888;font-size:0.9rem;">Mindestens 2 Spieler zum Starten nötig.</p>' : ''}
 
-      <div class="settings-row">
+      ${isHost ? `<div class="settings-row">
         <label>Runden:</label>
         <select id="roundsSelect">
           <option value="0" selected>∞ (Endlos)</option>
@@ -2402,7 +2402,7 @@
           <option value="18">18 (lang, ~25 Min.)</option>
           <option value="24">24 (marathon, ~35 Min.)</option>
         </select>
-      </div>
+      </div>` : ''}
       ${isHost ? `
       <div id="modeSegmented" style="display:flex;border:2px solid var(--ms-green);border-radius:8px;overflow:hidden;margin:8px 0;">
         <div id="modeBtn0" onclick="setMode(false)" style="flex:1;padding:10px 8px;text-align:center;font-size:.9rem;font-weight:600;cursor:pointer;transition:all .25s;background:${gameState.includeAllgemein ? 'transparent' : 'var(--ms-green)'};color:${gameState.includeAllgemein ? '#999' : 'white'};">Nur Münster</div>
