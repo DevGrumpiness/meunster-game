@@ -2471,7 +2471,7 @@
       const winnerCat = availCats[winnerIdx];
 
       // Start highlight animation
-      runHighlightAnimation(winnerIdx, segCount);
+      runHighlightAnimation(winnerIdx, segCount, winnerCat.id);
 
       if (role === 'host') {
         broadcastWheelSpin(winnerCat.id, winnerIdx);
@@ -2480,7 +2480,7 @@
       }
     }
 
-    function runHighlightAnimation(winnerIdx, segCount) {
+    function runHighlightAnimation(winnerIdx, segCount, winnerCatId) {
       const isSolo = myId === 'test-host';
       const totalCycles = isSolo ? 0.5 : 2 + Math.random();
       const totalSteps = Math.floor(totalCycles * segCount) + winnerIdx;
@@ -2512,11 +2512,7 @@
           // Proceed to question after brief pause
           setTimeout(() => {
             if (role === 'host') {
-              const activeCats = getActiveCategories();
-              const availCats = activeCats.filter(c =>
-                QUESTIONS.some((q, i) => q.cat === c.id && !gameState.usedQuestionIdxs.includes(i) && (gameState.includeAllgemein || q.cat !== 'allgemein'))
-              );
-              if (availCats[winnerIdx]) selectCategory(availCats[winnerIdx].id);
+              selectCategory(winnerCatId);
             }
           }, 1200);
         }
@@ -2525,10 +2521,16 @@
     }
 
     function animateWheelRemote(catId, winnerIdx) {
+      const connectedCount = gameState.players.filter(p => p.connected).length;
+      const isPlayable = (q, i) =>
+        !gameState.usedQuestionIdxs.includes(i) &&
+        (q.type !== 'vote' || connectedCount >= 3) &&
+        (q.type !== 'smart10' || connectedCount >= 2) &&
+        (gameState.includeAllgemein || q.cat !== 'allgemein');
       const availCats = getActiveCategories().filter(c =>
-        QUESTIONS.some((q, i) => q.cat === c.id && !gameState.usedQuestionIdxs.includes(i) && (gameState.includeAllgemein || q.cat !== 'allgemein'))
+        QUESTIONS.some((q, i) => q.cat === c.id && isPlayable(q, i))
       );
-      runHighlightAnimation(winnerIdx, availCats.length);
+      runHighlightAnimation(winnerIdx, availCats.length, catId);
     }
 
     function hostSelectCategory(catId) {
