@@ -1799,7 +1799,7 @@ function renderCategorySelect() {
       <div class="round-info">Runde ${gameState.round + 1}${gameState.totalRounds === Infinity ? '' : ' / ' + gameState.totalRounds}</div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;" id="catGrid">
         ${availCats.map((c, i) => `
-          <div class="cat-tile" id="cat-${i}" style="border-color:${c.color}33;">
+          <div class="cat-tile" id="cat-${i}" style="border-color:${c.color}33;${availCats.length % 2 === 1 && i === availCats.length - 1 ? 'grid-column:span 2;' : ''}">
             <div style="font-size:1.6rem;margin-bottom:4px;">${c.icon}</div>
             <div style="font-weight:600;font-size:0.8rem;color:var(--ms-blue);">${c.name}</div>
           </div>
