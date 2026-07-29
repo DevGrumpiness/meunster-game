@@ -638,6 +638,17 @@ const QUESTIONS = [
   { cat:'wissen', type:'smart10', q:'Welche dieser Aussagen zu Münster und Umgebung stimmen?', options:['Münster liegt in NRW','Die Stadt hat mehr Fahrräder als Einwohner','Der Westfälische Frieden wurde auch in Osnabrück verhandelt','Münster ist Deutschlands höchstes Gebirge','Die Uni nutzt das Fürstbischöfliche Schloss','Der Send findet dreimal pro Jahr statt','Münster hat einen internationalen Seehafen','Masematte gehört zur Stadtkultur'], correct:[true,true,true,false,true,true,false,true], fact:'NRW, Fahrradstadt, Frieden mit Osnabrück, Schloss-Uni, dreimal Send und Masematte – alles korrekt.' },
 
   // ===== NOCH MEHR FRAGEN – AUFFÜLLUNG =====
+  // --- Neue Abstimmungen ---
+  { cat:'ausgehen', type:'vote', q:'Bestes Bier in Münster?', options:['Pinkus Alt 🍺','Oberdorfer im ToPo 🍻','Estrella im Casa Vazquez 🇪🇸','In der Dockbar 🍺','Lieber Wein 🍷'] },
+  { cat:'ausgehen', type:'vote', q:'Must Do für Münster-Neulinge?', options:['Prinzipalmarkt & Dom 🏛️','Aasee-Runde 🌊','Kneipentour Kreuzstraße 🍺','Hafen-Viertel 🍷'] },
+  { cat:'ausgehen', type:'vote', q:'Beste Pizza gibt es bei...', options:['Unico Bar 🍕','Borgo Antico 🇮🇹','IL PIZZAIOLO 🔥','Dai Fratelli 🤌'] },
+  { cat:'ausgehen', type:'vote', q:'An heißen Sommertagen...', options:['In den Kanal springen 🏊','Ab in den Südpark 🌳','Am Aasee chillen ☀️','Tom&Polly Biergarten 🍺'] },
+  { cat:'fahrrad', type:'vote', q:'Wie bewegt ihr euch nachts nach Hause?', options:['Leeze (natürlich) 🚲','Taxi 🚕','Zu Fuß 🚶','Nachtbus 🚌'] },
+  { cat:'wissen', type:'vote', q:'Bester Stadtteil zum Wohnen?', options:['Kreuzviertel (Café-Kultur) ☕','Gievenbeck (günstig & Uni-nah) 🏠','Hafen (modern) 🏗️','Altstadt (mittendrin) 🏛️'] },
+  { cat:'wissen', type:'vote', q:'Was fehlt Münster am meisten?', options:['U-Bahn / Straßenbahn 🚇','Mehr bezahlbare Wohnungen 🏠','Ein richtiger Club wie in Berlin 🎶','Strand am Aasee 🏖️'] },
+  { cat:'wissen', type:'vote', q:'Lieblings-Münster-Klischee?', options:['Alle fahren Rad 🚲','Es regnet immer ☔','Jeder kennt jeden 👋','Studenten überall 🎓'] },
+  { cat:'wissen', type:'vote', q:'Bester Spot zum Lernen in Münster?', options:['ULB (Uni-Bibliothek) 📚','Café mit Laptop ☕','Aasee-Wiese bei Sonne 🌞','Zuhause (wer lernt schon?) 🛋️'] },
+
   // --- Ausgehen & Genuss extra ---
   { cat:'ausgehen', type:'quiz', q:'Was ist "Glühwein am Kiepenkerl"?', answers:['Beliebter Weihnachtsmarkt-Spot','Cocktail','Kneipe','Festival'], correct:0, fact:'Der Kiepenkerl-Platz ist im Winter DER Spot für Glühwein – gemütlich, zentral, mit der berühmten Kiepenkerl-Statue.' },
   { cat:'ausgehen', type:'quiz', q:'Wo liegt das "Hansaviertel" und wofür ist es bekannt?', answers:['Östlich der Altstadt – Cafés & Restaurants','Am Hafen','Im Süden – Industrie','Am Kanal'], correct:0, fact:'Das Hansaviertel ist ein lebendiges Wohnviertel mit vielen kleinen Restaurants, Cafés und Boutiquen – etwas ruhiger als die Altstadt.' },
@@ -1052,8 +1063,10 @@ function startGame(totalRounds) {
 }
 
 function selectCategory(catId) {
+  const connectedCount = gameState.players.filter(p => p.connected).length;
   const available = QUESTIONS.map((q, i) => ({ ...q, idx: i }))
-    .filter(q => q.cat === catId && !gameState.usedQuestionIdxs.includes(q.idx));
+    .filter(q => q.cat === catId && !gameState.usedQuestionIdxs.includes(q.idx))
+    .filter(q => q.type !== 'vote' || connectedCount >= 3);
   if (available.length === 0) return;
 
   const q = { ...available[Math.floor(Math.random() * available.length)] };
