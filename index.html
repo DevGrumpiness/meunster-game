@@ -1156,25 +1156,32 @@ function evaluateRound() {
       }
     });
   } else if (q.type === 'estimate') {
-    // Best estimate gets 3 points, within tolerance gets 1
-    let bestDiff = Infinity, bestId = null;
+    // Find best diff, then ALL players with that diff get 3 points (tie-friendly)
+    let bestDiff = Infinity;
     gameState.players.forEach(p => {
       const est = parseFloat(gameState.answers[p.id]);
       if (isNaN(est)) return;
       const diff = Math.abs(est - q.answer);
-      if (diff < bestDiff) { bestDiff = diff; bestId = p.id; }
+      if (diff < bestDiff) { bestDiff = diff; }
     });
-    if (bestId) {
-      gameState.players.find(p => p.id === bestId).score += 3;
-    }
+    const winnerIds = [];
     gameState.players.forEach(p => {
-      if (p.id === bestId) return;
+      const est = parseFloat(gameState.answers[p.id]);
+      if (isNaN(est)) return;
+      if (Math.abs(est - q.answer) === bestDiff) {
+        winnerIds.push(p.id);
+        p.score += 3;
+      }
+    });
+    // Tolerance bonus for non-winners
+    gameState.players.forEach(p => {
+      if (winnerIds.includes(p.id)) return;
       const est = parseFloat(gameState.answers[p.id]);
       if (!isNaN(est) && Math.abs(est - q.answer) <= q.tolerance) {
         p.score += 1;
       }
     });
-    gameState._estimateWinner = bestId;
+    gameState._estimateWinners = winnerIds;
   } else if (q.type === 'höher_tiefer') {
     const correctAnswer = q.answer > q.reference ? 'höher' : 'tiefer';
     gameState._hotCorrectAnswer = correctAnswer;
@@ -1730,11 +1737,19 @@ function renderResult() {
       ` : '<p style="text-align:center;color:#888;">Niemand hatte recht!</p>'}
     `;
   } else if (q.type === 'estimate') {
-    const winner = gameState.players.find(p => p.id === gameState._estimateWinner);
+    const winnerIds = gameState._estimateWinners || [];
+    const winners = gameState.players.filter(p => winnerIds.includes(p.id));
     const sorted = gameState.players
-      .map(p => ({ name: p.name, color: p.color, est: parseFloat(gameState.answers[p.id]), diff: Math.abs(parseFloat(gameState.answers[p.id]) - q.answer) }))
+      .map(p => ({ name: p.name, color: p.color, id: p.id, est: parseFloat(gameState.answers[p.id]), diff: Math.abs(parseFloat(gameState.answers[p.id]) - q.answer) }))
       .filter(p => !isNaN(p.est))
       .sort((a, b) => a.diff - b.diff);
+
+    const winnerText = winners.length > 1
+      ? `🏆 ${winners.map(w => `<span style="color:${w.color}">${w.name}</span>`).join(' & ')} waren gleich nah dran! Je +3 Punkte`
+      : winners.length === 1
+        ? `🏆 ${winners[0].name} war am nächsten! +3 Punkte`
+        : '';
+    const winnerColor = winners.length === 1 ? winners[0].color : '#1d3557';
 
     resultContent = `
       <div class="result-box info">
@@ -1744,7 +1759,7 @@ function renderResult() {
       <div class="vote-results">
         ${sorted.map((s, i) => `
           <div class="vote-result-row">
-            <div class="vote-result-name" style="color:${s.color}">${i === 0 ? '🏆' : ''} ${s.name}</div>
+            <div class="vote-result-name" style="color:${s.color}">${winnerIds.includes(s.id) ? '🏆' : ''} ${s.name}</div>
             <div class="vote-result-bar-bg">
               <div class="vote-result-bar" style="background:${s.color};width:${Math.max(15, 100 - (s.diff / Math.max(q.answer, 1) * 80))}%">
                 ${formatNumber(s.est)}
@@ -1753,7 +1768,7 @@ function renderResult() {
           </div>
         `).join('')}
       </div>
-      ${winner ? `<p style="text-align:center;font-weight:700;color:${winner.color};">🏆 ${winner.name} war am nächsten! +3 Punkte</p>` : ''}
+      ${winnerText ? `<p style="text-align:center;font-weight:700;color:${winnerColor};">${winnerText}</p>` : ''}
     `;
   } else if (q.type === 'höher_tiefer') {
     const correctAnswer = gameState._hotCorrectAnswer;
