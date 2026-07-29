@@ -875,7 +875,7 @@ function handleHostMessage(conn, data) {
     case 'ready': {
       if (gameState.phase === 'result' && !gameState.readyPlayers.includes(data.playerId)) {
         gameState.readyPlayers.push(data.playerId);
-        broadcastState();
+        broadcastReadyUpdate();
         checkAllReady();
       }
       break;
@@ -959,6 +959,19 @@ function broadcastAnswerUpdate() {
   }
 }
 
+// HOST: lightweight broadcast that only updates ready section on clients (and host)
+function broadcastReadyUpdate() {
+  const stateMsg = { type: 'state', state: gameState };
+  connections.forEach(c => {
+    try { c.send(stateMsg); } catch(e) {}
+  });
+  if (gameState.phase === 'result') {
+    updateReadySection();
+  } else {
+    render();
+  }
+}
+
 // HOST: broadcast wheel spin to all players
 function broadcastWheelSpin(winnerCatId, winnerIdx) {
   const msg = { type: 'wheelSpin', catId: winnerCatId, winnerIdx };
@@ -982,6 +995,7 @@ function handlePlayerMessage(data) {
   if (data.type === 'state') {
     const oldPhase = gameState.phase;
     const oldAnswerCount = Object.keys(gameState.answers || {}).length;
+    const oldReadyCount = (gameState.readyPlayers || []).length;
     gameState = data.state;
 
     // If we're still in the question phase and only the answer count changed,
@@ -990,6 +1004,15 @@ function handlePlayerMessage(data) {
       const newAnswerCount = Object.keys(gameState.answers || {}).length;
       if (newAnswerCount !== oldAnswerCount) {
         updateAnswerCount();
+        return;
+      }
+    }
+
+    // If we're still in result phase and only readyPlayers changed, partial update
+    if (oldPhase === 'result' && gameState.phase === 'result') {
+      const newReadyCount = (gameState.readyPlayers || []).length;
+      if (newReadyCount !== oldReadyCount) {
+        updateReadySection();
         return;
       }
     }
@@ -1010,6 +1033,12 @@ function updateAnswerCount() {
   const totalPlayers = gameState.players.filter(p => p.connected).length;
   const iAnswered = localState.answered || gameState.answers[myId] !== undefined;
   el.innerHTML = `${iAnswered ? '✓ ' : ''}${answeredCount}/${totalPlayers} haben geantwortet`;
+}
+
+function updateReadySection() {
+  const el = document.getElementById('ready-section');
+  if (!el) return;
+  el.innerHTML = renderReadySectionContent();
 }
 
 // PLAYER: send message to host
@@ -2044,6 +2073,10 @@ function renderResult() {
 }
 
 function renderReadySection() {
+  return `<div id="ready-section">${renderReadySectionContent()}</div>`;
+}
+
+function renderReadySectionContent() {
   const connectedPlayers = gameState.players.filter(p => p.connected);
   const readyCount = gameState.readyPlayers ? gameState.readyPlayers.length : 0;
   const totalCount = connectedPlayers.length;
@@ -2138,7 +2171,7 @@ function onReady() {
   if (role === 'host') {
     if (!gameState.readyPlayers.includes(myId)) {
       gameState.readyPlayers.push(myId);
-      broadcastState();
+      broadcastReadyUpdate();
       checkAllReady();
     }
   } else {
