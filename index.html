@@ -1412,15 +1412,13 @@ function spinWheel() {
 }
 
 function runHighlightAnimation(winnerIdx, segCount) {
-  // Cycle through tiles: fast → slow, land on winnerIdx
-  // Total steps: 2-3 full cycles + land on winner
-  const totalCycles = 2 + Math.random();
+  const isSolo = myId === 'test-host';
+  const totalCycles = isSolo ? 0.5 : 2 + Math.random();
   const totalSteps = Math.floor(totalCycles * segCount) + winnerIdx;
   let step = 0;
   let prevHighlight = -1;
 
   function tick() {
-    // Remove previous highlight
     if (prevHighlight >= 0) {
       const prev = document.getElementById('cat-' + prevHighlight);
       if (prev) prev.classList.remove('highlight');
@@ -1433,9 +1431,8 @@ function runHighlightAnimation(winnerIdx, segCount) {
 
     step++;
     if (step <= totalSteps) {
-      // Easing: start at 60ms, end at ~400ms
       const progress = step / totalSteps;
-      const delay = 60 + progress * progress * 340;
+      const delay = isSolo ? 30 + progress * progress * 120 : 60 + progress * progress * 340;
       setTimeout(tick, delay);
     } else {
       // Final: mark winner
