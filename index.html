@@ -2317,24 +2317,23 @@
         </div>
         <input type="hidden" id="modeToggle" value="off">
       </div>
-      <script>
-        function toggleAllgemein() {
-          const track = document.getElementById('modeToggleTrack');
-          const knob = document.getElementById('modeToggleKnob');
-          const input = document.getElementById('modeToggle');
-          const isOn = input.value === 'on';
-          input.value = isOn ? 'off' : 'on';
-          track.style.background = isOn ? '#ccc' : 'var(--ms-green)';
-          knob.style.left = isOn ? '3px' : '29px';
-          gameState.includeAllgemein = !isOn;
-        }
-      </script>
       ` : ''}
       <div class="btn-row">
         <button class="btn btn-primary" ${!canStart ? 'disabled' : ''} onclick="onStartGame()">🚀 Spiel starten!</button>
       </div>
     </div>
   `;
+    }
+
+    function toggleAllgemein() {
+      const track = document.getElementById('modeToggleTrack');
+      const knob = document.getElementById('modeToggleKnob');
+      const input = document.getElementById('modeToggle');
+      const isOn = input.value === 'on';
+      input.value = isOn ? 'off' : 'on';
+      track.style.background = isOn ? '#ccc' : 'var(--ms-green)';
+      knob.style.left = isOn ? '3px' : '29px';
+      gameState.includeAllgemein = !isOn;
     }
 
     function onStartGame() {
