@@ -339,16 +339,20 @@
 
     /* Question */
     .category-badge {
-      display: block;
+      display: inline-block;
       text-align: center;
-      font-weight: 600;
+      font-weight: 700;
       font-size: 0.75rem;
-      letter-spacing: 1.5px;
+      letter-spacing: 1px;
       text-transform: uppercase;
-      margin-bottom: 8px;
-      padding: 0;
-      border-radius: 0;
-      background: none !important;
+      padding: 4px 16px;
+      border-radius: 10px 10px 0 0;
+      color: white;
+      margin: 0 auto -1px;
+    }
+    .category-badge-wrapper {
+      text-align: center;
+      margin-top: 4px;
     }
 
     .question-type-label {
@@ -2675,10 +2679,10 @@
       }
 
       app.innerHTML = `
+    <div class="category-badge-wrapper"><div class="category-badge" style="background:${cat.color}">${cat.icon} ${cat.name}</div></div>
     <div class="card" style="border:3px solid ${cat.color}">
       ${renderScoreboard()}
       <div class="round-info">Runde ${gameState.round + 1}${gameState.totalRounds === 0 ? '' : ' / ' + gameState.totalRounds}</div>
-      <div class="category-badge" style="color:${cat.color}">${cat.icon} ${cat.name}</div>
       ${content}
       <div class="answer-count">${iAnswered ? '✓ ' : ''}${answeredCount}/${totalPlayers} haben geantwortet</div>
       ${iAnswered ? '<div class="waiting">Warte auf die anderen<span class="waiting-dots"></span></div>' : ''}
@@ -2726,10 +2730,10 @@
               : `${activePlayer.name} ist dran`;
 
       app.innerHTML = `
+    <div class="category-badge-wrapper"><div class="category-badge" style="background:${cat.color}">${cat.icon} ${cat.name}</div></div>
     <div class="card" style="border:3px solid ${cat.color}">
       ${renderScoreboard()}
       <div class="round-info">Runde ${gameState.round + 1}${gameState.totalRounds === 0 ? '' : ' / ' + gameState.totalRounds}</div>
-      <div class="category-badge" style="color:${cat.color}">${cat.icon} ${cat.name}</div>
       <div class="question-type-label">🧩 Wahr oder Falsch – Reihum rätseln!</div>
       <div class="turn-banner" style="background:${activePlayer ? activePlayer.color : cat.color}">
         ${bannerText}
@@ -2953,9 +2957,9 @@
       }
 
       app.innerHTML = `
+    <div class="category-badge-wrapper"><div class="category-badge" style="background:${cat.color}">${cat.icon} ${cat.name}</div></div>
     <div class="card" style="border:3px solid ${cat.color}">
       ${renderScoreboard()}
-      <div class="category-badge" style="color:${cat.color}">${cat.icon} ${cat.name}</div>
       <div class="question-text">${q.q}</div>
       ${resultContent}
       ${q.fact ? `<div class="fun-fact"><strong>💡 Wusstest du?</strong> ${q.fact}</div>` : ''}
