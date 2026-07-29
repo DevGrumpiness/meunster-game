@@ -183,6 +183,108 @@
   .vote-btn:active { transform: scale(0.97); }
   .vote-btn.selected { border-color: var(--ms-gold); background: #fff3d6; pointer-events: none; }
 
+  /* Smart10 */
+  .smart10-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+    margin: 16px 0 12px;
+  }
+  .smart10-tile {
+    min-height: 122px;
+    border: 2px solid #e0e0e0;
+    border-radius: 14px;
+    background: white;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 10px;
+    transition: all 0.2s;
+  }
+  .smart10-tile.active {
+    border-color: var(--ms-gold);
+    box-shadow: 0 6px 20px rgba(244,162,97,0.22);
+  }
+  .smart10-tile.guess-correct,
+  .smart10-tile.truth-true {
+    border-color: var(--ms-green);
+    background: #d4edda;
+  }
+  .smart10-tile.guess-wrong,
+  .smart10-tile.truth-false {
+    border-color: #cfd4da;
+    background: #f1f3f5;
+    color: #5f6b76;
+  }
+  .smart10-option-text {
+    font-weight: 700;
+    color: var(--ms-blue);
+    line-height: 1.35;
+    word-break: break-word;
+  }
+  .smart10-tile.guess-correct .smart10-option-text,
+  .smart10-tile.truth-true .smart10-option-text {
+    color: var(--ms-green);
+  }
+  .smart10-tile.guess-wrong .smart10-option-text,
+  .smart10-tile.truth-false .smart10-option-text {
+    color: inherit;
+  }
+  .smart10-actions { display: flex; gap: 8px; }
+  .smart10-action-btn {
+    flex: 1;
+    border: none;
+    border-radius: 10px;
+    padding: 10px 0;
+    font-size: 1rem;
+    font-weight: 800;
+    cursor: pointer;
+    transition: transform 0.15s ease, opacity 0.15s ease;
+  }
+  .smart10-action-btn:active { transform: scale(0.97); }
+  .smart10-action-btn.true { background: #d4edda; color: var(--ms-green); }
+  .smart10-action-btn.false { background: #f8d7da; color: var(--ms-red); }
+  .smart10-action-btn:disabled { opacity: 0.5; pointer-events: none; }
+  .smart10-note {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #667085;
+    text-align: center;
+  }
+  .smart10-status-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+    margin-bottom: 8px;
+  }
+  .smart10-player-pill {
+    padding: 6px 10px;
+    border-radius: 999px;
+    font-size: 0.78rem;
+    font-weight: 800;
+    border: 2px solid transparent;
+  }
+  .smart10-player-pill.active {
+    transform: scale(1.04);
+    box-shadow: 0 3px 10px rgba(0,0,0,0.12);
+  }
+  .smart10-player-pill.out {
+    background: #f1f3f5 !important;
+    color: #7a7a7a !important;
+    border-color: #d0d7de !important;
+  }
+  .smart10-tile-meta {
+    font-size: 0.74rem;
+    font-weight: 700;
+    line-height: 1.35;
+  }
+  .smart10-tile-note {
+    font-size: 0.76rem;
+    font-weight: 800;
+  }
+
   /* Results */
   .result-box { text-align: center; padding: 16px; border-radius: 12px; margin: 12px 0; animation: popIn 0.4s ease; }
   .result-box.success { background: #d4edda; color: var(--ms-green); }
@@ -490,6 +592,16 @@ const QUESTIONS = [
   { cat:'sights', type:'quiz', q:'Welche Tiere kann man im Allwetterzoo Münster sehen?', answers:['Elefanten, Affen, Pinguine und mehr','Nur heimische Tiere','Nur Fische','Nur Vögel'], correct:0, fact:'Der Allwetterzoo ist einer der beliebtesten Zoos Deutschlands – mit überdachten Gängen zwischen den Gehegen (daher "Allwetter")!' },
   { cat:'sights', type:'estimate', q:'Wie viele Einwohner hat Münster?', answer:320000, unit:'', tolerance:40000, fact:'Münster hat rund 320.000 Einwohner und ist damit eine der größten Städte Westfalens – und wächst stetig.' },
 
+  // ===== SMART10 – AUSGEHEN =====
+  { cat:'ausgehen', type:'smart10', q:'Welche dieser Ausgeh-Locations gibt es in Münster?', options:['Cavete','Berghain','Pinkus Müller','Destille','Jovel','Hofbräuhaus','Hot Jazz Club','Elbphilharmonie Bar'], correct:[true,false,true,true,true,false,true,false], fact:'Cavete, Pinkus Müller, Destille, Jovel und Hot Jazz Club sind echte Münsteraner Institutionen.' },
+  { cat:'ausgehen', type:'smart10', q:'Welche dieser Spezialitäten sind typisch westfälisch?', options:['Töttchen','Weißwurst','Pumpernickel','Struwen','Labskaus','Pickert','Westfälischer Schinken','Obatzda'], correct:[true,false,true,true,false,true,true,false], fact:'Töttchen, Pumpernickel, Struwen, Pickert und Westfälischer Schinken gehören fest zur westfälischen Küche.' },
+  { cat:'ausgehen', type:'smart10', q:'Welche dieser Weihnachtsmarkt-Orte gehören zu Münster?', options:['Rathaus-Innenhof','Aegidiimarkt','Gendarmenmarkt','Kiepenkerlmarkt','Jungfernstieg','Lichtermarkt am Prinzipalmarkt','Neumarkt Köln','Augustusplatz Leipzig'], correct:[true,true,false,true,false,true,false,false], fact:'Zu Münsters Weihnachtsmärkten zählen unter anderem Rathaus-Innenhof, Aegidii, Kiepenkerl und der Lichtermarkt am Prinzipalmarkt.' },
+  { cat:'ausgehen', type:'smart10', q:'Welche dieser Aussagen zu Münsteraner Ausgeh-Orten stimmen?', options:['Die Cavete liegt am Alten Steinweg','Pinkus Müller braut Altbier','Tom&Polly liegt am Südpark','Casa Vazquez ist für Tapas bekannt','Der Send findet im Hafenbecken statt','Die Destille ist eine urige Bar an der Kreuzstraße','Der Jovel ist ein Skigebiet','Der Hot Jazz Club steht für Live-Musik'], correct:[true,true,true,true,false,true,false,true], fact:'Cavete, Pinkus, Tom&Polly, Casa Vazquez, Destille und Hot Jazz Club sind echte Münster-Facts – der Send steht natürlich auf dem Schlossplatz.' },
+  { cat:'ausgehen', type:'smart10', q:'Welche dieser Restaurants oder Kneipen gibt es in Münster?', options:['Tom&Polly','Casa Vazquez','Sansibar Münster','Stuhlmacher','Altes Gasthaus Leve','Augustiner-Keller Münster','Café Kleimann','Auerbachs Keller'], correct:[true,true,false,true,true,false,true,false], fact:'Tom&Polly, Casa Vazquez, Stuhlmacher, Altes Gasthaus Leve und Café Kleimann sind bekannte Namen in Münster.' },
+  { cat:'ausgehen', type:'smart10', q:'Welche dieser Straßen oder Gegenden stehen besonders für Münsters Nachtleben?', options:['Kreuzstraße','Kuhviertel','Reeperbahn','Hawerkamp','Jüdefelderstraße','Schanzenviertel','Alter Steinweg','Maximilianstraße'], correct:[true,true,false,true,true,false,true,false], fact:'Kreuzstraße, Kuhviertel, Hawerkamp, Jüdefelderstraße und Alter Steinweg gehören fest zur Münsteraner Feierlandkarte.' },
+  { cat:'ausgehen', type:'smart10', q:'Welche dieser Speisen findet man typisch in westfälischen Gaststätten?', options:['Grünkohl mit Mettwurst','Töttchen','Kimchi','Struwen','Pumpernickel','Falafel','Westfälischer Pickert','Ceviche'], correct:[true,true,false,true,true,false,true,false], fact:'Grünkohl mit Mettwurst, Töttchen, Struwen, Pumpernickel und Pickert sind klassische westfälische Kost.' },
+  { cat:'ausgehen', type:'smart10', q:'Welche dieser Aussagen rund um Essen und Trinken in Münster stimmen?', options:['Pinkus ist Münsters Traditionsbier','Killepitsch stammt ursprünglich aus Münster','Der Wochenmarkt am Domplatz ist für regionale Produkte bekannt','Pumpernickel wird stundenlang gebacken','Casa Vazquez serviert spanische Küche','Der Aasee ist für seinen Fischmarkt berühmt','Tom&Polly ist auch für Frozen Yogurt bekannt','Der Stuhlmacher ist ein Sushi-Restaurant'], correct:[true,false,true,true,true,false,true,false], fact:'Pinkus, der Domplatz-Markt, Pumpernickel, Casa Vazquez und Tom&Polly sind echte Treffer – Killepitsch kommt aus Düsseldorf.' },
+
   // ===== WISSEN & KURIOSES =====
   { cat:'wissen', type:'quiz', q:'Münster wurde 2004 von der UN ausgezeichnet als...', answers:['Lebenswerteste Stadt der Welt','Grünste Stadt Europas','Fahrradhauptstadt','Friedlichste Stadt'], correct:0, fact:'Münster gewann 2004 den LivCom-Award als lebenswerteste Stadt der Welt – in der Kategorie 200.000-750.000 Einwohner.' },
   { cat:'wissen', type:'quiz', q:'Wie viele Brücken gibt es in Münster?', answers:['Über 100','Etwa 30','Genau 12','Über 200'], correct:0, fact:'Münster hat über 100 Brücken – die Stadt wird von Aa, Werse und dem Dortmund-Ems-Kanal durchzogen.' },
@@ -515,6 +627,15 @@ const QUESTIONS = [
   { cat:'wissen', type:'quiz', q:'Was ist die "Aa"?', answers:['Ein Fluss durch Münster','Ein Ausruf','Eine Straße','Ein See'], correct:0, fact:'Die Münstersche Aa fließt durch die Stadt und speist den Aasee – der Name kommt vom altgermanischen Wort für Wasser.' },
   { cat:'wissen', type:'quiz', q:'Welcher berühmte Vertrag wurde im Rathaus von Münster geschlossen?', answers:['Westfälischer Frieden (1648)','Versailler Vertrag','NATO-Vertrag','Maastricht-Vertrag'], correct:0, fact:'Im Friedenssaal des Rathauses wurde 1648 der Dreißigjährige Krieg beendet – einer der wichtigsten Verträge der europäischen Geschichte.' },
   { cat:'wissen', type:'höher_tiefer', q:'Wie viele Hochschulen gibt es in Münster?', reference:3, answer:9, unit:'', fact:'9 Hochschulen – neben der Uni auch die FH, Kunstakademie, Musikhochschule und mehr.' },
+  { cat:'wissen', type:'smart10', q:'Welche dieser Straßen liegen in Münster?', options:['Kreuzstraße','Reeperbahn','Wolbecker Str.','Kurfürstendamm','Salzstraße','Zeil','Ludgeristraße','Königsallee'], correct:[true,false,true,false,true,false,true,false], fact:'Kreuzstraße, Wolbecker Straße, Salzstraße und Ludgeristraße sind echte Münsteraner Straßen.' },
+  { cat:'wissen', type:'smart10', q:'Welche dieser Sehenswürdigkeiten stehen in Münster?', options:['Prinzipalmarkt','Holstentor','Lambertikirche','Brandenburger Tor','St.-Paulus-Dom','Schwebebahn','Fürstbischöfliches Schloss','Römer'], correct:[true,false,true,false,true,false,true,false], fact:'Prinzipalmarkt, Lambertikirche, Dom und Schloss zählen zu Münsters bekanntesten Sehenswürdigkeiten.' },
+  { cat:'wissen', type:'smart10', q:'Welche dieser Städte liegen näher an Münster als 100 km?', options:['Osnabrück','Köln','Dortmund','Bremen','Bielefeld','Hannover','Enschede','Hamm'], correct:[true,false,true,false,true,false,true,true], fact:'Osnabrück, Dortmund, Bielefeld, Enschede und Hamm liegen grob innerhalb von 100 km um Münster.' },
+  { cat:'wissen', type:'smart10', q:'Welche dieser Fakten über Münster stimmen?', options:['Münster hat eine autofreie Promenade um die Altstadt','Der Aasee ist ein natürlicher Bergsee','Im Rathaus wurde am Westfälischen Frieden mitverhandelt','Münster liegt in Niedersachsen','Es gibt mehr Fahrräder als Einwohner','Die Stadt hat einen Seehafen an der Nordsee','Die Uni nutzt das Fürstbischöfliche Schloss','Der Send findet nur einmal pro Jahr statt'], correct:[true,false,true,false,true,false,true,false], fact:'Promenade, Frieden, Fahrrad-Rekord und Schloss-Uni sind echte Münster-Fakten; Seehafen und Niedersachsen natürlich nicht.' },
+  { cat:'wissen', type:'smart10', q:'Welche dieser Länder liegen in Europa?', options:['Spanien','Brasilien','Norwegen','Japan','Slowakei','Marokko','Portugal','Kenia'], correct:[true,false,true,false,true,false,true,false], fact:'Spanien, Norwegen, die Slowakei und Portugal liegen in Europa.' },
+  { cat:'wissen', type:'smart10', q:'Welche dieser Tiere leben in Deutschland wild?', options:['Fuchs','Koala','Wildschwein','Pinguin','Dachs','Giraffe','Wolf','Känguru'], correct:[true,false,true,false,true,false,true,false], fact:'Fuchs, Wildschwein, Dachs und Wolf leben in Deutschland wild; Koala, Giraffe und Pinguin nicht.' },
+  { cat:'wissen', type:'smart10', q:'Welche dieser Städte liegen in Nordrhein-Westfalen?', options:['Münster','Hannover','Bielefeld','Mainz','Bonn','Kiel','Aachen','Leipzig'], correct:[true,false,true,false,true,false,true,false], fact:'Münster, Bielefeld, Bonn und Aachen liegen alle in NRW.' },
+  { cat:'wissen', type:'smart10', q:'Welche dieser Gewässer prägen Münster direkt?', options:['Aasee','Münstersche Aa','Dortmund-Ems-Kanal','Bodensee','Werse','Alster','Emscher','Hafenbecken am Kreativkai'], correct:[true,true,true,false,true,false,false,true], fact:'Aasee, Aa, Werse, Dortmund-Ems-Kanal und das Hafenbecken gehören direkt zu Münster.' },
+  { cat:'wissen', type:'smart10', q:'Welche dieser Aussagen zu Münster und Umgebung stimmen?', options:['Münster liegt in NRW','Die Stadt hat mehr Fahrräder als Einwohner','Der Westfälische Frieden wurde auch in Osnabrück verhandelt','Münster ist Deutschlands höchstes Gebirge','Die Uni nutzt das Fürstbischöfliche Schloss','Der Send findet dreimal pro Jahr statt','Münster hat einen internationalen Seehafen','Masematte gehört zur Stadtkultur'], correct:[true,true,true,false,true,true,false,true], fact:'NRW, Fahrradstadt, Frieden mit Osnabrück, Schloss-Uni, dreimal Send und Masematte – alles korrekt.' },
 
   // ===== NOCH MEHR FRAGEN – AUFFÜLLUNG =====
   // --- Ausgehen & Genuss extra ---
@@ -562,13 +683,15 @@ let roomCode = '';
 
 // Game state (host manages, syncs to all)
 let gameState = {
-  phase: 'home', // home, lobby, categorySelect, question, waitAnswers, result, final
+  phase: 'home', // home, lobby, categorySelect, question, smart10, result, final
   players: [], // { id, name, color, score, connected }
   currentPlayerIdx: 0,
   round: 0,
   totalRounds: 12,
   currentQuestion: null,
   answers: {}, // playerId -> answer
+  questionPlayerIds: [],
+  smart10State: null,
   usedQuestionIdxs: [],
   usedCategories: {},
 };
@@ -684,6 +807,10 @@ function handleHostMessage(conn, data) {
       checkAllAnswered();
       break;
     }
+    case 'smart10Answer': {
+      processSmart10Answer(conn._playerId || data.playerId, data.optionIdx, data.claimTrue);
+      break;
+    }
     case 'selectCategory': {
       if (gameState.phase === 'categorySelect') {
         const cp = getCurrentPlayer();
@@ -721,6 +848,21 @@ function handleHostMessage(conn, data) {
 function handleDisconnect(conn) {
   const player = gameState.players.find(p => p.id === conn._playerId);
   if (player) player.connected = false;
+  if (player && gameState.phase === 'smart10' && gameState.smart10State && (gameState.questionPlayerIds || []).includes(player.id)) {
+    if (!gameState.smart10State.playerOut.includes(player.id)) {
+      gameState.smart10State.playerOut.push(player.id);
+    }
+    if (isSmart10Over()) {
+      gameState.phase = 'result';
+    } else if (gameState.smart10State.currentTurnIdx === gameState.players.indexOf(player)) {
+      const nextTurnIdx = findNextSmart10PlayerIdx(gameState.smart10State.currentTurnIdx, gameState.smart10State.playerOut);
+      if (nextTurnIdx === -1) {
+        gameState.phase = 'result';
+      } else {
+        gameState.smart10State.currentTurnIdx = nextTurnIdx;
+      }
+    }
+  }
   connections = connections.filter(c => c !== conn);
   broadcastState();
 }
@@ -806,6 +948,94 @@ function sendToHost(msg) {
 function getHost() { return gameState.players[0]; }
 function getMe() { return gameState.players.find(p => p.id === myId); }
 function getCurrentPlayer() { return gameState.players[gameState.currentPlayerIdx]; }
+function getSmart10ActivePlayer() {
+  return gameState.players[gameState.smart10State?.currentTurnIdx] || null;
+}
+
+function findNextSmart10PlayerIdx(fromIdx, playerOutList) {
+  const totalPlayers = gameState.players.length;
+  if (!totalPlayers) return -1;
+  const relevantIds = new Set((gameState.questionPlayerIds || []).length
+    ? gameState.questionPlayerIds
+    : gameState.players.filter(p => p.connected).map(p => p.id));
+  const outIds = new Set(playerOutList || gameState.smart10State?.playerOut || []);
+  const start = typeof fromIdx === 'number' ? fromIdx : gameState.currentPlayerIdx - 1;
+
+  for (let step = 1; step <= totalPlayers; step++) {
+    const idx = (start + step + totalPlayers * 10) % totalPlayers;
+    const player = gameState.players[idx];
+    if (player && player.connected && relevantIds.has(player.id) && !outIds.has(player.id)) {
+      return idx;
+    }
+  }
+  return -1;
+}
+
+function createSmart10State(question) {
+  const eliminated = Array(question.options.length).fill(false);
+  const playerOut = [];
+  return {
+    eliminated,
+    playerOut,
+    currentTurnIdx: findNextSmart10PlayerIdx(gameState.currentPlayerIdx - 1, playerOut),
+    claimResults: Array(question.options.length).fill(null),
+    attemptedBy: Array(question.options.length).fill(null),
+    resolvedBy: Array(question.options.length).fill(null),
+    claims: Array(question.options.length).fill(null),
+  };
+}
+
+function isSmart10Over(state = gameState.smart10State) {
+  if (!state || !gameState.currentQuestion) return true;
+  const allEliminated = state.eliminated.every(Boolean);
+  const relevantIds = (gameState.questionPlayerIds || []).filter(id => {
+    const player = gameState.players.find(p => p.id === id);
+    return player && player.connected;
+  });
+  const everyoneOut = relevantIds.length === 0 || relevantIds.every(id => state.playerOut.includes(id));
+  return allEliminated || everyoneOut;
+}
+
+function processSmart10Answer(playerId, optionIdx, claimTrue) {
+  const q = gameState.currentQuestion;
+  const smart10 = gameState.smart10State;
+  if (gameState.phase !== 'smart10' || !q || q.type !== 'smart10' || !smart10) return;
+  if (!Array.isArray(q.options) || !Array.isArray(q.correct)) return;
+  if (optionIdx < 0 || optionIdx >= q.options.length) return;
+  if ((gameState.questionPlayerIds || []).length && !gameState.questionPlayerIds.includes(playerId)) return;
+  if (smart10.eliminated[optionIdx] || smart10.playerOut.includes(playerId)) return;
+
+  const activePlayer = getSmart10ActivePlayer();
+  if (!activePlayer || activePlayer.id !== playerId) return;
+
+  const actual = !!q.correct[optionIdx];
+  const wasCorrect = actual === !!claimTrue;
+  smart10.eliminated[optionIdx] = true;
+  smart10.claimResults[optionIdx] = wasCorrect ? 'correct' : 'wrong';
+  smart10.attemptedBy[optionIdx] = playerId;
+  smart10.claims[optionIdx] = !!claimTrue;
+
+  if (wasCorrect) {
+    const player = gameState.players.find(p => p.id === playerId);
+    if (player) player.score += 1;
+    smart10.resolvedBy[optionIdx] = playerId;
+  } else if (!smart10.playerOut.includes(playerId)) {
+    smart10.playerOut.push(playerId);
+  }
+
+  if (isSmart10Over(smart10)) {
+    gameState.phase = 'result';
+  } else {
+    const nextTurnIdx = findNextSmart10PlayerIdx(smart10.currentTurnIdx, smart10.playerOut);
+    if (nextTurnIdx === -1) {
+      gameState.phase = 'result';
+    } else {
+      smart10.currentTurnIdx = nextTurnIdx;
+    }
+  }
+
+  broadcastState();
+}
 
 function startGame(totalRounds) {
   gameState.totalRounds = totalRounds === 0 ? Infinity : totalRounds;
@@ -813,6 +1043,8 @@ function startGame(totalRounds) {
   gameState.currentPlayerIdx = 0;
   gameState.usedQuestionIdxs = [];
   gameState.usedCategories = {};
+  gameState.questionPlayerIds = [];
+  gameState.smart10State = null;
   CATEGORIES.forEach(c => gameState.usedCategories[c.id] = 0);
   gameState.players.forEach(p => p.score = 0);
   gameState.phase = 'categorySelect';
@@ -844,7 +1076,8 @@ function selectCategory(catId) {
   gameState.usedCategories[catId] = (gameState.usedCategories[catId] || 0) + 1;
   gameState.answers = {};
   gameState.questionPlayerIds = gameState.players.filter(p => p.connected).map(p => p.id);
-  gameState.phase = 'question';
+  gameState.smart10State = q.type === 'smart10' ? createSmart10State(q) : null;
+  gameState.phase = q.type === 'smart10' ? 'smart10' : 'question';
   localState.answered = false;
   localState.myAnswer = null;
   broadcastState();
@@ -958,6 +1191,9 @@ function nextRound() {
   gameState.currentPlayerIdx = (gameState.currentPlayerIdx + 1) % gameState.players.length;
   gameState.phase = 'categorySelect';
   gameState.answers = {};
+  gameState.questionPlayerIds = [];
+  gameState.smart10State = null;
+  gameState.currentQuestion = null;
   localState.answered = false;
   localState.myAnswer = null;
   broadcastState();
@@ -972,6 +1208,7 @@ function render() {
     case 'lobby': renderLobby(); break;
     case 'categorySelect': renderCategorySelect(); break;
     case 'question': renderQuestion(); break;
+    case 'smart10': renderSmart10(); break;
     case 'result': renderResult(); break;
     case 'final': renderFinal(); break;
     case 'disconnected': renderDisconnected(); break;
@@ -1044,6 +1281,8 @@ function onTestMode() {
   gameState.currentPlayerIdx = 0;
   gameState.usedQuestionIdxs = [];
   gameState.usedCategories = {};
+  gameState.questionPlayerIds = [];
+  gameState.smart10State = null;
   CATEGORIES.forEach(c => gameState.usedCategories[c.id] = 0);
   gameState.phase = 'categorySelect';
   render();
@@ -1237,6 +1476,10 @@ function hostSelectCategory(catId) {
 function renderQuestion() {
   const q = gameState.currentQuestion;
   if (!q) return;
+  if (q.type === 'smart10') {
+    renderSmart10();
+    return;
+  }
   const cat = CATEGORIES.find(c => c.id === q.cat);
   const answeredCount = Object.keys(gameState.answers).length;
   const totalPlayers = gameState.players.filter(p => p.connected).length;
@@ -1321,6 +1564,94 @@ function renderQuestion() {
   if (q.type === 'estimate' && !iAnswered) {
     setTimeout(() => { const el = document.getElementById('estInput'); if (el) el.focus(); }, 100);
   }
+}
+
+function submitSmart10Choice(optionIdx, claimTrue) {
+  if (role === 'host') {
+    processSmart10Answer(myId, optionIdx, claimTrue);
+  } else {
+    sendToHost({ type: 'smart10Answer', playerId: myId, optionIdx, claimTrue });
+  }
+}
+
+function renderSmart10() {
+  const q = gameState.currentQuestion;
+  const smart10 = gameState.smart10State;
+  if (!q || q.type !== 'smart10' || !smart10) return;
+
+  const cat = CATEGORIES.find(c => c.id === q.cat);
+  const activePlayer = getSmart10ActivePlayer();
+  const participantIds = (gameState.questionPlayerIds || []).length
+    ? gameState.questionPlayerIds
+    : gameState.players.filter(p => p.connected).map(p => p.id);
+  const participantPlayers = gameState.players.filter(p => participantIds.includes(p.id));
+  const isParticipating = participantIds.includes(myId);
+  const isOut = smart10.playerOut.includes(myId);
+  const isMyTurn = !!activePlayer && activePlayer.id === myId && !isOut;
+  const eliminatedCount = smart10.eliminated.filter(Boolean).length;
+  const playersStillIn = participantPlayers.filter(p => p.connected && !smart10.playerOut.includes(p.id)).length;
+
+  const bannerText = !activePlayer
+    ? 'Die Runde endet...'
+    : isMyTurn
+      ? '🟢 Du bist dran!'
+      : isOut
+        ? 'Du bist raus – schau zu!'
+        : !isParticipating
+          ? `${activePlayer.name} spielt diese Runde`
+          : `${activePlayer.name} ist dran`;
+
+  app.innerHTML = `
+    <div class="card" style="border:3px solid ${cat.color}">
+      ${renderScoreboard()}
+      <div class="round-info">Runde ${gameState.round + 1}${gameState.totalRounds === Infinity ? '' : ' / ' + gameState.totalRounds}</div>
+      <div class="category-badge" style="background:${cat.color}">${cat.icon} ${cat.name}</div>
+      <div class="question-type-label">🧩 Smart10 – Reihum rätseln!</div>
+      <div class="turn-banner" style="background:${activePlayer ? activePlayer.color : cat.color}">
+        ${bannerText}
+      </div>
+      <div class="question-text">${q.q}</div>
+      <div class="smart10-status-row">
+        ${participantPlayers.map(p => `
+          <div class="smart10-player-pill ${activePlayer && activePlayer.id === p.id ? 'active' : ''} ${smart10.playerOut.includes(p.id) || !p.connected ? 'out' : ''}"
+               style="background:${p.color}22;color:${p.color};border-color:${p.color};">
+            ${activePlayer && activePlayer.id === p.id ? '🎯 ' : ''}${p.name}${smart10.playerOut.includes(p.id) || !p.connected ? ' – raus' : ''}
+          </div>
+        `).join('')}
+      </div>
+      <div class="smart10-grid">
+        ${q.options.map((option, i) => {
+          const isEliminated = !!smart10.eliminated[i];
+          const guessResult = smart10.claimResults[i];
+          const attemptedBy = gameState.players.find(p => p.id === smart10.attemptedBy[i]);
+          const tileClasses = [
+            'smart10-tile',
+            isEliminated ? (guessResult === 'correct' ? 'guess-correct' : 'guess-wrong') : '',
+            !isEliminated && isMyTurn ? 'active' : '',
+          ].filter(Boolean).join(' ');
+
+          return `
+            <div class="${tileClasses}">
+              <div class="smart10-option-text">${option}</div>
+              ${isEliminated ? `
+                <div class="smart10-tile-note">${guessResult === 'correct' ? '✓ Richtig aufgedeckt' : '✗ Fehlversuch – Spieler raus'}</div>
+                <div class="smart10-tile-meta">${attemptedBy ? `<span style="color:${attemptedBy.color}">${attemptedBy.name}</span>` : ''}</div>
+              ` : isMyTurn ? `
+                <div class="smart10-actions">
+                  <button class="smart10-action-btn true" onclick="submitSmart10Choice(${i}, true)">✓</button>
+                  <button class="smart10-action-btn false" onclick="submitSmart10Choice(${i}, false)">✗</button>
+                </div>
+              ` : `
+                <div class="smart10-note">${activePlayer ? `${activePlayer.name} entscheidet` : 'Wird ausgewertet...'}</div>
+              `}
+            </div>
+          `;
+        }).join('')}
+      </div>
+      <div class="answer-count">${eliminatedCount}/${q.options.length} Felder eliminiert · ${playersStillIn} Spieler noch im Rennen</div>
+      ${!isMyTurn ? '<div class="waiting">Warte auf den Zug<span class="waiting-dots"></span></div>' : ''}
+    </div>
+  `;
 }
 
 function submitEstimateAnswer() {
@@ -1432,6 +1763,51 @@ function renderResult() {
         </p>
       `}
     `;
+  } else if (q.type === 'smart10') {
+    const smart10 = gameState.smart10State || { playerOut: [], resolvedBy: [], attemptedBy: [] };
+    const myRoundPoints = (smart10.resolvedBy || []).filter(id => id === myId).length;
+    const iGotOut = (smart10.playerOut || []).includes(myId);
+    const scorers = gameState.players
+      .map(p => ({ ...p, roundPoints: (smart10.resolvedBy || []).filter(id => id === p.id).length }))
+      .filter(p => p.roundPoints > 0);
+    const knockedOut = gameState.players.filter(p => (smart10.playerOut || []).includes(p.id));
+
+    resultContent = `
+      <div class="result-box ${myRoundPoints > 0 ? 'success' : iGotOut ? 'fail' : 'info'}">
+        <div class="result-big">
+          ${myRoundPoints > 0 ? `+${myRoundPoints} Punkt${myRoundPoints === 1 ? '' : 'e'}` : iGotOut ? '❌ Raus' : '🧩 Runde vorbei'}
+        </div>
+        <div class="result-detail">
+          ${myRoundPoints > 0 ? 'Du hast richtige Felder abgeräumt.' : iGotOut ? 'Ein Fehlgriff hat dich aus der Runde genommen.' : 'Alle Felder sind jetzt aufgedeckt.'}
+        </div>
+      </div>
+      <div class="smart10-grid">
+        ${q.options.map((option, i) => {
+          const actualTrue = !!q.correct[i];
+          const solver = gameState.players.find(p => p.id === smart10.resolvedBy?.[i]);
+          const attempter = gameState.players.find(p => p.id === smart10.attemptedBy?.[i]);
+          return `
+            <div class="smart10-tile ${actualTrue ? 'truth-true' : 'truth-false'}">
+              <div class="smart10-option-text">${option}</div>
+              <div class="smart10-tile-note">${actualTrue ? '✓ Gehört dazu' : '✗ Gehört nicht dazu'}</div>
+              <div class="smart10-tile-meta">
+                ${solver ? `+1 für <span style="color:${solver.color}">${solver.name}</span>` : attempter ? `Fehlversuch: <span style="color:${attempter.color}">${attempter.name}</span>` : 'Nicht gewählt'}
+              </div>
+            </div>
+          `;
+        }).join('')}
+      </div>
+      ${scorers.length ? `
+        <p style="text-align:center;font-weight:700;margin-top:8px;">
+          Punkte: ${scorers.map(p => `<span style="color:${p.color}">${p.name} +${p.roundPoints}</span>`).join(' · ')}
+        </p>
+      ` : '<p style="text-align:center;color:#888;">In dieser Runde hat niemand gepunktet.</p>'}
+      ${knockedOut.length ? `
+        <p style="text-align:center;color:#666;font-weight:600;margin-top:6px;">
+          Raus: ${knockedOut.map(p => `<span style="color:${p.color}">${p.name}</span>`).join(', ')}
+        </p>
+      ` : ''}
+    `;
   }
 
   app.innerHTML = `
@@ -1511,6 +1887,9 @@ function restartGame() {
   gameState.round = 0;
   gameState.players.forEach(p => p.score = 0);
   gameState.usedQuestionIdxs = [];
+  gameState.questionPlayerIds = [];
+  gameState.smart10State = null;
+  gameState.currentQuestion = null;
   broadcastState();
 }
 
@@ -1612,7 +1991,7 @@ render();
       <li>Ein Spieler erstellt einen Raum und teilt den 4-stelligen Code.</li>
       <li>Alle anderen treten mit dem Code bei.</li>
       <li>Jede Runde wird eine zufällige Kategorie per Glücks-Animation gewählt.</li>
-      <li>Alle beantworten die Frage gleichzeitig.</li>
+      <li>Je nach Fragetyp antworten alle gleichzeitig oder reihum.</li>
       <li>Punkte gibt's für richtige Antworten – wer am Ende führt, gewinnt! 👑</li>
       <li>Freunde können jederzeit nachträglich beitreten – sie starten mit dem Durchschnittspunktestand.</li>
     </ol>
@@ -1622,6 +2001,7 @@ render();
       <li>🔢 <strong>Schätzfrage</strong> – tippe eine Zahl ein. Wer am nächsten dran ist, bekommt den Punkt.</li>
       <li>⬆️⬇️ <strong>Höher oder Tiefer</strong> – ist die echte Antwort höher oder niedriger als der angezeigte Wert?</li>
       <li>🗳️ <strong>Abstimmung</strong> – die Mehrheit gewinnt! Stimme für deine Lieblingsantwort.</li>
+      <li>🧩 <strong>Smart10</strong> – reihum ein Feld wählen und behaupten, ob es dazugehört oder nicht.</li>
     </ul>
     <button class="btn btn-secondary" style="margin-top:16px;" onclick="document.getElementById('howto-overlay').style.display='none'">Verstanden!</button>
   </div>
