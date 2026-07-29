@@ -2310,18 +2310,25 @@
         </select>
       </div>
       ${isHost ? `
-      <div class="settings-row" style="justify-content:space-between;">
-        <label>🌍 + Allgemeinwissen</label>
-        <label style="position:relative;display:inline-block;width:48px;height:26px;margin:0;">
-          <input type="checkbox" id="modeToggle" onchange="gameState.includeAllgemein = this.checked" style="opacity:0;width:0;height:0;">
-          <span style="position:absolute;cursor:pointer;inset:0;background:#ccc;border-radius:26px;transition:.3s;" onclick="this.previousElementSibling.click()"></span>
-          <span style="position:absolute;left:3px;top:3px;width:20px;height:20px;background:white;border-radius:50%;transition:.3s;pointer-events:none;" id="modeToggleKnob"></span>
-        </label>
+      <div class="settings-row" style="justify-content:space-between;align-items:center;">
+        <label style="font-size:.95rem;">🌍 + Allgemeinwissen</label>
+        <div id="modeToggleTrack" onclick="toggleAllgemein()" style="position:relative;width:56px;height:30px;background:#ccc;border-radius:30px;cursor:pointer;transition:background .3s;flex-shrink:0;">
+          <div id="modeToggleKnob" style="position:absolute;top:3px;left:3px;width:24px;height:24px;background:white;border-radius:50%;transition:left .3s;box-shadow:0 1px 3px rgba(0,0,0,.3);"></div>
+        </div>
+        <input type="hidden" id="modeToggle" value="off">
       </div>
-      <style>
-        #modeToggle:checked + span { background: var(--ms-green); }
-        #modeToggle:checked ~ #modeToggleKnob { left: 25px; }
-      </style>
+      <script>
+        function toggleAllgemein() {
+          const track = document.getElementById('modeToggleTrack');
+          const knob = document.getElementById('modeToggleKnob');
+          const input = document.getElementById('modeToggle');
+          const isOn = input.value === 'on';
+          input.value = isOn ? 'off' : 'on';
+          track.style.background = isOn ? '#ccc' : 'var(--ms-green)';
+          knob.style.left = isOn ? '3px' : '29px';
+          gameState.includeAllgemein = !isOn;
+        }
+      </script>
       ` : ''}
       <div class="btn-row">
         <button class="btn btn-primary" ${!canStart ? 'disabled' : ''} onclick="onStartGame()">🚀 Spiel starten!</button>
@@ -2333,7 +2340,7 @@
     function onStartGame() {
       const totalRounds = +document.getElementById('roundsSelect').value;
       const modeToggle = document.getElementById('modeToggle');
-      if (modeToggle) gameState.includeAllgemein = modeToggle.checked;
+      if (modeToggle) gameState.includeAllgemein = (modeToggle.value === 'on');
       if (role === 'host') {
         startGame(totalRounds);
       } else {
