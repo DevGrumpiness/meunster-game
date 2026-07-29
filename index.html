@@ -1066,7 +1066,8 @@ function selectCategory(catId) {
   const connectedCount = gameState.players.filter(p => p.connected).length;
   const available = QUESTIONS.map((q, i) => ({ ...q, idx: i }))
     .filter(q => q.cat === catId && !gameState.usedQuestionIdxs.includes(q.idx))
-    .filter(q => q.type !== 'vote' || connectedCount >= 3);
+    .filter(q => q.type !== 'vote' || connectedCount >= 3)
+    .filter(q => q.type !== 'smart10' || connectedCount >= 2);
   if (available.length === 0) return;
 
   const q = { ...available[Math.floor(Math.random() * available.length)] };
@@ -1361,8 +1362,14 @@ function renderCategorySelect() {
   const cp = getCurrentPlayer();
   const isMyTurn = cp.id === myId;
 
+  const connectedCount = gameState.players.filter(p => p.connected).length;
+  const isPlayable = (q, i) =>
+    !gameState.usedQuestionIdxs.includes(i) &&
+    (q.type !== 'vote' || connectedCount >= 3) &&
+    (q.type !== 'smart10' || connectedCount >= 2);
+
   const availCats = CATEGORIES.filter(c =>
-    QUESTIONS.some((q, i) => q.cat === c.id && !gameState.usedQuestionIdxs.includes(i))
+    QUESTIONS.some((q, i) => q.cat === c.id && isPlayable(q, i))
   );
 
   if (availCats.length === 0) {
@@ -1396,14 +1403,20 @@ function spinWheel() {
   const btn = document.getElementById('spinBtn');
   if (btn) btn.disabled = true;
 
+  const connectedCount = gameState.players.filter(p => p.connected).length;
+  const isPlayable = (q, i) =>
+    !gameState.usedQuestionIdxs.includes(i) &&
+    (q.type !== 'vote' || connectedCount >= 3) &&
+    (q.type !== 'smart10' || connectedCount >= 2);
+
   const availCats = CATEGORIES.filter(c =>
-    QUESTIONS.some((q, i) => q.cat === c.id && !gameState.usedQuestionIdxs.includes(i))
+    QUESTIONS.some((q, i) => q.cat === c.id && isPlayable(q, i))
   );
   const segCount = availCats.length;
 
-  // Pick random winner — weighted by available question count
+  // Pick random winner — weighted by actually playable question count
   const weights = availCats.map(c =>
-    QUESTIONS.filter((q, i) => q.cat === c.id && !gameState.usedQuestionIdxs.includes(i)).length
+    QUESTIONS.filter((q, i) => q.cat === c.id && isPlayable(q, i)).length
   );
   const totalWeight = weights.reduce((a, b) => a + b, 0);
   let roll = Math.random() * totalWeight;
