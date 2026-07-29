@@ -2316,9 +2316,9 @@
       </div>
       <input type="hidden" id="modeToggle" value="off">
       ` : ''}
-      <div class="btn-row">
+      ${isHost ? `<div class="btn-row">
         <button class="btn btn-primary" ${!canStart ? 'disabled' : ''} onclick="onStartGame()">🚀 Spiel starten!</button>
-      </div>
+      </div>` : ''}
     </div>
   `;
     }
