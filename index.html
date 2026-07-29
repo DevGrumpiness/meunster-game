@@ -2014,35 +2014,28 @@
       gameState._wheelSpinning = false;
       CATEGORIES.forEach(c => gameState.usedCategories[c.id] = 0);
       gameState.players.forEach(p => p.score = 0);
-      // Pre-shuffle question decks per category for true randomness without repeats
-      gameState._shuffledDecks = buildShuffledDecks();
+      // Pre-shuffle global question deck for true randomness without repeats
+      gameState._globalDeck = buildGlobalDeck();
       gameState.phase = 'categorySelect';
       broadcastState();
     }
 
-    // Build pre-shuffled question index decks per category (Fisher-Yates)
-    function buildShuffledDecks() {
+    // Build one global shuffled deck of ALL playable questions (Fisher-Yates)
+    function buildGlobalDeck() {
       const connectedCount = gameState.players.filter(p => p.connected).length;
-      const decks = {};
-      const activeCats = getActiveCategories();
-      activeCats.forEach(cat => {
-        const indices = [];
-        QUESTIONS.forEach((q, i) => {
-          if (q.cat !== cat.id) return;
-          if (gameState.usedQuestionIdxs.includes(i)) return;
-          if (q.type === 'vote' && connectedCount < 3) return;
-          if (q.type === 'smart10' && connectedCount < 2) return;
-          if (!gameState.includeAllgemein && q.cat === 'allgemein') return;
-          indices.push(i);
-        });
-        // Fisher-Yates shuffle
-        for (let i = indices.length - 1; i > 0; i--) {
-          const j = Math.floor(Math.random() * (i + 1));
-          [indices[i], indices[j]] = [indices[j], indices[i]];
-        }
-        decks[cat.id] = indices;
+      const indices = [];
+      QUESTIONS.forEach((q, i) => {
+        if (gameState.usedQuestionIdxs.includes(i)) return;
+        if (q.type === 'vote' && connectedCount < 3) return;
+        if (q.type === 'smart10' && connectedCount < 2) return;
+        if (!gameState.includeAllgemein && q.cat === 'allgemein') return;
+        indices.push(i);
       });
-      return decks;
+      for (let i = indices.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [indices[i], indices[j]] = [indices[j], indices[i]];
+      }
+      return indices;
     }
 
     // Get questions filtered by current mode
@@ -2064,19 +2057,24 @@
     function selectCategory(catId) {
       const connectedCount = gameState.players.filter(p => p.connected).length;
       
-      // Try to draw from pre-shuffled deck first
+      // Use pre-drawn question from global deck if available
       let qIdx = null;
-      if (gameState._shuffledDecks && gameState._shuffledDecks[catId]) {
-        while (gameState._shuffledDecks[catId].length > 0) {
-          const candidate = gameState._shuffledDecks[catId].shift();
-          if (!gameState.usedQuestionIdxs.includes(candidate)) {
-            qIdx = candidate;
-            break;
-          }
+      if (gameState._predrawnQIdx != null && !gameState.usedQuestionIdxs.includes(gameState._predrawnQIdx)) {
+        qIdx = gameState._predrawnQIdx;
+        gameState._predrawnQIdx = null;
+      }
+      
+      // Fallback: draw from global deck for this category
+      if (qIdx === null && gameState._globalDeck) {
+        const deckIdx = gameState._globalDeck.findIndex(idx => 
+          QUESTIONS[idx].cat === catId && !gameState.usedQuestionIdxs.includes(idx)
+        );
+        if (deckIdx >= 0) {
+          qIdx = gameState._globalDeck.splice(deckIdx, 1)[0];
         }
       }
       
-      // Fallback: random from remaining (if deck exhausted or missing)
+      // Final fallback: random from remaining
       if (qIdx === null) {
         const available = QUESTIONS.map((q, i) => ({...q, idx: i}))
           .filter(q => q.cat === catId && !gameState.usedQuestionIdxs.includes(q.idx))
@@ -2341,7 +2339,7 @@
       gameState.readyPlayers = [];
       gameState._wheelSpinning = false;
       CATEGORIES.forEach(c => gameState.usedCategories[c.id] = 0);
-      gameState._shuffledDecks = buildShuffledDecks();
+      gameState._globalDeck = buildGlobalDeck();
       gameState.phase = 'categorySelect';
       render();
     }
@@ -2491,18 +2489,23 @@
       );
       const segCount = availCats.length;
 
-      // Pick random winner — weighted by actually playable question count
-      const weights = availCats.map(c =>
-        QUESTIONS.filter((q, i) => q.cat === c.id && isPlayable(q, i)).length
-      );
-      const totalWeight = weights.reduce((a, b) => a + b, 0);
-      let roll = Math.random() * totalWeight;
-      let winnerIdx = 0;
-      for (let i = 0; i < weights.length; i++) {
-        roll -= weights[i];
-        if (roll <= 0) {winnerIdx = i; break;}
+      // Draw next question from global deck → category follows from question
+      if (!gameState._globalDeck || gameState._globalDeck.length === 0) {
+        gameState._globalDeck = buildGlobalDeck();
       }
-      const winnerCat = availCats[winnerIdx];
+      let nextQIdx = null;
+      while (gameState._globalDeck.length > 0) {
+        const candidate = gameState._globalDeck.shift();
+        if (!gameState.usedQuestionIdxs.includes(candidate) && isPlayable(QUESTIONS[candidate], candidate)) {
+          const catObj = availCats.find(c => c.id === QUESTIONS[candidate].cat);
+          if (catObj) { nextQIdx = candidate; break; }
+        }
+      }
+      if (nextQIdx === null) return; // No questions left
+
+      const winnerCat = availCats.find(c => c.id === QUESTIONS[nextQIdx].cat);
+      const winnerIdx = availCats.indexOf(winnerCat);
+      gameState._predrawnQIdx = nextQIdx;
 
       // Start highlight animation
       runHighlightAnimation(winnerIdx, segCount, winnerCat.id);
