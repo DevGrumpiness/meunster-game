@@ -725,25 +725,26 @@ function generateRoomCode() {
   return code;
 }
 
+const PEER_CONFIG = {
+  debug: 0,
+  config: {
+    iceServers: [
+      { urls: 'stun:stun.l.google.com:19302' },
+      { urls: 'stun:stun1.l.google.com:19302' },
+      { urls: 'turn:openrelay.metered.ca:80', username: 'openrelayproject', credential: 'openrelayproject' },
+      { urls: 'turn:openrelay.metered.ca:443', username: 'openrelayproject', credential: 'openrelayproject' },
+      { urls: 'turn:openrelay.metered.ca:443?transport=tcp', username: 'openrelayproject', credential: 'openrelayproject' }
+    ]
+  }
+};
+
 function createHost(name) {
   roomCode = generateRoomCode();
   myName = name;
   role = 'host';
 
   const peerId = 'msk-' + roomCode.toLowerCase();
-  const peerConfig = {
-    debug: 0,
-    config: {
-      iceServers: [
-        { urls: 'stun:stun.l.google.com:19302' },
-        { urls: 'stun:stun1.l.google.com:19302' },
-        { urls: 'turn:openrelay.metered.ca:80', username: 'openrelayproject', credential: 'openrelayproject' },
-        { urls: 'turn:openrelay.metered.ca:443', username: 'openrelayproject', credential: 'openrelayproject' },
-        { urls: 'turn:openrelay.metered.ca:443?transport=tcp', username: 'openrelayproject', credential: 'openrelayproject' }
-      ]
-    }
-  };
-  peer = new Peer(peerId, peerConfig);
+  peer = new Peer(peerId, PEER_CONFIG);
 
   peer.on('open', (id) => {
     myId = id;
@@ -776,18 +777,7 @@ function joinRoom(name, code) {
   roomCode = code.toUpperCase();
   role = 'player';
 
-  peer = new Peer(undefined, {
-    debug: 0,
-    config: {
-      iceServers: [
-        { urls: 'stun:stun.l.google.com:19302' },
-        { urls: 'stun:stun1.l.google.com:19302' },
-        { urls: 'turn:openrelay.metered.ca:80', username: 'openrelayproject', credential: 'openrelayproject' },
-        { urls: 'turn:openrelay.metered.ca:443', username: 'openrelayproject', credential: 'openrelayproject' },
-        { urls: 'turn:openrelay.metered.ca:443?transport=tcp', username: 'openrelayproject', credential: 'openrelayproject' }
-      ]
-    }
-  });
+  peer = new Peer(undefined, PEER_CONFIG);
 
   peer.on('open', (id) => {
     myId = id;
@@ -801,8 +791,17 @@ function joinRoom(name, code) {
     hostConn.on('data', (data) => handlePlayerMessage(data));
 
     hostConn.on('close', () => {
-      gameState.phase = 'disconnected';
-      render();
+      // Attempt host migration instead of giving up
+      const myIdx = gameState.players.findIndex(p => p.id === myId);
+      const amFirstCandidate = !gameState.players.slice(1, myIdx).some(p => p.connected);
+
+      app.innerHTML = '<div class="card"><div class="result-box info"><div class="result-big">⏳ Host verloren</div><div class="result-detail">Versuche Verbindung wiederherzustellen...</div></div></div>';
+
+      if (amFirstCandidate) {
+        setTimeout(() => attemptHostMigration(), 2000);
+      } else {
+        setTimeout(() => reconnectAsPlayer(), 4000);
+      }
     });
 
     hostConn.on('error', (err) => {
@@ -875,6 +874,21 @@ function handleHostMessage(conn, data) {
     }
     case 'startGame': {
       startGame(data.totalRounds);
+      break;
+    }
+    case 'rejoin': {
+      const existing = gameState.players.find(p => p.id === data.oldId);
+      if (existing) {
+        existing.id = data.id;
+        existing.connected = true;
+        conn._playerId = data.id;
+      } else {
+        const color = PLAYER_COLORS[gameState.players.length % PLAYER_COLORS.length];
+        const player = { id: data.id, name: data.name, color, score: 0, connected: true };
+        gameState.players.push(player);
+        conn._playerId = data.id;
+      }
+      broadcastState();
       break;
     }
   }
@@ -951,6 +965,12 @@ function handlePlayerMessage(data) {
     animateWheelRemote(data.catId, data.winnerIdx);
     return;
   }
+  if (data.type === 'kicked') {
+    gameState.phase = 'kicked';
+    if (peer) peer.destroy();
+    render();
+    return;
+  }
   if (data.type === 'state') {
     const oldPhase = gameState.phase;
     const oldAnswerCount = Object.keys(gameState.answers || {}).length;
@@ -987,6 +1007,104 @@ function updateAnswerCount() {
 // PLAYER: send message to host
 function sendToHost(msg) {
   if (hostConn && hostConn.open) hostConn.send(msg);
+}
+
+// HOST: kick a player
+function kickPlayer(playerId) {
+  if (role !== 'host') return;
+  const conn = connections.find(c => c._playerId === playerId);
+  if (conn) {
+    try { conn.send({ type: 'kicked' }); } catch(e) {}
+    setTimeout(() => { try { conn.close(); } catch(e) {} }, 200);
+  }
+  // Remove from game state
+  const idx = gameState.players.findIndex(p => p.id === playerId);
+  if (idx !== -1) {
+    gameState.players.splice(idx, 1);
+    if (gameState.currentPlayerIdx >= gameState.players.length) {
+      gameState.currentPlayerIdx = 0;
+    }
+  }
+  connections = connections.filter(c => c._playerId !== playerId);
+  broadcastState();
+}
+
+// HOST MIGRATION: player takes over as host when original host disconnects
+function attemptHostMigration() {
+  const savedGameId = myId;
+  if (peer) { try { peer.destroy(); } catch(e) {} }
+
+  const peerId = 'msk-' + roomCode.toLowerCase();
+  peer = new Peer(peerId, PEER_CONFIG);
+
+  peer.on('open', (id) => {
+    myId = id;
+    role = 'host';
+    connections = [];
+
+    // Update player list: old host gets a modified ID, mark disconnected
+    const oldHost = gameState.players.find(p => p.id === peerId && p.id !== savedGameId);
+    if (oldHost) { oldHost.id = 'ex-' + Date.now(); oldHost.connected = false; }
+
+    // Update my entry with new peer ID
+    const myEntry = gameState.players.find(p => p.id === savedGameId);
+    if (myEntry) { myEntry.id = myId; myEntry.connected = true; }
+
+    // If current player was the old host or a disconnected player, skip
+    advanceToNextConnectedPlayer();
+
+    // Listen for reconnecting players
+    peer.on('connection', (conn) => {
+      conn.on('open', () => {
+        connections.push(conn);
+        conn.on('data', (data) => handleHostMessage(conn, data));
+        conn.on('close', () => handleDisconnect(conn));
+      });
+    });
+
+    render();
+  });
+
+  peer.on('error', (err) => {
+    if (err.type === 'unavailable-id') {
+      setTimeout(() => reconnectAsPlayer(), 2000);
+    } else {
+      gameState.phase = 'disconnected';
+      render();
+    }
+  });
+}
+
+function reconnectAsPlayer() {
+  const savedGameId = myId;
+  if (peer) { try { peer.destroy(); } catch(e) {} }
+
+  peer = new Peer(undefined, PEER_CONFIG);
+
+  peer.on('open', (id) => {
+    myId = id;
+    const hostPeerId = 'msk-' + roomCode.toLowerCase();
+    hostConn = peer.connect(hostPeerId, { reliable: true });
+
+    hostConn.on('open', () => {
+      hostConn.send({ type: 'rejoin', name: myName, id: myId, oldId: savedGameId });
+    });
+
+    hostConn.on('data', (data) => handlePlayerMessage(data));
+    hostConn.on('close', () => {
+      gameState.phase = 'disconnected';
+      render();
+    });
+    hostConn.on('error', () => {
+      gameState.phase = 'error';
+      render();
+    });
+  });
+
+  peer.on('error', () => {
+    gameState.phase = 'disconnected';
+    render();
+  });
 }
 
 // ============================================================
@@ -1277,6 +1395,7 @@ function render() {
     case 'result': renderResult(); break;
     case 'final': renderFinal(); break;
     case 'disconnected': renderDisconnected(); break;
+    case 'kicked': renderKicked(); break;
     case 'error': renderError(); break;
     default: renderHome(); break;
   }
@@ -1371,11 +1490,14 @@ function renderLobby() {
       <h2>👥 Spieler (${gameState.players.length})</h2>
       <ul class="player-list">
         ${gameState.players.map((p, i) => `
-          <li style="background:${p.color}15;">
-            <span class="player-dot" style="background:${p.color}"></span>
-            ${p.name}
-            ${p.id === myId ? '<span class="player-you">(Du)</span>' : ''}
-            ${!p.connected ? '<span class="player-you">⚠️ offline</span>' : ''}
+          <li style="background:${p.color}15;display:flex;align-items:center;justify-content:space-between;">
+            <span>
+              <span class="player-dot" style="background:${p.color}"></span>
+              ${p.name}
+              ${p.id === myId ? '<span class="player-you">(Du)</span>' : ''}
+              ${!p.connected ? '<span class="player-you">⚠️ offline</span>' : ''}
+            </span>
+            ${isHost && p.id !== myId ? `<button onclick="kickPlayer('${p.id}')" style="background:none;border:none;cursor:pointer;font-size:1rem;padding:2px 6px;opacity:0.5;" title="Entfernen">✕</button>` : ''}
           </li>
         `).join('')}
       </ul>
@@ -1981,6 +2103,20 @@ function onNextRound() {
   } else {
     sendToHost({ type: 'nextRound', playerId: myId });
   }
+}
+
+function renderKicked() {
+  app.innerHTML = `
+    <div class="card">
+      <div class="result-box fail">
+        <div class="result-big">🚫 Entfernt</div>
+        <div class="result-detail">Du wurdest vom Host aus dem Spiel entfernt.</div>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-secondary" onclick="location.reload()">↩️ Zurück zum Start</button>
+      </div>
+    </div>
+  `;
 }
 
 function renderDisconnected() {
