@@ -2310,13 +2310,11 @@
         </select>
       </div>
       ${isHost ? `
-      <div class="settings-row" style="justify-content:space-between;align-items:center;">
-        <label style="font-size:.95rem;">🌍 + Allgemeinwissen</label>
-        <div id="modeToggleTrack" onclick="toggleAllgemein()" style="position:relative;width:56px;height:30px;background:#ccc;border-radius:30px;cursor:pointer;transition:background .3s;flex-shrink:0;">
-          <div id="modeToggleKnob" style="position:absolute;top:3px;left:3px;width:24px;height:24px;background:white;border-radius:50%;transition:left .3s;box-shadow:0 1px 3px rgba(0,0,0,.3);"></div>
-        </div>
-        <input type="hidden" id="modeToggle" value="off">
+      <div id="modeSegmented" style="display:flex;border:2px solid var(--ms-green);border-radius:8px;overflow:hidden;margin:8px 0;">
+        <div id="modeBtn0" onclick="setMode(false)" style="flex:1;padding:10px 8px;text-align:center;font-size:.9rem;font-weight:600;cursor:pointer;transition:all .25s;background:var(--ms-green);color:white;">Nur Münster</div>
+        <div id="modeBtn1" onclick="setMode(true)" style="flex:1;padding:10px 8px;text-align:center;font-size:.9rem;font-weight:600;cursor:pointer;transition:all .25s;background:transparent;color:#999;">+ Allgemeinwissen</div>
       </div>
+      <input type="hidden" id="modeToggle" value="off">
       ` : ''}
       <div class="btn-row">
         <button class="btn btn-primary" ${!canStart ? 'disabled' : ''} onclick="onStartGame()">🚀 Spiel starten!</button>
@@ -2325,15 +2323,21 @@
   `;
     }
 
-    function toggleAllgemein() {
-      const track = document.getElementById('modeToggleTrack');
-      const knob = document.getElementById('modeToggleKnob');
+    function toggleAllgemein() {} // legacy, unused
+    function setMode(includeAllgemein) {
+      const btn0 = document.getElementById('modeBtn0');
+      const btn1 = document.getElementById('modeBtn1');
       const input = document.getElementById('modeToggle');
-      const isOn = input.value === 'on';
-      input.value = isOn ? 'off' : 'on';
-      track.style.background = isOn ? '#ccc' : 'var(--ms-green)';
-      knob.style.left = isOn ? '3px' : '29px';
-      gameState.includeAllgemein = !isOn;
+      if (includeAllgemein) {
+        btn1.style.background = 'var(--ms-green)'; btn1.style.color = 'white';
+        btn0.style.background = 'transparent'; btn0.style.color = '#999';
+        input.value = 'on';
+      } else {
+        btn0.style.background = 'var(--ms-green)'; btn0.style.color = 'white';
+        btn1.style.background = 'transparent'; btn1.style.color = '#999';
+        input.value = 'off';
+      }
+      gameState.includeAllgemein = includeAllgemein;
     }
 
     function onStartGame() {
