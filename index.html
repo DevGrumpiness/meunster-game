@@ -1854,7 +1854,7 @@ function renderSmart10() {
       ${renderScoreboard()}
       <div class="round-info">Runde ${gameState.round + 1}${gameState.totalRounds === Infinity ? '' : ' / ' + gameState.totalRounds}</div>
       <div class="category-badge" style="background:${cat.color}">${cat.icon} ${cat.name}</div>
-      <div class="question-type-label">🧩 Smart10 – Reihum rätseln!</div>
+      <div class="question-type-label">🧩 Wahr oder Falsch – Reihum rätseln!</div>
       <div class="turn-banner" style="background:${activePlayer ? activePlayer.color : cat.color}">
         ${bannerText}
       </div>
@@ -2307,7 +2307,7 @@ render();
       <li>🔢 <strong>Schätzfrage</strong> – tippe eine Zahl ein. Wer am nächsten dran ist, bekommt den Punkt.</li>
       <li>⬆️⬇️ <strong>Höher oder Tiefer</strong> – ist die echte Antwort höher oder niedriger als der angezeigte Wert?</li>
       <li>🗳️ <strong>Abstimmung</strong> – die Mehrheit gewinnt! Stimme für deine Lieblingsantwort.</li>
-      <li>🧩 <strong>Smart10</strong> – reihum ein Feld wählen und behaupten, ob es dazugehört oder nicht.</li>
+      <li>🧩 <strong>Wahr oder Falsch</strong> – reihum ein Feld wählen und behaupten, ob es dazugehört oder nicht.</li>
     </ul>
     <button class="btn btn-secondary" style="margin-top:16px;" onclick="document.getElementById('howto-overlay').style.display='none'">Verstanden!</button>
   </div>
