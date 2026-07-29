@@ -1532,6 +1532,7 @@
         hostConn = peer.connect(hostPeerId, {reliable: true});
 
         hostConn.on('open', () => {
+          clearTimeout(window._joinTimeout);
           hostConn.send({type: 'join', name: myName, id: myId});
         });
 
@@ -2310,6 +2311,22 @@
       if (code.length !== 4) {document.getElementById('codeInput').focus(); return;}
       localStorage.setItem('mk-name', name);
       app.innerHTML = `<div class="card"><div class="waiting">Verbinde mit Raum ${code}<span class="waiting-dots"></span></div></div>`;
+      
+      // Timeout: if not connected after 12s, show retry
+      clearTimeout(window._joinTimeout);
+      window._joinTimeout = setTimeout(() => {
+        if (gameState.phase === 'home') {
+          app.innerHTML = `<div class="card">
+            <div class="result-box fail">
+              <div class="result-big">⏳ Verbindung fehlgeschlagen</div>
+              <div class="result-detail">Raum ${code} nicht erreichbar. Ist der Host online?</div>
+            </div>
+            <button class="btn btn-gold" onclick="onJoinRoom()" style="margin-top:16px;">🔄 Nochmal versuchen</button>
+            <button class="btn" onclick="gameState.phase='home';render();" style="margin-top:8px;">← Zurück</button>
+          </div>`;
+        }
+      }, 12000);
+      
       joinRoom(name, code);
     }
 
