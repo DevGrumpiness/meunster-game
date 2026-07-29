@@ -1959,7 +1959,7 @@
     }
 
     function startGame(totalRounds) {
-      gameState.totalRounds = totalRounds === 0 ? Infinity : totalRounds;
+      gameState.totalRounds = totalRounds === 0 ? 0 : totalRounds;
       gameState.round = 0;
       gameState.currentPlayerIdx = 0;
       // Restore used questions from localStorage for cross-session variety
@@ -2138,12 +2138,12 @@
 
     function nextRound() {
       gameState.round++;
-      if (gameState.round >= gameState.totalRounds) {
+      if (gameState.totalRounds > 0 && gameState.round >= gameState.totalRounds) {
         gameState.phase = 'final';
         broadcastState();
         return;
       }
-      if (gameState.totalRounds === Infinity && gameState.usedQuestionIdxs.length >= getActiveQuestions().length) {
+      if (gameState.totalRounds === 0 && gameState.usedQuestionIdxs.length >= getActiveQuestions().length) {
         gameState.usedQuestionIdxs = [];
         localStorage.removeItem('mk-used-questions');
         gameState.usedCategories = {};
@@ -2244,7 +2244,7 @@
       myId = 'test-host';
       roomCode = 'TEST';
       gameState.players = [{id: 'test-host', name, color: PLAYER_COLORS[0], score: 0, connected: true}];
-      gameState.totalRounds = Infinity;
+      gameState.totalRounds = 0;
       gameState.round = 0;
       gameState.currentPlayerIdx = 0;
       gameState.includeAllgemein = true; // solo test includes all questions
@@ -2375,7 +2375,7 @@
       app.innerHTML = `
     <div class="card">
       ${renderScoreboard()}
-      <div class="round-info">Runde ${gameState.round + 1}${gameState.totalRounds === Infinity ? '' : ' / ' + gameState.totalRounds}</div>
+      <div class="round-info">Runde ${gameState.round + 1}${gameState.totalRounds === 0 ? '' : ' / ' + gameState.totalRounds}</div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;" id="catGrid">
         ${availCats.map((c, i) => `
           <div class="cat-tile" id="cat-${i}" style="border-color:${c.color}33;${availCats.length % 2 === 1 && i === availCats.length - 1 ? 'grid-column:span 2;' : ''}">
@@ -2575,7 +2575,7 @@
       app.innerHTML = `
     <div class="card" style="border:3px solid ${cat.color}">
       ${renderScoreboard()}
-      <div class="round-info">Runde ${gameState.round + 1}${gameState.totalRounds === Infinity ? '' : ' / ' + gameState.totalRounds}</div>
+      <div class="round-info">Runde ${gameState.round + 1}${gameState.totalRounds === 0 ? '' : ' / ' + gameState.totalRounds}</div>
       <div class="category-badge" style="background:${cat.color}">${cat.icon} ${cat.name}</div>
       ${content}
       <div class="answer-count">${iAnswered ? '✓ ' : ''}${answeredCount}/${totalPlayers} haben geantwortet</div>
@@ -2626,7 +2626,7 @@
       app.innerHTML = `
     <div class="card" style="border:3px solid ${cat.color}">
       ${renderScoreboard()}
-      <div class="round-info">Runde ${gameState.round + 1}${gameState.totalRounds === Infinity ? '' : ' / ' + gameState.totalRounds}</div>
+      <div class="round-info">Runde ${gameState.round + 1}${gameState.totalRounds === 0 ? '' : ' / ' + gameState.totalRounds}</div>
       <div class="category-badge" style="background:${cat.color}">${cat.icon} ${cat.name}</div>
       <div class="question-type-label">🧩 Wahr oder Falsch – Reihum rätseln!</div>
       <div class="turn-banner" style="background:${activePlayer ? activePlayer.color : cat.color}">
