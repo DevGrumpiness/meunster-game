@@ -130,6 +130,7 @@
     font-size: 0.75rem; color: white; transition: all 0.3s;
   }
   .score-chip.active { transform: scale(1.08); box-shadow: 0 3px 10px rgba(0,0,0,0.2); }
+  .score-chip.me { box-shadow: 0 2px 0 0 white, 0 4px 8px rgba(0,0,0,0.15); }
   .score-chip .pts { font-family: 'Fredoka One', cursive; font-size: 0.85rem; }
 
   /* Question */
@@ -898,6 +899,18 @@ function handleDisconnect(conn) {
     }
   }
   connections = connections.filter(c => c !== conn);
+  // If disconnected player was supposed to act (categorySelect), skip to next connected player
+  if (player && (gameState.phase === 'categorySelect' || gameState.phase === 'wheelSpin')) {
+    const idx = gameState.players.indexOf(player);
+    if (idx === gameState.currentPlayerIdx) {
+      advanceToNextConnectedPlayer();
+      gameState.phase = 'categorySelect';
+    }
+  }
+  // If waiting for answers, re-check if all remaining connected players have answered
+  if (player && gameState.phase === 'question') {
+    checkAllAnswers();
+  }
   broadcastState();
 }
 
@@ -982,6 +995,13 @@ function sendToHost(msg) {
 function getHost() { return gameState.players[0]; }
 function getMe() { return gameState.players.find(p => p.id === myId); }
 function getCurrentPlayer() { return gameState.players[gameState.currentPlayerIdx]; }
+function advanceToNextConnectedPlayer() {
+  const len = gameState.players.length;
+  for (let i = 0; i < len; i++) {
+    if (gameState.players[gameState.currentPlayerIdx].connected) return;
+    gameState.currentPlayerIdx = (gameState.currentPlayerIdx + 1) % len;
+  }
+}
 function getSmart10ActivePlayer() {
   return gameState.players[gameState.smart10State?.currentTurnIdx] || null;
 }
@@ -1233,6 +1253,7 @@ function nextRound() {
     CATEGORIES.forEach(c => gameState.usedCategories[c.id] = 0);
   }
   gameState.currentPlayerIdx = (gameState.currentPlayerIdx + 1) % gameState.players.length;
+  advanceToNextConnectedPlayer();
   gameState.phase = 'categorySelect';
   gameState.answers = {};
   gameState.questionPlayerIds = [];
@@ -2000,7 +2021,7 @@ function renderScoreboard() {
         ${gameState.players.map((p, i) => {
           const isLeader = hasScores && p.score === maxScore;
           return `
-          <div class="score-chip ${i === gameState.currentPlayerIdx ? 'active' : ''}" style="background:${p.color}">
+          <div class="score-chip ${i === gameState.currentPlayerIdx ? 'active' : ''} ${p.id === myId ? 'me' : ''}" style="background:${p.color}">
             ${isLeader ? '👑 ' : ''}${p.name.slice(0,8)} <span class="pts">${p.score}</span>
           </div>
         `;
