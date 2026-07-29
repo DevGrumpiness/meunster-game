@@ -2356,10 +2356,10 @@
       </div>
       ${isHost ? `
       <div id="modeSegmented" style="display:flex;border:2px solid var(--ms-green);border-radius:8px;overflow:hidden;margin:8px 0;">
-        <div id="modeBtn0" onclick="setMode(false)" style="flex:1;padding:10px 8px;text-align:center;font-size:.9rem;font-weight:600;cursor:pointer;transition:all .25s;background:var(--ms-green);color:white;">Nur Münster</div>
-        <div id="modeBtn1" onclick="setMode(true)" style="flex:1;padding:10px 8px;text-align:center;font-size:.9rem;font-weight:600;cursor:pointer;transition:all .25s;background:transparent;color:#999;">+ Allgemeinwissen</div>
+        <div id="modeBtn0" onclick="setMode(false)" style="flex:1;padding:10px 8px;text-align:center;font-size:.9rem;font-weight:600;cursor:pointer;transition:all .25s;background:${gameState.includeAllgemein ? 'transparent' : 'var(--ms-green)'};color:${gameState.includeAllgemein ? '#999' : 'white'};">Nur Münster</div>
+        <div id="modeBtn1" onclick="setMode(true)" style="flex:1;padding:10px 8px;text-align:center;font-size:.9rem;font-weight:600;cursor:pointer;transition:all .25s;background:${gameState.includeAllgemein ? 'var(--ms-green)' : 'transparent'};color:${gameState.includeAllgemein ? 'white' : '#999'};">+ Allgemeinwissen</div>
       </div>
-      <input type="hidden" id="modeToggle" value="off">
+      <input type="hidden" id="modeToggle" value="${gameState.includeAllgemein ? 'on' : 'off'}">
       ` : ''}
       ${isHost ? `<div class="btn-row">
         <button class="btn btn-primary" ${!canStart ? 'disabled' : ''} onclick="onStartGame()">🚀 Spiel starten!</button>
