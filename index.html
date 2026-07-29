@@ -130,7 +130,7 @@
     font-size: 0.75rem; color: white; transition: all 0.3s;
   }
   .score-chip.active { transform: scale(1.08); box-shadow: 0 3px 10px rgba(0,0,0,0.2); }
-  .score-chip.me { box-shadow: 0 2px 0 0 white, 0 4px 8px rgba(0,0,0,0.15); }
+  .score-chip.me { box-shadow: 0 0 0 2px white, 0 4px 8px rgba(0,0,0,0.15); }
   .score-chip .pts { font-family: 'Fredoka One', cursive; font-size: 0.85rem; }
 
   /* Question */
@@ -418,7 +418,7 @@ const QUESTIONS = [
   { cat:'ausgehen', type:'vote', q:'Bester Ort für ein erstes Date in Münster?', options:['Aasee-Spaziergang 🌅','Hafen-Viertel 🍷','Botanischer Garten 🌺','Prinzipalmarkt-Bummel 🏛️'] },
   { cat:'ausgehen', type:'quiz', q:'Wie heißt die bekannte Cocktailbar an der Kreuzstraße?', answers:['Grotemeyer','Pension Schmidt','Hot Jazz Club','Cavete'], correct:1, fact:'Die Pension Schmidt ist bekannt für kreative Cocktails in gemütlicher Atmosphäre mitten auf der Kreuzstraße.' },
   { cat:'ausgehen', type:'höher_tiefer', q:'Wie viele Cocktails hat die Pension Schmidt auf der Karte?', reference:50, answer:80, unit:'Cocktails', fact:'Die Pension Schmidt hat über 80 verschiedene Cocktails – eine der umfangreichsten Karten in Münster.' },
-  { cat:'ausgehen', type:'quiz', q:'Welche Studenten-Kneipe am Alten Steinweg ist für ihre Graffiti-Wände bekannt?', answers:['Cavete','Destille','Blaues Haus','Gasolin'], correct:0, fact:'Die Cavete ist eine legendäre Studentenkneipe seit 1959 – mit Biergarten, günstigen Preisen und viel Charme.' },
+  { cat:'ausgehen', type:'quiz', q:'Welche Studenten-Kneipe am Alten Steinweg ist für ihre Graffiti-Wände bekannt?', answers:['Cavete','Destille','Blaues Haus','Gasolin'], correct:0, fact:'Die Cavete ist eine legendäre Studentenkneipe seit 1959 – mit belebtem Außenbereich, günstigen Preisen und viel Charme.' },
   { cat:'ausgehen', type:'quiz', q:'Wo findet man die meisten Bars und Clubs auf engem Raum?', answers:['Kreuzstraße/Kuhviertel','Hafen','Prinzipalmarkt','Gievenbeck'], correct:0, fact:'Das Kuhviertel und die Kreuzstraße sind die zwei Hotspots – wer feiern will, kommt hier nicht vorbei.' },
   { cat:'ausgehen', type:'quiz', q:'Welche Bar im Kuhviertel ist für Live-Jazz bekannt?', answers:['Hot Jazz Club','Blaues Haus','Gorilla Bar','Mata Hari'], correct:0, fact:'Der Hot Jazz Club im Kuhviertel bietet regelmäßig Live-Jazz, Blues und Soul in intimem Setting.' },
   { cat:'ausgehen', type:'vote', q:'Wo feiert man in Münster am besten seinen Geburtstag?', options:['Kreuzstraße Bar-Tour 🍸','Hafen-Restaurants 🍽️','Hawerkamp-Clubs 🎶','Biergarten am Aasee 🌳'] },
@@ -569,7 +569,7 @@ const QUESTIONS = [
 
   // --- Essen & Trinken ---
   { cat:'ausgehen', type:'quiz', q:'Welches Restaurant an der Kreuzstraße ist für Tapas bekannt?', answers:['Casa Vazquez','Casa Nostra','La Bodega','Tapas y Mas'], correct:0, fact:'Casa Vazquez ist eine Institution für spanische Tapas in Münster – immer voll, immer gut, sehr beliebt bei Studenten.' },
-  { cat:'ausgehen', type:'quiz', q:'Was bekommt man bei Tom&Polly?', answers:['Frozen Yogurt','Pizza','Sushi','Currywurst'], correct:0, fact:'Tom&Polly ist bekannt für Frozen Yogurt – der perfekte Snack beim Chillen im Biergarten am Südpark!' },
+  { cat:'ausgehen', type:'quiz', q:'Was bekommt man bei Tom&Polly NICHT?', answers:['Sushi','Frozen Yogurt','Currywurst','Bier'], correct:0, fact:'Tom&Polly bietet Frozen Yogurt, Currywurst, Bier und mehr – aber kein Sushi. Gemütlicher Biergarten am Südpark!' },
   { cat:'ausgehen', type:'quiz', q:'Welche Mensa gilt als die beste der Uni?', answers:['Mensa am Aasee','Mensa am Ring','Bistro Domplatz','Mensa Bispinghof'], correct:0, fact:'Die Mensa am Aasee (auch "Mensa 1") ist die größte und beliebteste – mit Blick auf den See und überraschend gutem Essen für den Preis.' },
   { cat:'ausgehen', type:'estimate', q:'Wie viel kostet ein Studierenden-Mittagessen in der Mensa?', answer:3.5, unit:'€', tolerance:1.5, fact:'Ein Hauptgericht in der Mensa kostet für Studierende nur 2,50-4,50€ – günstig und ordentlich!' },
   { cat:'ausgehen', type:'quiz', q:'Welches Lokal am Prinzipalmarkt ist für seinen Westfälischen Grünkohl bekannt?', answers:['Großer Kiepenkerl','Stuhlmacher','Pinkus Müller','Altes Gasthaus Leve'], correct:0, fact:'Der Große Kiepenkerl und das Alte Gasthaus Leve servieren traditionelle Westfälische Küche – Grünkohl, Mettwurst, Pumpernickel.' },
@@ -633,7 +633,7 @@ const QUESTIONS = [
   { cat:'wissen', type:'smart10', q:'Welche dieser Städte liegen näher an Münster als 100 km?', options:['Osnabrück','Köln','Dortmund','Bremen','Bielefeld','Hannover','Enschede','Hamm'], correct:[true,false,true,false,true,false,true,true], fact:'Osnabrück, Dortmund, Bielefeld, Enschede und Hamm liegen grob innerhalb von 100 km um Münster.' },
   { cat:'wissen', type:'smart10', q:'Welche dieser Fakten über Münster stimmen?', options:['Münster hat eine autofreie Promenade um die Altstadt','Der Aasee ist ein natürlicher Bergsee','Im Rathaus wurde am Westfälischen Frieden mitverhandelt','Münster liegt in Niedersachsen','Es gibt mehr Fahrräder als Einwohner','Die Stadt hat einen Seehafen an der Nordsee','Die Uni nutzt das Fürstbischöfliche Schloss','Der Send findet nur einmal pro Jahr statt'], correct:[true,false,true,false,true,false,true,false], fact:'Promenade, Frieden, Fahrrad-Rekord und Schloss-Uni sind echte Münster-Fakten; Seehafen und Niedersachsen natürlich nicht.' },
   { cat:'wissen', type:'smart10', q:'Welche dieser Länder liegen in Europa?', options:['Spanien','Brasilien','Norwegen','Japan','Slowakei','Marokko','Portugal','Kenia'], correct:[true,false,true,false,true,false,true,false], fact:'Spanien, Norwegen, die Slowakei und Portugal liegen in Europa.' },
-  { cat:'wissen', type:'smart10', q:'Welche dieser Tiere leben in Deutschland wild?', options:['Fuchs','Koala','Wildschwein','Pinguin','Dachs','Giraffe','Wolf','Känguru'], correct:[true,false,true,false,true,false,true,false], fact:'Fuchs, Wildschwein, Dachs und Wolf leben in Deutschland wild; Koala, Giraffe und Pinguin nicht.' },
+  { cat:'wissen', type:'smart10', q:'Welche dieser Tiere wurden in den letzten 20 Jahren in NRW nachgewiesen?', options:['Wolf','Wisent','Luchs','Goldschakal','Marderhund','Flamingo','Waschbär','Nerz'], correct:[true,true,true,true,true,true,true,false], fact:'Alle außer dem Europäischen Nerz (ausgestorben in NRW) wurden nachgewiesen. Flamingos brüten sogar am Zwillbrocker Venn!' },
   { cat:'wissen', type:'smart10', q:'Welche dieser Städte liegen in Nordrhein-Westfalen?', options:['Münster','Hannover','Bielefeld','Mainz','Bonn','Kiel','Aachen','Leipzig'], correct:[true,false,true,false,true,false,true,false], fact:'Münster, Bielefeld, Bonn und Aachen liegen alle in NRW.' },
   { cat:'wissen', type:'smart10', q:'Welche dieser Gewässer prägen Münster direkt?', options:['Aasee','Münstersche Aa','Dortmund-Ems-Kanal','Bodensee','Werse','Alster','Emscher','Hafenbecken am Kreativkai'], correct:[true,true,true,false,true,false,false,true], fact:'Aasee, Aa, Werse, Dortmund-Ems-Kanal und das Hafenbecken gehören direkt zu Münster.' },
   { cat:'wissen', type:'smart10', q:'Welche dieser Aussagen zu Münster und Umgebung stimmen?', options:['Münster liegt in NRW','Die Stadt hat mehr Fahrräder als Einwohner','Der Westfälische Frieden wurde auch in Osnabrück verhandelt','Münster ist Deutschlands höchstes Gebirge','Die Uni nutzt das Fürstbischöfliche Schloss','Der Send findet dreimal pro Jahr statt','Münster hat einen internationalen Seehafen','Masematte gehört zur Stadtkultur'], correct:[true,true,true,false,true,true,false,true], fact:'NRW, Fahrradstadt, Frieden mit Osnabrück, Schloss-Uni, dreimal Send und Masematte – alles korrekt.' },
@@ -867,9 +867,8 @@ function handleHostMessage(conn, data) {
       break;
     }
     case 'nextRound': {
-      // The current player (whose turn it is) can advance
-      const cp = getCurrentPlayer();
-      if (data.playerId === cp.id) nextRound();
+      // Any player can advance to next round
+      if (gameState.phase === 'result') nextRound();
       break;
     }
     case 'startGame': {
@@ -2021,13 +2020,9 @@ function renderResult() {
       <div class="question-text">${q.q}</div>
       ${resultContent}
       ${q.fact ? `<div class="fun-fact"><strong>💡 Wusstest du?</strong> ${q.fact}</div>` : ''}
-      ${getCurrentPlayer().id === myId ? `
-        <div class="btn-row">
-          <button class="btn btn-primary" onclick="onNextRound()">Weiter ➜</button>
-        </div>
-      ` : `
-        <div class="waiting" style="margin-top:14px;">${getCurrentPlayer().name} klickt weiter<span class="waiting-dots"></span></div>
-      `}
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="onNextRound()">Weiter ➜</button>
+      </div>
     </div>
   `;
 }
@@ -2158,7 +2153,7 @@ function renderScoreboard() {
           const isLeader = hasScores && p.score === maxScore;
           return `
           <div class="score-chip ${i === gameState.currentPlayerIdx ? 'active' : ''} ${p.id === myId ? 'me' : ''}" style="background:${p.color}">
-            ${isLeader ? '👑 ' : ''}${p.name.slice(0,8)} <span class="pts">${p.score}</span>
+           ${isLeader ? '👑 ' : ''}${p.id === myId ? '★ ' : ''}${p.name.slice(0,8)} <span class="pts">${p.score}</span>
           </div>
         `;
         }).join('')}
