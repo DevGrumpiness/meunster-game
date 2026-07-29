@@ -1003,7 +1003,7 @@ function renderHome() {
           <button class="btn btn-gold" onclick="onJoinRoom()">Beitreten!</button>
         </div>
       </div>
-      <p style="text-align:center;margin-top:16px;"><a href="#" onclick="document.getElementById('datenschutz-overlay').style.display='flex';return false;" style="color:#999;font-size:0.75rem;text-decoration:none;">🔒 Datenschutz</a></p>
+      <p style="text-align:center;margin-top:16px;"><a href="#" onclick="document.getElementById('howto-overlay').style.display='flex';return false;" style="color:#999;font-size:0.75rem;text-decoration:none;margin-right:12px;">❓ So geht's</a><a href="#" onclick="document.getElementById('datenschutz-overlay').style.display='flex';return false;" style="color:#999;font-size:0.75rem;text-decoration:none;">🔒 Datenschutz</a></p>
       ${location.protocol === 'file:' ? '<div style="text-align:center;"><button class="test-btn" onclick="onTestMode()">🧪 Testen (Solo)</button></div>' : ''}
     </div>
   `;
@@ -1600,6 +1600,30 @@ function spawnConfetti() {
 render();
 </script>
 
+<div id="howto-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:9999;padding:20px;overflow-y:auto;">
+  <div style="max-width:500px;margin:40px auto;background:white;border-radius:16px;padding:24px;">
+    <h2 style="font-family:'Fredoka One',cursive;color:#1d3557;">So geht's</h2>
+    <p style="font-size:0.9rem;line-height:1.6;margin:12px 0;">
+      <strong>Münster Game</strong> ist ein Quiz für 2+ Spieler – jeder auf seinem eigenen Handy!
+    </p>
+    <h3 style="font-size:0.95rem;margin-top:14px;">🎮 Spielablauf</h3>
+    <ol style="font-size:0.85rem;line-height:1.8;padding-left:20px;">
+      <li>Ein Spieler erstellt einen Raum und teilt den 4-stelligen Code.</li>
+      <li>Alle anderen treten mit dem Code bei.</li>
+      <li>Jede Runde wird eine zufällige Kategorie per Glücks-Animation gewählt.</li>
+      <li>Alle beantworten die Frage gleichzeitig.</li>
+      <li>Punkte gibt's für richtige Antworten – wer am Ende führt, gewinnt! 👑</li>
+    </ol>
+    <h3 style="font-size:0.95rem;margin-top:14px;">📋 Fragetypen</h3>
+    <ul style="font-size:0.85rem;line-height:1.8;padding-left:20px;">
+      <li>🔘 <strong>Multiple Choice</strong> – wähle die richtige Antwort aus 4 Optionen.</li>
+      <li>🔢 <strong>Schätzfrage</strong> – tippe eine Zahl ein. Wer am nächsten dran ist, bekommt den Punkt.</li>
+      <li>⬆️⬇️ <strong>Höher oder Tiefer</strong> – ist die echte Antwort höher oder niedriger als der angezeigte Wert?</li>
+      <li>🗳️ <strong>Abstimmung</strong> – die Mehrheit gewinnt! Stimme für deine Lieblingsantwort.</li>
+    </ul>
+    <button class="btn btn-secondary" style="margin-top:16px;" onclick="document.getElementById('howto-overlay').style.display='none'">Verstanden!</button>
+  </div>
+</div>
 <div id="datenschutz-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:9999;padding:20px;overflow-y:auto;">
   <div style="max-width:500px;margin:40px auto;background:white;border-radius:16px;padding:24px;">
     <h2 style="font-family:'Fredoka One',cursive;color:#1d3557;">Datenschutz</h2>
