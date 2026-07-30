@@ -2016,8 +2016,11 @@
       gameState.players.forEach(p => p.score = 0);
       // Pre-shuffle global question deck for true randomness without repeats
       gameState._globalDeck = buildGlobalDeck();
-      console.log(`🎲 Neues Deck: ${gameState._globalDeck.length} Fragen im Pool. Erste 5: ` +
-        gameState._globalDeck.slice(0, 5).map(i => `#${i} "${QUESTIONS[i].q.substring(0,30)}…"`).join(', '));
+      const deckCatsMP = {};
+      gameState._globalDeck.forEach(i => { const c = QUESTIONS[i].cat; deckCatsMP[c] = (deckCatsMP[c] || 0) + 1; });
+      console.log(`🎲 Multiplayer Deck: ${gameState._globalDeck.length} Fragen (allgemein=${gameState.includeAllgemein}, Spieler=${gameState.players.filter(p=>p.connected).length})`);
+      console.log(`📊 Verteilung:`, deckCatsMP);
+      console.log(`🔢 Erste 20:`, gameState._globalDeck.slice(0, 20).map(i => `#${i} [${QUESTIONS[i].cat}] ${QUESTIONS[i].q.substring(0,40)}`));
       gameState.phase = 'categorySelect';
       broadcastState();
     }
@@ -2349,6 +2352,12 @@
       gameState._wheelSpinning = false;
       CATEGORIES.forEach(c => gameState.usedCategories[c.id] = 0);
       gameState._globalDeck = buildGlobalDeck();
+      // Debug: show pool composition
+      const deckCats = {};
+      gameState._globalDeck.forEach(i => { const c = QUESTIONS[i].cat; deckCats[c] = (deckCats[c] || 0) + 1; });
+      console.log(`🎲 SOLO Deck: ${gameState._globalDeck.length} Fragen im Pool (allgemein=${gameState.includeAllgemein})`);
+      console.log(`📊 Verteilung:`, deckCats);
+      console.log(`🔢 Erste 20 Fragen im Deck:`, gameState._globalDeck.slice(0, 20).map(i => `#${i} [${QUESTIONS[i].cat}] ${QUESTIONS[i].q.substring(0,40)}`));
       gameState.phase = 'categorySelect';
       render();
     }
@@ -2515,6 +2524,7 @@
       const winnerCat = availCats.find(c => c.id === QUESTIONS[nextQIdx].cat);
       const winnerIdx = availCats.indexOf(winnerCat);
       gameState._predrawnQIdx = nextQIdx;
+      console.log(`➡️ Runde ${gameState.round + 1}: Frage #${nextQIdx} [${winnerCat.id}] "${QUESTIONS[nextQIdx].q.substring(0,50)}" | Deck rest: ${gameState._globalDeck.length}`);
 
       // Start highlight animation
       runHighlightAnimation(winnerIdx, segCount, winnerCat.id);
