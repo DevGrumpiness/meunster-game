@@ -1008,7 +1008,7 @@
       {cat: 'ausgehen', type: 'vote', q: 'Tom&Polly oder Casa Vazquez für einen Abend mit Freunden?', options: ['Tom&Polly – Biergarten am Südpark 🌳', 'Casa Vazquez – Tapas teilen ist geselliger 🇪🇸', 'Kommt auf die Stimmung an 🤷', 'Erst Tapas, dann Biergarten! 🍷➡️🍺']},
       {cat: 'ausgehen', type: 'quiz', q: 'Was sollte man bei Casa Vazquez beachten?', answers: ['Reservieren – am Wochenende oft ausgebucht', 'Es gibt nur Tapas, keine warmen Gerichte', 'Nur Barzahlung möglich', 'Montags und dienstags geschlossen'], correct: 0, fact: 'Casa Vazquez ist vor allem freitags und samstags sehr beliebt – ohne Reservierung wird es schwierig, einen Tisch zu bekommen.'},
       {cat: 'ausgehen', type: 'quiz', q: 'Wann ist der Biergarten am Tom&Polly besonders beliebt?', answers: ['Nachmittags & abends bei gutem Wetter', 'Zur Mittagspause unter der Woche', 'Samstags zum Frühstück', 'Sonntags zum Brunch'], correct: 0, fact: 'Bei gutem Wetter ist der Biergarten am Südpark nachmittags und abends der Place to be – entspannt, grün, gesellig.'},
-      {cat: 'ausgehen', type: 'quiz', q: 'Was trinkt man typischerweise bei Casa Vazquez?', answers: ['Sangría oder Rioja', 'Altbier', 'Gin Tonic', 'Kölsch'], correct: 0, fact: 'Zu Tapas gehört spanischer Wein – Casa Vazquez hat eine gute Auswahl an Rioja, Tempranillo und natürlich Sangría.'},
+      {cat: 'ausgehen', type: 'quiz', q: 'Was trinkt man typischerweise bei Casa Vazquez?', answers: ['Estrella, Rioja oder Espresso Martini', 'Altbier', 'Gin Tonic', 'Kölsch'], correct: 0, fact: 'Casa Vazquez ist eine Tapas-, Cocktail- & Weinbar – beliebt sind Estrella vom Fass, spanischer Rioja und Cocktails wie Espresso Martini.'},
 
       // ===== FAHRRAD & MOBILITÄT =====
       {cat: 'fahrrad', type: 'quiz', q: 'Wie heißt der autofreie Ring um die Altstadt?', answers: ['Promenade', 'Veloroute', 'Ringallee', 'Fahrradwall'], correct: 0, fact: 'Die 4,5 km lange Promenade ist Deutschlands längste autofreie Fahrrad-Allee rund um eine Altstadt!'},
@@ -1753,6 +1753,11 @@
         const oldReadyCount = (gameState.readyPlayers || []).length;
         gameState = data.state;
 
+        // Non-host: persist seen questions to localStorage so cross-session tracking works on ALL devices
+        if (gameState.usedQuestionIdxs && gameState.usedQuestionIdxs.length > 0) {
+          persistUsedQuestions();
+        }
+
         // If we're still in the question phase and only the answer count changed,
         // just update the counter instead of full re-render (preserves local input state)
         if (oldPhase === 'question' && gameState.phase === 'question') {
@@ -2063,8 +2068,22 @@
     }
 
     function persistUsedQuestions() {
-      const hashes = gameState.usedQuestionIdxs.map(i => qFingerprint(QUESTIONS[i]));
-      localStorage.setItem('mk-used-q2', JSON.stringify(hashes));
+      const currentHashes = gameState.usedQuestionIdxs.map(i => qFingerprint(QUESTIONS[i]));
+      // Merge with existing localStorage (don't overwrite fingerprints from previous sessions)
+      const stored = localStorage.getItem('mk-used-q2');
+      let merged = currentHashes;
+      if (stored) {
+        try {
+          const existing = JSON.parse(stored);
+          const set = new Set([...existing, ...currentHashes]);
+          merged = [...set];
+        } catch (e) { }
+      }
+      // Cap at total question count to prevent unbounded growth
+      if (merged.length > QUESTIONS.length) {
+        merged = merged.slice(merged.length - QUESTIONS.length);
+      }
+      localStorage.setItem('mk-used-q2', JSON.stringify(merged));
     }
 
     function restoreUsedQuestions() {
