@@ -564,6 +564,12 @@
       color: #c0392b;
     }
 
+    .smart10-tile.just-revealed {
+      box-shadow: 0 0 12px 4px rgba(255, 193, 7, 0.7);
+      transform: scale(1.04);
+      transition: box-shadow 0.3s, transform 0.3s;
+    }
+
     .smart10-tile.not-revealed .smart10-option-text {
       color: #adb5bd;
     }
@@ -1019,7 +1025,7 @@
       {cat: 'fahrrad', type: 'estimate', q: 'Wie lang ist die Promenade in Kilometern?', answer: 4.5, unit: 'km', tolerance: 1.2, fact: 'Die Promenade ist exakt 4,5 km lang und folgt dem Verlauf der ehemaligen Stadtbefestigung.'},
       {cat: 'fahrrad', type: 'quiz', q: 'Wie viele Räder kommen auf einen Einwohner?', answers: ['Ca. 1,5', 'Ca. 0,8', 'Ca. 2,5', 'Ca. 1,0'], correct: 0, fact: 'Mit ca. 1,5 Fahrrädern pro Einwohner ist Münster die fahrradfreundlichste Großstadt Deutschlands.'},
       {cat: 'fahrrad', type: 'vote', q: 'Was nervt Münsteraner Radfahrer am meisten?', options: ['Fußgänger auf dem Radweg 🚶', 'Gegenverkehr auf der Promenade 🔄', 'Fahrraddiebstahl 🔒', 'Kopfsteinpflaster 🪨']},
-      {cat: 'fahrrad', type: 'quiz', q: 'Beim ADFC-Fahrradklima-Test belegt Münster regelmäßig...', answers: ['Platz 1 bei Großstädten', 'Einen Mittelfeldplatz', 'Den letzten Platz', 'Platz 3'], correct: 0, fact: 'Münster ist seit Jahren auf Platz 1 der fahrradfreundlichsten Großstädte beim ADFC-Test.'},
+      {cat: 'fahrrad', type: 'quiz', q: 'Welchen Platz belegt Münster regelmäßig beim ADFC-Fahrradklima-Test unter Großstädten?', answers: ['Platz 1', 'Platz 5', 'Platz 3', 'Einen Mittelfeldplatz'], correct: 0, fact: 'Münster ist seit Jahren auf Platz 1 der fahrradfreundlichsten Großstädte beim ADFC-Test.'},
       {cat: 'fahrrad', type: 'quiz', q: 'Was passiert mit Fahrrädern, die lange am Bahnhof angekettet bleiben?', answers: ['Sie werden vom Ordnungsamt entfernt', 'Nichts', 'Sie werden versteigert', 'Sie kommen ins Museum'], correct: 0, fact: 'Das Ordnungsamt markiert und entfernt regelmäßig "Fahrradleichen" – über 1.000 pro Jahr werden abgeschleppt!'},
       {cat: 'fahrrad', type: 'estimate', q: 'Wie viele Kilometer Radwege hat Münster insgesamt?', answer: 480, unit: 'km', tolerance: 100, fact: 'Münster hat rund 480 km Radwege – das sind mehr Radwege als manche Städte Straßen haben!'},
 
@@ -1028,7 +1034,7 @@
       {cat: 'sights', type: 'quiz', q: 'Welcher Frieden wurde 1648 in Münster geschlossen?', answers: ['Westfälischer Frieden', 'Münsteraner Frieden', 'Norddeutscher Frieden', 'Hanseatischer Frieden'], correct: 0, fact: 'Der Westfälische Frieden beendete den 30-jährigen Krieg – verhandelt in Münster & Osnabrück.'},
       {cat: 'sights', type: 'quiz', q: 'Das barocke Schloss beherbergt heute...', answers: ['Die Uni-Verwaltung', 'Das Rathaus', 'Ein Hotel', 'Ein Museum'], correct: 0, fact: 'Das Fürstbischöfliche Schloss (1767-1787) ist Sitz der Uni-Verwaltung. Davor liegt der beliebte Schlossplatz.'},
       {cat: 'sights', type: 'estimate', q: 'In welchem Jahr wurde der St.-Paulus-Dom geweiht?', answer: 1264, unit: '', tolerance: 50, fact: 'Der Dom wurde 1264 geweiht – ein Meisterwerk der Übergangszeit von Romanik zu Gotik.'},
-      {cat: 'sights', type: 'quiz', q: 'Was findet samstags auf dem Domplatz statt?', answers: ['Wochenmarkt', 'Flohmarkt', 'Gottesdienst draußen', 'Radrennen'], correct: 0, fact: 'Der Wochenmarkt auf dem Domplatz ist einer der schönsten Deutschlands – mit regionalen Produkten und Pumpernickel.'},
+      {cat: 'sights', type: 'quiz', q: 'An welchem Wochentag findet der große Markt auf dem Domplatz statt?', answers: ['Mittwoch und Samstag', 'Nur Samstag', 'Freitag und Sonntag', 'Täglich außer Sonntag'], correct: 0, fact: 'Der Wochenmarkt auf dem Domplatz findet jeden Mittwoch und Samstag statt – einer der schönsten Deutschlands.'},
       {cat: 'sights', type: 'quiz', q: 'Was sind die "Skulptur Projekte"?', answers: ['Kunstausstellung alle 10 Jahre', 'Steinmetz-Wettbewerb', 'Uni-Architekturprojekt', 'Skulpturen-Werkstatt'], correct: 0, fact: 'Die Skulptur Projekte finden seit 1977 alle 10 Jahre statt und machen Münster zum Open-Air-Museum.'},
       {cat: 'sights', type: 'vote', q: 'Schönstes Fotomotiv in Münster?', options: ['Prinzipalmarkt-Giebel 🏛️', 'Aasee-Sonnenuntergang 🌅', 'Lambertikirche nachts 🕯️', 'Hafen-Kräne 🏗️']},
       {cat: 'sights', type: 'quiz', q: 'Wie heißt der künstliche See mitten in Münster?', answers: ['Aasee', 'Münstersee', 'Schlosssee', 'Domteich'], correct: 0, fact: 'Der Aasee wurde 1934 aufgestaut und ist heute DAS Naherholungsgebiet – zum Joggen, Segeln, Grillen.'},
@@ -1042,7 +1048,7 @@
       {cat: 'ausgehen', type: 'estimate', q: 'Wie viele Stände hat der Domplatz-Wochenmarkt?', answer: 150, unit: 'Stände', tolerance: 40, fact: 'Rund 150 Stände machen den Domplatz-Markt zu einem der größten und schönsten in ganz Deutschland.'},
       {cat: 'ausgehen', type: 'quiz', q: 'Wofür ist "Westfälischer Knochenschinken" bekannt?', answers: ['Luftgetrocknet & über Buche geräuchert', 'Gekocht in Bier', 'Paniert & frittiert', 'Süß mariniert'], correct: 0, fact: 'Der Westfälische Knochenschinken wird monatelang luftgetrocknet und über Buchenholz geräuchert.'},
       {cat: 'ausgehen', type: 'vote', q: 'Was muss man in Münster unbedingt probieren?', options: ['Pinkus Alt im Brauhaus 🍺', 'Töttchen beim Kiepenkerl 🍲', 'Struwen vom Imbiss 🥞', 'Käse vom Wochenmarkt 🧀']},
-      {cat: 'ausgehen', type: 'quiz', q: 'Welches Getränk ist Münsters Traditionsgebräu?', answers: ['Pinkus Altbier', 'Weizenbier', 'Kölsch', 'Exportbier'], correct: 0, fact: 'Pinkus Alt – obergärig, mild, süffig – ist seit 1816 DAS Münsteraner Bier.'},
+      {cat: 'ausgehen', type: 'quiz', q: 'Seit wann wird Pinkus Altbier in Münster gebraut?', answers: ['Seit 1816', 'Seit 1950', 'Seit 1723', 'Seit 1902'], correct: 0, fact: 'Pinkus Müller braut seit 1816 Altbier in Münster – die letzte Altbierbrauerei der Stadt und komplett bio-zertifiziert.'},
       {cat: 'ausgehen', type: 'quiz', q: 'Welches günstige Restaurant am Hafen ist für seine Burger bekannt?', answers: ['Flamingos', 'Heaven', 'Alex', 'Pier 31'], correct: 0, fact: 'Flamingos am Hafen ist beliebt für solide Burger, lockere Atmosphäre und faire Preise – Studenten-Treff!'},
       {cat: 'ausgehen', type: 'quiz', q: 'Was ist KEIN echtes Masematte-Wort?', answers: ['Knötterig', 'Schofel', 'Talpe', 'Pansen'], correct: 0, fact: 'Schofel (schlecht), Talpe (Nacht) und Pansen (essen) sind echte Masematte-Wörter aus Münster. "Knötterig" gibt es nicht.'},
       {cat: 'ausgehen', type: 'vote', q: 'Bester Spot für günstiges Mittagessen in Münster?', options: ['Mensa am Aasee 🍝', 'Döner Wolbecker Str. 🥙', 'Asia-Imbiss Altstadt 🍜', 'Markt am Domplatz 🥨']},
@@ -1100,7 +1106,7 @@
 
       // ===== NEUE FRAGEN – ALLE KATEGORIEN =====
       // --- Kneipen & Nightlife ---
-      {cat: 'ausgehen', type: 'quiz', q: 'Welche Kneipe im Kuhviertel ist für ihr Altbier und die urige Atmosphäre bekannt?', answers: ['Pinkus Müller', 'Cavete', 'Hot Jazz Club', 'Blaues Haus'], correct: 0, fact: 'Pinkus Müller in der Kreuzstraße ist ein Brauhaus seit 1816 – urig, studentisch, gemütlich.'},
+      {cat: 'ausgehen', type: 'quiz', q: 'Welches Brauhaus an der Kreuzstraße ist für sein Altbier und die urige Atmosphäre bekannt?', answers: ['Pinkus Müller', 'Cavete', 'Hot Jazz Club', 'Blaues Haus'], correct: 0, fact: 'Pinkus Müller an der Kreuzstraße ist ein Brauhaus seit 1816 – urig, studentisch, gemütlich.'},
       {cat: 'ausgehen', type: 'quiz', q: 'Wo findet man das "Kuhviertel"?', answers: ['Nördlich des Doms', 'Am Hafen', 'In Hiltrup', 'Am Aasee'], correct: 0, fact: 'Das Kuhviertel liegt direkt nördlich des Doms und ist bekannt für kleine Kneipen, Galerien und Charme.'},
       {cat: 'ausgehen', type: 'quiz', q: 'Welcher Club war der bekannteste Techno-Laden am Hawerkamp?', answers: ['Amp', 'Fusion', 'Jovel', 'Sputnikhalle'], correct: 0, fact: 'Das Amp (vorher Tribehouse) war DER Techno-Club am Hawerkamp – leider geschlossen, aber legendär.'},
       {cat: 'ausgehen', type: 'quiz', q: 'Wie heißt das alternative Kulturzentrum in Münster?', answers: ['Hawerkamp', 'Hansapark', 'Gievenbecker Hof', 'Aaseeterrassen'], correct: 0, fact: 'Der Hawerkamp ist Münsters alternatives Herz – Clubs, Ateliers, Skatepark, Graffiti auf einem alten Industriegelände.'},
@@ -1116,7 +1122,7 @@
       {cat: 'fahrrad', type: 'quiz', q: 'Wie heißt der Fahrrad-Schnellweg, der Münster mit dem Umland verbinden soll?', answers: ['Veloroute', 'Radschnellweg RS1', 'Leeze-Express', 'Fahrradautobahn'], correct: 0, fact: 'Münster plant mehrere Velorouten als Fahrrad-Schnellverbindungen ins Umland – breit, kreuzungsfrei, beleuchtet.'},
       {cat: 'fahrrad', type: 'quiz', q: 'Warum stehen tausende Räder am Hauptbahnhof?', answers: ['Pendler & Studenten nutzen das Rad als Zubringer', 'Es ist verboten, woanders zu parken', 'Fahrrad-Flohmarkt', 'Kunstinstallation'], correct: 0, fact: 'In Münster ist die Kombination Zug+Rad extrem beliebt – das Chaos am Bahnhof ist legendär und geht regelmäßig viral.'},
       {cat: 'fahrrad', type: 'estimate', q: 'Wie viele Fahrrad-Unfälle passieren jährlich in Münster?', answer: 1800, unit: '', tolerance: 500, fact: 'Rund 1.800 Fahrrad-Unfälle pro Jahr – die Kehrseite der Fahrradstadt. Kreuzungen sind besonders gefährlich.'},
-      {cat: 'fahrrad', type: 'quiz', q: 'Was ist die "Promenade"?', answers: ['Autofreier Radweg-Ring um die Altstadt', 'Einkaufsstraße', 'Hafenpromenade', 'Fußgängerzone'], correct: 0, fact: 'Die Promenade folgt dem Verlauf der ehemaligen Stadtmauer – 4,5 km, komplett autofrei, gesäumt von Linden.'},
+      {cat: 'fahrrad', type: 'quiz', q: 'Wie lang ist die Promenade in Münster ungefähr?', answers: ['Ca. 4,5 km', 'Ca. 2 km', 'Ca. 8 km', 'Ca. 12 km'], correct: 0, fact: 'Die Promenade folgt dem Verlauf der ehemaligen Stadtmauer – 4,5 km, komplett autofrei, gesäumt von Linden.'},
       {cat: 'fahrrad', type: 'höher_tiefer', q: 'Wie viele Fahrradleichen entfernt das Ordnungsamt pro Jahr?', reference: 500, answer: 1000, unit: 'Räder', fact: 'Über 1.000 "Fahrradleichen" werden jährlich am Bahnhof und in der Innenstadt entfernt – manche stehen seit Jahren.'},
       {cat: 'fahrrad', type: 'quiz', q: 'Welche besondere Ampel gibt es für Radfahrer in Münster?', answers: ['Grüne Welle für Radfahrer', 'Ampel mit Countdown', 'Keine besonderen', 'Sprachgesteuerte Ampel'], correct: 0, fact: 'An einigen Strecken gibt es eine "Grüne Welle" für Radfahrer bei Tempo 18-20 km/h – smart und einzigartig!'},
       {cat: 'fahrrad', type: 'vote', q: 'Was sollte Münster für Radfahrer verbessern?', options: ['Mehr überdachte Parkplätze 🏠', 'Breitere Radwege 🛤️', 'Bessere Beleuchtung nachts 💡', 'Härtere Diebstahl-Strafen ⚖️']},
@@ -1134,7 +1140,7 @@
       {cat: 'sights', type: 'quiz', q: 'Welche berühmte Skulptur zeigt riesige Billardkugeln am Aasee?', answers: ['Giant Pool Balls von Claes Oldenburg', 'Kugelkunst von Picasso', 'Münster Balls', 'Aasee Spheres'], correct: 0, fact: 'Die "Giant Pool Balls" (1977) von Claes Oldenburg sind eines der bekanntesten Kunstwerke der Skulptur Projekte – drei riesige Billardkugeln am Aaseeufer.'},
 
       // --- Essen & Trinken ---
-      {cat: 'ausgehen', type: 'quiz', q: 'Welche Tapas-, Cocktail- & Weinbar an der Kreuzstraße ist sehr beliebt?', answers: ['Casa Vazquez', 'Casa Nostra', 'La Bodega', 'Tapas y Mas'], correct: 0, fact: 'Casa Vazquez ist eine Institution in Münster – Tapas, Cocktails und Wein in toller Atmosphäre, sehr beliebt bei Studenten.'},
+      {cat: 'ausgehen', type: 'quiz', q: 'Welche Tapas-, Cocktail- & Weinbar in der Warendorfer Straße ist sehr beliebt?', answers: ['Casa Vazquez', 'Casa Nostra', 'La Bodega', 'Tapas y Mas'], correct: 0, fact: 'Casa Vazquez in der Warendorfer Straße ist eine Institution in Münster – Tapas, Cocktails und Wein in toller Atmosphäre, sehr beliebt bei Studenten.'},
       {cat: 'ausgehen', type: 'quiz', q: 'Was bekommt man bei Tom&Polly NICHT?', answers: ['Pommes', 'Frozen Yogurt', 'Currywurst', 'Bier'], correct: 0, fact: 'Tom&Polly bietet Frozen Yogurt, Currywurst, Bier und mehr – aber keine Pommes. Gemütlicher Biergarten am Südpark!'},
       {cat: 'ausgehen', type: 'quiz', q: 'An welchem Park liegt das Tom&Polly?', answers: ['Südpark', 'Aaseepark', 'Wienburgpark', 'Schlossgarten'], correct: 0, fact: 'Tom&Polly liegt direkt an der Hammer Straße am Südpark – mit riesen Sonnenterrasse und gemütlicher Atmosphäre.'},
       {cat: 'ausgehen', type: 'estimate', q: 'Seit wann gibt es Tom&Polly an der Hammer Straße?', answer: 2018, unit: '', tolerance: 1, fact: 'Tom&Polly hat 2018 eröffnet und ist seitdem fester Bestandteil des Südviertels – Kneipe, Biergarten und Hostel in einem!'},
@@ -1183,9 +1189,9 @@
       {cat: 'wissen', type: 'quiz', q: 'Welche Brücke über den Kanal ist bei Radfahrern besonders bekannt?', answers: ['Kanalbrücke Wolbecker Straße', 'Torminbrücke', 'Schlossgartenbrücke', 'Hafenbrücke Nord'], correct: 0, fact: 'Der Dortmund-Ems-Kanal wird von mehreren Brücken überquert – die Kanalbrücke Wolbecker Str. ist eine der wichtigsten Radrouten.'},
       {cat: 'wissen', type: 'quiz', q: 'Welche Sprache hat Wörter wie "jovel", "Leeze" und "Meese"?', answers: ['Masematte', 'Plattdeutsch', 'Holländisch', 'Jiddisch'], correct: 0, fact: 'Masematte ist Münsters Geheimsprache – eine Mischung aus Rotwelsch, Jiddisch und Romani. "Meese" = Geld, "jovel" = gut.'},
       {cat: 'wissen', type: 'estimate', q: 'In welchem Jahr wurde Münster gegründet?', answer: 793, unit: '', tolerance: 50, fact: '793 gründete der Missionar Liudger ein Kloster – daraus entstand Münster. Über 1.200 Jahre Geschichte!'},
-      {cat: 'wissen', type: 'quiz', q: 'Welcher bekannte Physiker studierte in Münster?', answers: ['Wilhelm Röntgen (kurzzeitig)', 'Albert Einstein', 'Max Planck', 'Werner Heisenberg'], correct: 0, fact: 'Wilhelm Röntgen besuchte kurz die Schule in Münster, bevor er in Zürich studierte und die Röntgenstrahlen entdeckte.'},
+      {cat: 'wissen', type: 'quiz', q: 'Welcher bekannte Physiker studierte (kurzfristig) in Münster?', answers: ['Wilhelm Röntgen', 'Albert Einstein', 'Max Planck', 'Werner Heisenberg'], correct: 0, fact: 'Wilhelm Röntgen besuchte kurz die Schule in Münster, bevor er in Zürich studierte und die Röntgenstrahlen entdeckte.'},
       {cat: 'wissen', type: 'höher_tiefer', q: 'Wie groß ist die Fläche von Münster in km²?', reference: 200, answer: 303, unit: 'km²', fact: 'Mit 303 km² ist Münster flächenmäßig eine der größten Städte Deutschlands – größer als Frankfurt oder München!'},
-      {cat: 'wissen', type: 'quiz', q: 'Welcher Fluss fließt durch Münster?', answers: ['Die Aa', 'Die Ems', 'Die Lippe', 'Die Weser'], correct: 0, fact: 'Die Aa (auch Münstersche Aa) fließt mitten durch die Stadt – klein aber prägend. Der Aasee wurde durch ihren Aufstau geschaffen.'},
+      {cat: 'wissen', type: 'quiz', q: 'Welches Gewässer wurde durch Aufstau der Aa geschaffen?', answers: ['Der Aasee', 'Der Dortmund-Ems-Kanal', 'Die Rieselfelder', 'Der Hiltruper See'], correct: 0, fact: 'Der Aasee entstand durch Aufstau der Münsterschen Aa – heute das beliebteste Naherholungsgebiet der Stadt.'},
       {cat: 'wissen', type: 'quiz', q: 'Was ist das "Fürstbischöfliche Schloss"?', answers: ['Barockschloss, heute Uni-Verwaltung', 'Ruine', 'Museum', 'Wohngebäude'], correct: 0, fact: 'Das Schloss wurde 1767-1787 im Barockstil erbaut und dient seit 1954 als Hauptgebäude der Uni – einer der schönsten Uni-Sitze Deutschlands.'},
       {cat: 'wissen', type: 'quiz', q: 'Wie viele Stadtbezirke hat Münster?', answers: ['6', '4', '9', '12'], correct: 0, fact: 'Münster hat 6 Stadtbezirke mit insgesamt 45 Stadtteilen – von urban (Kreuzviertel) bis ländlich (Amelsbüren).'},
       {cat: 'wissen', type: 'quiz', q: 'Warum gilt der 15. Mai als wichtiger Tag für Münsters Geschichte?', answers: ['Westfälischer Frieden unterzeichnet (1648)', 'Stadtgründung', 'Erstes Fahrrad', 'Uni-Gründung'], correct: 0, fact: 'Am 15. Mai 1648 wurde in Münster der Spanisch-Niederländische Frieden geschlossen – Teil des Westfälischen Friedens.'},
@@ -1325,7 +1331,7 @@
       {cat: 'allgemein', type: 'quiz', q: 'Welches chemische Element hat das Symbol "Au"?', answers: ['Gold', 'Silber', 'Aluminium', 'Argon'], correct: 0, fact: 'Au kommt vom lateinischen "Aurum" – Gold ist eines der ältesten bekannten Elemente der Menschheit.'},
       {cat: 'allgemein', type: 'quiz', q: 'Wer malte die Mona Lisa?', answers: ['Leonardo da Vinci', 'Michelangelo', 'Raffael', 'Rembrandt'], correct: 0, fact: 'Leonardo malte die Mona Lisa vermutlich zwischen 1503 und 1506. Sie hängt heute im Louvre in Paris.'},
       {cat: 'allgemein', type: 'quiz', q: 'Welcher Planet ist der größte im Sonnensystem?', answers: ['Jupiter', 'Saturn', 'Neptun', 'Uranus'], correct: 0, fact: 'Jupiter ist so groß, dass alle anderen Planeten zusammen hineinpassen würden – sein Durchmesser beträgt ca. 140.000 km.'},
-      {cat: 'allgemein', type: 'quiz', q: 'In welchem Land steht die Akropolis?', answers: ['Griechenland', 'Italien', 'Türkei', 'Ägypten'], correct: 0, fact: 'Die Akropolis in Athen wurde im 5. Jh. v. Chr. erbaut und ist eines der bekanntesten Bauwerke der Antike.'},
+      {cat: 'allgemein', type: 'quiz', q: 'Welches antike Bauwerk steht NICHT in Griechenland?', answers: ['Kolosseum', 'Parthenon', 'Erechtheion', 'Tempel des Zeus'], correct: 0, fact: 'Das Kolosseum steht in Rom (Italien). Parthenon, Erechtheion und der Tempel des Zeus stehen alle in Griechenland.'},
       {cat: 'allgemein', type: 'quiz', q: 'Wie viele Bundesländer hat Deutschland?', answers: ['16', '15', '14', '17'], correct: 0, fact: 'Seit der Wiedervereinigung 1990 hat Deutschland 16 Bundesländer – darunter 3 Stadtstaaten (Berlin, Hamburg, Bremen).'},
       {cat: 'allgemein', type: 'quiz', q: 'Welcher Ozean ist der größte der Welt?', answers: ['Pazifik', 'Atlantik', 'Indischer Ozean', 'Arktischer Ozean'], correct: 0, fact: 'Der Pazifische Ozean bedeckt mehr Fläche als alle Landmassen der Erde zusammen – rund 165 Millionen km².'},
       {cat: 'allgemein', type: 'quiz', q: 'Wer schrieb "Faust"?', answers: ['Johann Wolfgang von Goethe', 'Friedrich Schiller', 'Heinrich Heine', 'Thomas Mann'], correct: 0, fact: 'Goethe arbeitete über 60 Jahre an seinem Lebenswerk "Faust" – von 1772 bis kurz vor seinem Tod 1832.'},
@@ -1431,6 +1437,20 @@
       {cat: 'allgemein', type: 'smart10', q: 'Welche Flaggen haben die Farbe Rot?', options: ['Deutschland', 'Frankreich', 'Japan', 'Schweden', 'Türkei', 'Irland', 'China', 'Brasilien'], correct: [true, true, true, false, true, false, true, false], fact: 'Schweden (blau-gelb), Irland (grün-weiß-orange ohne Rot) und Brasilien (grün-gelb-blau) haben kein Rot in der Flagge.'},
       {cat: 'allgemein', type: 'smart10', q: 'Welche Aussagen über das Weltall stimmen?', options: ['Im Weltall herrscht Stille', 'Ein Jahr auf dem Mars dauert ca. 687 Erdtage', 'Die Sonne macht über 99% der Masse des Sonnensystems aus', 'Schwarze Löcher saugen alles in ihrer Nähe ein', 'Auf der Venus regnet es Schwefelsäure', 'Der Mond hat eine eigene Atmosphäre', 'Licht braucht ca. 8 Minuten von der Sonne zur Erde', 'Die ISS umkreist die Erde in 24 Stunden'], correct: [true, true, true, false, true, false, true, false], fact: 'Schwarze Löcher "saugen" nicht aktiv – sie wirken durch Gravitation. Der Mond hat quasi keine Atmosphäre. Die ISS umkreist die Erde in ca. 90 Minuten.'},
       {cat: 'allgemein', type: 'smart10', q: 'Welche dieser Gewürze kommen ursprünglich aus Asien?', options: ['Pfeffer', 'Vanille', 'Zimt', 'Chili', 'Ingwer', 'Oregano', 'Kurkuma', 'Petersilie'], correct: [true, false, true, false, true, false, true, false], fact: 'Pfeffer (Indien), Zimt (Sri Lanka), Ingwer und Kurkuma (Südasien) kommen aus Asien. Vanille (Mexiko), Chili (Südamerika), Oregano und Petersilie (Mittelmeer) nicht.'},
+
+      // Smart10 Batch – Juli 2026 (Münster-Fokus)
+      {cat: 'ausgehen', type: 'smart10', q: 'Welche dieser Clubs oder Bars in Münster gibt es (noch)?', options: ['Amp', 'Fusion Club', 'Sputnik Café', 'Hafen 26', 'Gleis 22', 'Coconut Beach', 'Conny Kramer', 'Berghain Münster'], correct: [true, true, true, false, true, false, true, false], fact: 'Amp, Fusion, Sputnik, Gleis 22 und Conny Kramer sind echte Münsteraner Locations. Hafen 26, Coconut Beach und Berghain Münster gibt es nicht.'},
+      {cat: 'fahrrad', type: 'smart10', q: 'Welche dieser Fahrradstraßen gibt es in Münster?', options: ['Promenade', 'Schlossplatzring', 'Kanalstraße', 'Weseler Straße', 'Bismarckallee', 'Hafenweg', 'Warendorfer Straße', 'Domplatz-Allee'], correct: [true, false, true, true, true, false, true, false], fact: 'Promenade, Kanalstraße, Weseler Straße, Bismarckallee und Warendorfer Straße sind offizielle Fahrradstraßen. Schlossplatzring, Hafenweg und Domplatz-Allee sind erfunden.'},
+      {cat: 'kultur', type: 'smart10', q: 'Welche Events finden jährlich in Münster statt?', options: ['Send', 'Schlossgartenfest', 'Eurocityfest', 'Hafenfest', 'Münster Marathon', 'Karnevalsumzug', 'Weinfest am Dom', 'Oktoberfest am Aasee'], correct: [true, true, true, true, true, true, false, false], fact: 'Send, Schlossgartenfest, Eurocityfest, Hafenfest, Marathon und Karneval gibt es wirklich. Ein Weinfest am Dom oder Oktoberfest am Aasee existieren nicht.'},
+      {cat: 'sights', type: 'smart10', q: 'Welche Stadtteile liegen nördlich der Münsteraner Innenstadt?', options: ['Kinderhaus', 'Coerde', 'Sprakel', 'Handorf', 'Nienberge', 'Gievenbeck', 'Uppenberg', 'Albachten'], correct: [true, true, true, false, true, false, true, false], fact: 'Kinderhaus, Coerde, Sprakel, Nienberge und Uppenberg liegen nördlich. Handorf liegt östlich, Gievenbeck westlich, Albachten südwestlich.'},
+      {cat: 'fahrrad', type: 'smart10', q: 'Welche Aussagen über die Promenade stimmen?', options: ['Sie ist ein ehemaliger Befestigungswall', 'Sie ist ca. 4,5 km lang', 'Autos sind dort komplett verboten', 'Sie wurde im 18. Jahrhundert angelegt', 'Inline-Skaten ist verboten', 'Es gibt eine Ampel auf der Promenade', 'Sie führt einmal komplett um die Altstadt', 'Nachts ist sie beleuchtet'], correct: [true, true, true, true, false, false, true, true], fact: 'Die Promenade ist ein ~4,5 km langer, beleuchteter Grüngürtel auf dem alten Wall, autofrei und komplett um die Altstadt. Inline-Skaten ist erlaubt, Ampeln gibt es keine.'},
+
+      // Smart10 Batch 2 – Tricky (Juli 2026)
+      {cat: 'sights', type: 'smart10', q: 'Welche Aussagen über den Prinzipalmarkt stimmen?', options: ['Die Giebelhäuser sind Originale aus dem Mittelalter', 'Er heißt so wegen der Kaufleute (Prinzipale)', 'Der Friedenssaal liegt am Prinzipalmarkt', 'Früher fand dort ein Pferdemarkt statt', 'Die Lambertikirche steht am Prinzipalmarkt', 'McDonald\'s hat dort eine Filiale', 'Er ist komplett autofrei', 'Die Arkaden sind in allen Häusern gleich hoch'], correct: [false, true, true, true, true, false, false, false], fact: 'Die Giebelhäuser sind Nachkriegs-Rekonstruktionen! Morgens gibt es Lieferverkehr, und die Arkaden haben alle unterschiedliche Höhen – jedes Haus wurde individuell gebaut.'},
+      {cat: 'fahrrad', type: 'smart10', q: 'Welche Gewässer kann man von Münster aus in unter 30 Min. mit dem Rad erreichen?', options: ['Aasee', 'Rieselfelder', 'Dortmund-Ems-Kanal', 'Werse', 'Hiltruper See', 'Emssee', 'Möhnesee', 'Biggesee'], correct: [true, true, true, true, true, false, false, false], fact: 'Aasee, Rieselfelder, Kanal, Werse und Hiltruper See sind alle per Rad erreichbar. Möhnesee und Biggesee liegen im Sauerland, einen Emssee gibt es nicht.'},
+      {cat: 'kultur', type: 'smart10', q: 'Welche Aussagen über den Send stimmen?', options: ['Er findet dreimal im Jahr statt', 'Er steht auf dem Schlossplatz', 'Es gibt ihn seit über 700 Jahren', 'Send kommt von Synode', 'Der Herbst-Send ist der größte', 'Am Montag ist Familientag mit Rabatten', 'Es gibt ein offizielles Send-Bier', 'Der Send hat ein eigenes Maskottchen'], correct: [true, true, true, true, false, true, false, false], fact: 'Der Send findet 3× jährlich auf dem Schlossplatz statt, seit über 700 Jahren. Der Name kommt von „Synode". Alle drei Sends sind etwa gleich groß, ein offizielles Bier oder Maskottchen gibt es nicht.'},
+      {cat: 'wissen', type: 'smart10', q: 'Welche Straßen in Münster sind nach Frauen benannt?', options: ['Annette-von-Droste-Hülshoff-Str.', 'Königin-Sophia-Straße', 'Edith-Stein-Straße', 'Marie-Curie-Straße', 'Hildegard-von-Bingen-Weg', 'Clara-Schumann-Straße', 'Frida-Kahlo-Allee', 'Käthe-Kollwitz-Weg'], correct: [true, false, true, true, false, true, false, true], fact: 'Annette-von-Droste-Hülshoff, Edith Stein, Marie Curie, Clara Schumann und Käthe Kollwitz haben Straßen in Münster. Die anderen sind erfunden.'},
+      {cat: 'ausgehen', type: 'smart10', q: 'Welche Aussagen über Pinkus Müller stimmen?', options: ['Es ist die letzte Altbier-Brauerei Münsters', 'Es wurde 1816 gegründet', 'Das Bier ist nach dem Gründer Pinkus benannt', 'Pinkus braut auch ein Weizenbier', 'Die Brauerei liegt am Prinzipalmarkt', 'Pinkus hat eine Filiale in Berlin', 'Die Brauerei ist komplett bio-zertifiziert', 'Pinkus exportiert in über 20 Länder'], correct: [true, true, true, true, false, false, true, false], fact: 'Pinkus Müller an der Kreuzstraße braut seit 1816 Altbier und Weizen, komplett bio. Der Gründer hieß tatsächlich Johannes „Pinkus" Müller. Filialen in Berlin oder Export in 20+ Länder gibt es nicht.'},
     ];
 
     // ============================================================
@@ -1881,6 +1901,15 @@
         counter.innerHTML = `${eliminatedCount}/${q.options.length} Felder eliminiert · ${playersStillIn} Spieler noch im Rennen`;
       }
 
+      // Highlight the last revealed tile for 1 second
+      const lastIdx = smart10._lastRevealedIdx;
+      if (lastIdx != null && tiles[lastIdx]) {
+        tiles[lastIdx].classList.add('just-revealed');
+        setTimeout(() => {
+          if (tiles[lastIdx]) tiles[lastIdx].classList.remove('just-revealed');
+        }, 1000);
+      }
+
       // Update waiting text
       const waiting = document.querySelector('.waiting');
       if (!isMyTurn && !waiting) {
@@ -2063,6 +2092,9 @@
       if (optionIdx < 0 || optionIdx >= q.options.length) return;
       if ((gameState.questionPlayerIds || []).length && !gameState.questionPlayerIds.includes(playerId)) return;
       if (smart10.eliminated[optionIdx] || smart10.playerOut.includes(playerId)) return;
+
+      // Track which tile was just revealed for highlight animation
+      smart10._lastRevealedIdx = optionIdx;
 
       const activePlayer = getSmart10ActivePlayer();
       if (!activePlayer || activePlayer.id !== playerId) return;
