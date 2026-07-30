@@ -1763,6 +1763,12 @@
           }
         }
 
+        // Smart10: partial update to avoid flicker when a tile changes
+        if (oldPhase === 'smart10' && gameState.phase === 'smart10') {
+          updateSmart10Partial();
+          return;
+        }
+
         // If we're still in result phase and only readyPlayers changed, partial update
         if (oldPhase === 'result' && gameState.phase === 'result') {
           const newReadyCount = (gameState.readyPlayers || []).length;
@@ -1794,6 +1800,95 @@
       const el = document.getElementById('ready-section');
       if (!el) return;
       el.innerHTML = renderReadySectionContent();
+    }
+
+    function updateSmart10Partial() {
+      const q = gameState.currentQuestion;
+      const smart10 = gameState.smart10State;
+      if (!q || !smart10) { render(); return; }
+
+      const activePlayer = getSmart10ActivePlayer();
+      const participantIds = (gameState.questionPlayerIds || []).length
+        ? gameState.questionPlayerIds
+        : gameState.players.filter(p => p.connected).map(p => p.id);
+      const participantPlayers = gameState.players.filter(p => participantIds.includes(p.id));
+      const isOut = smart10.playerOut.includes(myId);
+      const isMyTurn = !!activePlayer && activePlayer.id === myId && !isOut;
+      const eliminatedCount = smart10.eliminated.filter(Boolean).length;
+      const playersStillIn = participantPlayers.filter(p => p.connected && !smart10.playerOut.includes(p.id)).length;
+      const isParticipating = participantIds.includes(myId);
+
+      // Update turn banner
+      const banner = document.querySelector('.turn-banner');
+      if (banner) {
+        const bannerText = !activePlayer ? 'Die Runde endet...'
+          : isMyTurn ? '🟢 Du bist dran!'
+          : isOut ? 'Du bist raus – schau zu!'
+          : !isParticipating ? `${activePlayer.name} spielt diese Runde`
+          : `${activePlayer.name} ist dran`;
+        banner.innerHTML = bannerText;
+        banner.style.background = activePlayer ? activePlayer.color : '';
+      }
+
+      // Update tiles
+      const tiles = document.querySelectorAll('.smart10-tile');
+      tiles.forEach((tile, i) => {
+        if (i >= q.options.length) return;
+        const isEliminated = !!smart10.eliminated[i];
+        const guessResult = smart10.claimResults[i];
+        const attemptedBy = gameState.players.find(p => p.id === smart10.attemptedBy[i]);
+
+        tile.className = ['smart10-tile',
+          isEliminated ? (guessResult === 'correct' ? 'guess-correct' : 'guess-wrong') : '',
+          !isEliminated && isMyTurn ? 'active' : ''
+        ].filter(Boolean).join(' ');
+
+        const noteArea = tile.querySelector('.smart10-tile-note, .smart10-actions, .smart10-note');
+        if (noteArea) noteArea.remove();
+        const metaArea = tile.querySelector('.smart10-tile-meta');
+        if (metaArea) metaArea.remove();
+
+        if (isEliminated) {
+          tile.insertAdjacentHTML('beforeend',
+            `<div class="smart10-tile-note">${guessResult === 'correct' ? '✓ Richtig aufgedeckt' : '✗ Fehlversuch – Spieler raus'}</div>
+             <div class="smart10-tile-meta">${attemptedBy ? `<span style="color:${attemptedBy.color}">${attemptedBy.name}</span>` : ''}</div>`);
+        } else if (isMyTurn) {
+          tile.insertAdjacentHTML('beforeend',
+            `<div class="smart10-actions">
+              <button class="smart10-action-btn true" onclick="submitSmart10Choice(${i}, true)">✓</button>
+              <button class="smart10-action-btn false" onclick="submitSmart10Choice(${i}, false)">✗</button>
+            </div>`);
+        } else {
+          tile.insertAdjacentHTML('beforeend',
+            `<div class="smart10-note">${activePlayer ? `${activePlayer.name} entscheidet` : 'Wird ausgewertet...'}</div>`);
+        }
+      });
+
+      // Update player pills
+      const statusRow = document.querySelector('.smart10-status-row');
+      if (statusRow) {
+        statusRow.innerHTML = participantPlayers.map(p => `
+          <div class="smart10-player-pill ${activePlayer && activePlayer.id === p.id ? 'active' : ''} ${smart10.playerOut.includes(p.id) || !p.connected ? 'out' : ''}"
+               style="background:${p.color}22;color:${p.color};border-color:${p.color};">
+            ${activePlayer && activePlayer.id === p.id ? '🎯 ' : ''}${p.name}${smart10.playerOut.includes(p.id) || !p.connected ? ' – raus' : ''}
+          </div>
+        `).join('');
+      }
+
+      // Update counter
+      const counter = document.querySelector('.answer-count');
+      if (counter) {
+        counter.innerHTML = `${eliminatedCount}/${q.options.length} Felder eliminiert · ${playersStillIn} Spieler noch im Rennen`;
+      }
+
+      // Update waiting text
+      const waiting = document.querySelector('.waiting');
+      if (!isMyTurn && !waiting) {
+        const card = document.querySelector('.card');
+        if (card) card.insertAdjacentHTML('beforeend', '<div class="waiting">Warte auf den Zug<span class="waiting-dots"></span></div>');
+      } else if (isMyTurn && waiting) {
+        waiting.remove();
+      }
     }
 
     // PLAYER: send message to host
@@ -1989,16 +2084,20 @@
 
       if (isSmart10Over(smart10)) {
         gameState.phase = 'result';
+        broadcastState();
       } else {
         const nextTurnIdx = findNextSmart10PlayerIdx(smart10.currentTurnIdx, smart10.playerOut);
         if (nextTurnIdx === -1) {
           gameState.phase = 'result';
+          broadcastState();
         } else {
           smart10.currentTurnIdx = nextTurnIdx;
+          // Broadcast state but only partial-update on host (no flicker)
+          const stateMsg = {type: 'state', state: gameState};
+          connections.forEach(c => { try {c.send(stateMsg);} catch (e) { } });
+          updateSmart10Partial();
         }
       }
-
-      broadcastState();
     }
 
     function startGame(totalRounds) {
