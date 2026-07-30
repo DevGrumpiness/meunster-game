@@ -1753,11 +1753,6 @@
         const oldReadyCount = (gameState.readyPlayers || []).length;
         gameState = data.state;
 
-        // Non-host: persist seen questions to localStorage so cross-session tracking works on ALL devices
-        if (gameState.usedQuestionIdxs && gameState.usedQuestionIdxs.length > 0) {
-          persistUsedQuestions();
-        }
-
         // If we're still in the question phase and only the answer count changed,
         // just update the counter instead of full re-render (preserves local input state)
         if (oldPhase === 'question' && gameState.phase === 'question') {
@@ -2010,15 +2005,8 @@
       gameState.totalRounds = totalRounds === 0 ? 0 : totalRounds;
       gameState.round = 0;
       gameState.currentPlayerIdx = 0;
-      // Restore used questions from localStorage (fingerprint-based, survives reorderings)
-      const restoredIdxs = restoreUsedQuestions();
-      const activeQs = getActiveQuestions();
-      if (restoredIdxs.length < activeQs.length * 0.9) {
-        gameState.usedQuestionIdxs = restoredIdxs;
-      } else {
-        gameState.usedQuestionIdxs = [];
-        localStorage.removeItem('mk-used-q2');
-      }
+      // Fresh start: every session uses ALL questions, shuffled randomly
+      gameState.usedQuestionIdxs = [];
       gameState.usedCategories = {};
       gameState.questionPlayerIds = [];
       gameState.smart10State = null;
@@ -2060,46 +2048,6 @@
     function getActiveCategories() {
       if (gameState.includeAllgemein) return CATEGORIES;
       return CATEGORIES.filter(c => c.id !== 'allgemein');
-    }
-
-    // Stable question fingerprint (survives index changes when questions are added/reordered)
-    function qFingerprint(q) {
-      return q.q.substring(0, 40);
-    }
-
-    function persistUsedQuestions() {
-      const currentHashes = gameState.usedQuestionIdxs.map(i => qFingerprint(QUESTIONS[i]));
-      // Merge with existing localStorage (don't overwrite fingerprints from previous sessions)
-      const stored = localStorage.getItem('mk-used-q2');
-      let merged = currentHashes;
-      if (stored) {
-        try {
-          const existing = JSON.parse(stored);
-          const set = new Set([...existing, ...currentHashes]);
-          merged = [...set];
-        } catch (e) { }
-      }
-      // Cap at total question count to prevent unbounded growth
-      if (merged.length > QUESTIONS.length) {
-        merged = merged.slice(merged.length - QUESTIONS.length);
-      }
-      localStorage.setItem('mk-used-q2', JSON.stringify(merged));
-    }
-
-    function restoreUsedQuestions() {
-      // New format: fingerprints
-      const stored2 = localStorage.getItem('mk-used-q2');
-      if (stored2) {
-        const hashes = JSON.parse(stored2);
-        const indices = [];
-        QUESTIONS.forEach((q, i) => {
-          if (hashes.includes(qFingerprint(q))) indices.push(i);
-        });
-        return indices;
-      }
-      // Clear legacy index-based storage
-      localStorage.removeItem('mk-used-questions');
-      return [];
     }
 
     function selectCategory(catId) {
@@ -2149,7 +2097,6 @@
 
       gameState.currentQuestion = q;
       gameState.usedQuestionIdxs.push(q.idx);
-      persistUsedQuestions();
       gameState.usedCategories[catId] = (gameState.usedCategories[catId] || 0) + 1;
       gameState.answers = {};
       gameState.questionPlayerIds = gameState.players.filter(p => p.connected).map(p => p.id);
@@ -2269,7 +2216,6 @@
       }
       if (gameState.totalRounds === 0 && gameState.usedQuestionIdxs.length >= getActiveQuestions().length) {
         gameState.usedQuestionIdxs = [];
-        localStorage.removeItem('mk-used-q2');
         gameState.usedCategories = {};
         CATEGORIES.forEach(c => gameState.usedCategories[c.id] = 0);
       }
@@ -2392,14 +2338,8 @@
       gameState.round = 0;
       gameState.currentPlayerIdx = 0;
       gameState.includeAllgemein = true; // solo test includes all questions
-      // Restore used questions from localStorage (fingerprint-based)
-      const restoredIdxs = restoreUsedQuestions();
-      if (restoredIdxs.length < QUESTIONS.length * 0.9) {
-        gameState.usedQuestionIdxs = restoredIdxs;
-      } else {
-        gameState.usedQuestionIdxs = [];
-        localStorage.removeItem('mk-used-q2');
-      }
+      // Fresh start: every session uses ALL questions
+      gameState.usedQuestionIdxs = [];
       gameState.usedCategories = {};
       gameState.questionPlayerIds = [];
       gameState.smart10State = null;
