@@ -2594,12 +2594,12 @@
             el.classList.remove('highlight');
             el.classList.add('winner');
           }
-          // Proceed to question after brief pause
+          // Proceed to question after pause so players can see the winner
           setTimeout(() => {
             if (role === 'host') {
               selectCategory(winnerCatId);
             }
-          }, 1200);
+          }, 2200);
         }
       }
       tick();
