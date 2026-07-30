@@ -2313,7 +2313,7 @@
           <button class="btn btn-gold" onclick="onJoinRoom()">Beitreten!</button>
         </div>
       </div>
-      <p style="text-align:center;margin-top:16px;"><a href="#" onclick="document.getElementById('howto-overlay').style.display='flex';return false;" style="color:#999;font-size:0.75rem;text-decoration:none;margin-right:12px;">❓ So geht's</a><a href="#" onclick="document.getElementById('datenschutz-overlay').style.display='flex';return false;" style="color:#999;font-size:0.75rem;text-decoration:none;">🔒 Datenschutz</a></p>
+      <p style="text-align:center;margin-top:16px;"><a href="#" onclick="document.getElementById('howto-overlay').style.display='flex';document.getElementById('app').style.pointerEvents='none';return false;" style="color:#999;font-size:0.75rem;text-decoration:none;margin-right:12px;">❓ So geht's</a><a href="#" onclick="document.getElementById('datenschutz-overlay').style.display='flex';document.getElementById('app').style.pointerEvents='none';return false;" style="color:#999;font-size:0.75rem;text-decoration:none;">🔒 Datenschutz</a></p>
       ${location.protocol === 'file:' ? '<div style="text-align:center;"><button class="test-btn" onclick="onTestMode()">🧪 Testen (Solo)</button></div>' : ''}
     </div>
   `;
@@ -3202,8 +3202,9 @@
   </script>
 
   <div id="howto-overlay"
-    style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:9999;padding:20px;overflow-y:auto;">
-    <div style="max-width:500px;margin:40px auto;background:white;border-radius:16px;padding:24px;">
+    style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:9999;padding:20px;overflow-y:auto;align-items:flex-start;justify-content:center;"
+    onclick="if(event.target===this){this.style.display='none';document.getElementById('app').style.pointerEvents=''}">
+    <div style="max-width:500px;margin:40px auto;background:white;border-radius:16px;padding:24px;position:relative;z-index:10000;">
       <h2 style="font-family:'Fredoka One',cursive;color:#1d3557;">So geht's</h2>
       <p style="font-size:0.9rem;line-height:1.6;margin:12px 0;">
         <strong>Münster Game</strong> ist ein Quiz für 2+ Spieler – jeder auf seinem eigenen Handy!
@@ -3230,7 +3231,7 @@
         </li>
       </ul>
       <button class="btn btn-secondary" style="margin-top:16px;"
-        onclick="document.getElementById('howto-overlay').style.display='none'">Verstanden!</button>
+        onclick="document.getElementById('howto-overlay').style.display='none';document.getElementById('app').style.pointerEvents=''">Verstanden!</button>
     </div>
   </div>
   <div id="datenschutz-overlay"
@@ -3252,7 +3253,7 @@
       </ul>
       <p style="font-size:0.85rem;margin-top:12px;">Kontakt: GitHub-Repository des Projekts</p>
       <button class="btn btn-secondary" style="margin-top:16px;"
-        onclick="document.getElementById('datenschutz-overlay').style.display='none'">Schließen</button>
+        onclick="document.getElementById('datenschutz-overlay').style.display='none';document.getElementById('app').style.pointerEvents=''">Schließen</button>
     </div>
   </div>
   <script data-goatcounter="https://ms-game.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
