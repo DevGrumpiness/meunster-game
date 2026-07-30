@@ -2016,6 +2016,8 @@
       gameState.players.forEach(p => p.score = 0);
       // Pre-shuffle global question deck for true randomness without repeats
       gameState._globalDeck = buildGlobalDeck();
+      console.log(`🎲 Neues Deck: ${gameState._globalDeck.length} Fragen im Pool. Erste 5: ` +
+        gameState._globalDeck.slice(0, 5).map(i => `#${i} "${QUESTIONS[i].q.substring(0,30)}…"`).join(', '));
       gameState.phase = 'categorySelect';
       broadcastState();
     }
