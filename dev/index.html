@@ -331,10 +331,6 @@
       box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
     }
 
-    .score-chip.me {
-      box-shadow: 0 0 0 2px white, 0 0 0 4px rgba(0, 0, 0, 0.5);
-    }
-
     .score-chip .pts {
       font-family: 'Fredoka One', cursive;
       font-size: 0.85rem;
@@ -3744,14 +3740,17 @@
         ${gameState.players.map((p, i) => {
         const isLeader = hasScores && p.score === maxScore;
         return `
-          <div class="score-chip ${gameState.phase === 'smart10' && i === gameState.currentPlayerIdx ? 'active' : ''} ${p.id === myId ? 'me' : ''}" style="background:${p.color};position:relative;">
+          <div class="score-chip ${gameState.phase === 'smart10' && i === gameState.currentPlayerIdx ? 'active' : ''}" style="background:${p.color};position:relative;">
            ${isLeader ? '👑 ' : ''}${p.name.slice(0, 8)} <span class="pts">${p.score}</span>${gameState.deckelMode && gameState.phase !== 'lobby' ? ` <span style="opacity:0.9;">🍺${gameState.deckel[p.id] || 0}</span>` : ''}${role === 'host' && p.id !== myId ? `<span onclick="if(confirm('${p.name} entfernen?'))kickPlayer('${p.id}')" style="position:absolute;top:-6px;right:-6px;background:rgba(0,0,0,0.55);color:#fff;border-radius:50%;width:16px;height:16px;font-size:10px;line-height:16px;text-align:center;cursor:pointer;">✕</span>` : ''}
           </div>
         `;
       }).join('')}
       </div>
-      <div style="font-family:'Fredoka One',cursive;font-size:0.75rem;color:#999;background:#f0f4ff;padding:4px 10px;border-radius:8px;white-space:nowrap;margin-left:8px;cursor:pointer;" onclick="alert('Raum-Code: ${roomCode}\\n\\nNeue Spieler können jederzeit beitreten!')" title="Raum-Code anzeigen">
-        🔗 ${roomCode}
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:3px;margin-left:8px;">
+        <div style="font-family:'Fredoka One',cursive;font-size:0.75rem;color:#999;background:#f0f4ff;padding:4px 10px;border-radius:8px;white-space:nowrap;cursor:pointer;" onclick="alert('Raum-Code: ${roomCode}\\n\\nNeue Spieler können jederzeit beitreten!')" title="Raum-Code anzeigen">
+          🔗 ${roomCode}
+        </div>
+        ${(() => { const me = getMe(); return me ? `<div style="font-size:0.68rem;color:#aaa;white-space:nowrap;display:flex;align-items:center;gap:4px;"><span style="width:7px;height:7px;border-radius:50%;background:${me.color};display:inline-block;"></span>${me.name}</div>` : ''; })()}
       </div>
     </div>`;
     }
