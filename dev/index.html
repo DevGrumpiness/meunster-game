@@ -1487,8 +1487,10 @@
       includeAllgemein: false, // mode toggle: Nur Münster vs Auch Allgemeinwissen
       deckelMode: false,       // 🍺 Deckel-Modus (Schocken-Style): Fehler = Deckel, Verlierer zahlt
       deckel: {},              // playerId -> Deckel count (current Halbzeit/Finale)
+      deckelPot: 0,            // remaining Deckel in the pot – empty pot ends the Halbzeit
       halbzeit: 1,             // 1, 2, 3 = Finale
-      halbzeitLen: 6,          // rounds per Halbzeit
+      halbzeitStartRound: 0,   // round index the current Halbzeit started at (for safety cap)
+      halbzeitLen: 15,         // safety cap: max rounds per Halbzeit
       halbzeitLosers: [],      // loser IDs of Halbzeit 1 & 2
       finaleIds: null,         // the two finalists
       finaleRound: 0,          // finale question counter
@@ -2278,14 +2280,15 @@
 
     function startGame(totalRounds) {
       gameState.totalRounds = totalRounds === 0 ? 0 : totalRounds;
-      // Deckel-Modus: fixed structure 2 Halbzeiten + Finale
+      // Deckel-Modus: Pott bestimmt die Halbzeitlänge (wie beim Schocken), nicht die Rundenzahl
       if (gameState.deckelMode) {
-        if (gameState.totalRounds === 0) gameState.totalRounds = 12;
-        gameState.halbzeitLen = Math.max(2, Math.round(gameState.totalRounds / 2));
-        gameState.totalRounds = gameState.halbzeitLen * 2;
+        gameState.totalRounds = 0;   // Ende entscheidet das Finale, nicht der Rundenzähler
+        gameState.halbzeitLen = 15;  // Sicherheits-Cap pro Halbzeit
+        gameState.deckelPot = deckelPotSize();
       }
       gameState.deckel = {};
       gameState.halbzeit = 1;
+      gameState.halbzeitStartRound = 0;
       gameState.halbzeitLosers = [];
       gameState.finaleIds = null;
       gameState.finaleRound = 0;
@@ -2528,9 +2531,14 @@
     // ============================================================
     // 🍺 DECKEL-MODUS (Schocken-Style)
     // ============================================================
-    // Mistakes earn Deckel. After each Halbzeit the player with the most
-    // Deckel is the Halbzeit loser. Two losers duel in the Finale –
-    // the final loser pays the round.
+    // Mistakes earn Deckel from the pot. When the pot is empty the
+    // Halbzeit ends – the player with the most Deckel is the Halbzeit
+    // loser. Two losers duel in the Finale – the final loser pays.
+
+    function deckelPotSize() {
+      const n = gameState.players.filter(p => p.connected).length;
+      return Math.max(10, 3 * n + 1); // 4 Spieler = 13 Deckel, wie beim Schocken
+    }
 
     function awardDeckelForRound() {
       gameState._roundDeckel = [];
@@ -2577,6 +2585,10 @@
       losers.forEach(id => {
         gameState.deckel[id] = (gameState.deckel[id] || 0) + 1;
       });
+      // Deckel come out of the pot (only during Halbzeit 1/2, finale has no pot)
+      if (gameState.halbzeit < 3) {
+        gameState.deckelPot = Math.max(0, gameState.deckelPot - losers.length);
+      }
       gameState._roundDeckel = losers;
     }
 
@@ -2631,14 +2643,17 @@
         return false;
       }
 
-      // HALBZEIT boundary?
-      if (gameState.round >= gameState.halbzeitLen * gameState.halbzeit) {
+      // HALBZEIT boundary: pot empty (or safety cap reached)
+      const roundsInHalf = gameState.round - gameState.halbzeitStartRound;
+      if (gameState.deckelPot <= 0 || roundsInHalf >= gameState.halbzeitLen) {
         const loserId = determineHalbzeitLoser();
         if (loserId) gameState.halbzeitLosers.push(loserId);
 
         if (gameState.halbzeit === 1) {
           gameState.halbzeit = 2;
           gameState.deckel = {};
+          gameState.deckelPot = deckelPotSize();
+          gameState.halbzeitStartRound = gameState.round;
           const loser = gameState.players.find(p => p.id === loserId);
           gameState._deckelEvent = { kind: 'halftime', loserId, loserName: loser ? loser.name : '?' };
         } else {
@@ -2812,7 +2827,9 @@
       gameState.includeAllgemein = true; // solo test includes all questions
       gameState.deckelMode = false; // pointless solo
       gameState.deckel = {};
+      gameState.deckelPot = 0;
       gameState.halbzeit = 1;
+      gameState.halbzeitStartRound = 0;
       gameState.halbzeitLosers = [];
       gameState.finaleIds = null;
       gameState.finalLoserId = null;
@@ -2891,7 +2908,7 @@
         <div style="font-size:1.5rem;">🍺</div>
         <div style="flex:1;">
           <div style="font-weight:700;font-size:.9rem;color:var(--ms-blue);">Deckel-Modus ${gameState.deckelMode ? '– AN' : ''}</div>
-          <div style="font-size:.75rem;color:#888;">Wer Fehler macht, sammelt Deckel. 2 Halbzeiten + Finale – der Verlierer zahlt die Runde!</div>
+          <div style="font-size:.75rem;color:#888;">Fehler = Deckel aus dem Pott (3 pro Spieler +1). Pott leer = Halbzeit vorbei. Die 2 Halbzeit-Verlierer duellieren sich im Finale – der Verlierer zahlt die Runde!</div>
         </div>
         <div style="font-size:1.1rem;">${gameState.deckelMode ? '✅' : '⬜'}</div>
       </div>
@@ -3510,7 +3527,7 @@
         return '<p style="text-align:center;color:#888;font-size:0.85rem;margin-top:8px;">✅ Diese Runde keine Deckel!</p>';
       }
       return `<p style="text-align:center;font-weight:700;margin-top:8px;color:#8a6d1a;">
-        ❌ Deckel für: ${losers.map(p => `<span style="color:${p.color}">${p.name} (${gameState.deckel[p.id] || 0})</span>`).join(', ')}
+        ❌ Deckel für: ${losers.map(p => `<span style="color:${p.color}">${p.name} (${gameState.deckel[p.id] || 0})</span>`).join(', ')}${gameState.halbzeit < 3 ? `<span style="font-weight:400;color:#888;"> · Pott: ${gameState.deckelPot}</span>` : ''}
       </p>`;
     }
 
@@ -3625,7 +3642,9 @@
       gameState.currentQuestion = null;
       // Reset Deckel state, keep deckelMode setting for the next game
       gameState.deckel = {};
+      gameState.deckelPot = 0;
       gameState.halbzeit = 1;
+      gameState.halbzeitStartRound = 0;
       gameState.halbzeitLosers = [];
       gameState.finaleIds = null;
       gameState.finaleRound = 0;
@@ -3704,8 +3723,8 @@
       if (ev.kind === 'halftime') {
         return `<div style="text-align:center;background:#fdf6e3;border:2px solid #c9a227;border-radius:10px;padding:12px;margin-bottom:12px;">
           <div style="font-size:1.4rem;">🍺</div>
-          <div style="font-weight:800;color:#8a6d1a;">1. Halbzeit vorbei!</div>
-          <div style="font-size:.85rem;color:#666;margin-top:4px;"><strong>${ev.loserName}</strong> hat die meisten Deckel kassiert und ist im Finale gesetzt. Deckel zurückgesetzt – 2. Halbzeit läuft!</div>
+          <div style="font-weight:800;color:#8a6d1a;">Pott leer – 1. Halbzeit vorbei!</div>
+          <div style="font-size:.85rem;color:#666;margin-top:4px;"><strong>${ev.loserName}</strong> hat die meisten Deckel kassiert und ist im Finale gesetzt. Neuer Pott – 2. Halbzeit läuft!</div>
         </div>`;
       }
       if (ev.kind === 'finaleStart') {
@@ -3724,8 +3743,8 @@
         if (gameState.halbzeit === 3) {
           return `<div class="round-info">🥊 FINALE · Frage ${gameState.finaleRound + 1}</div>`;
         }
-        const roundInHalf = gameState.round - (gameState.halbzeit - 1) * gameState.halbzeitLen;
-        return `<div class="round-info">🍺 ${gameState.halbzeit}. Halbzeit · Runde ${roundInHalf + 1} / ${gameState.halbzeitLen}</div>`;
+        const roundInHalf = gameState.round - gameState.halbzeitStartRound;
+        return `<div class="round-info">${gameState.halbzeit}. Halbzeit · Runde ${roundInHalf + 1} · Noch <strong>${gameState.deckelPot}</strong> Deckel im Pott</div>`;
       }
       return `<div class="round-info">Runde ${gameState.round + 1}${gameState.totalRounds === 0 ? '' : ' / ' + gameState.totalRounds}</div>`;
     }
