@@ -2536,8 +2536,7 @@
     // loser. Two losers duel in the Finale – the final loser pays.
 
     function deckelPotSize() {
-      const n = gameState.players.filter(p => p.connected).length;
-      return Math.max(10, 3 * n + 1); // 4 Spieler = 13 Deckel, wie beim Schocken
+      return 13; // wie beim Schocken: immer 13 Deckel pro Halbzeit
     }
 
     function awardDeckelForRound() {
@@ -2911,7 +2910,7 @@
             <div style="position:absolute;top:2px;left:${gameState.deckelMode ? '22px' : '2px'};width:20px;height:20px;border-radius:50%;background:#fff;transition:left .25s;box-shadow:0 1px 3px rgba(0,0,0,.3);"></div>
           </div>
         </div>
-        <div style="font-size:.75rem;color:#888;margin-top:6px;line-height:1.45;">Fehler = Deckel aus dem Pott. Ist der Pott leer, endet die Halbzeit. Die beiden Halbzeit-Verlierer duellieren sich im Finale – der Verlierer zahlt die Runde!</div>
+        <div style="font-size:.75rem;color:#888;margin-top:6px;line-height:1.45;">13 Deckel im Pott – Fehler = Deckel. Ist der Pott leer, endet die Halbzeit. Die beiden Halbzeit-Verlierer duellieren sich im Finale – der Verlierer zahlt die Runde!</div>
       </div>
       ` : gameState.deckelMode ? `
       <div style="text-align:center;background:#fdf6e3;border:2px solid #c9a227;border-radius:8px;padding:8px;margin:8px 0;font-weight:600;font-size:.85rem;color:#8a6d1a;">
