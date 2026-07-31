@@ -2886,7 +2886,7 @@
 
       ${!canStart ? '<p style="text-align:center;color:#888;font-size:0.9rem;">Mindestens 2 Spieler zum Starten nötig.</p>' : ''}
 
-      ${isHost ? `<div class="settings-row">
+      ${isHost && !gameState.deckelMode ? `<div class="settings-row">
         <label>Runden:</label>
         <select id="roundsSelect">
           <option value="0" selected>∞ (Endlos)</option>
@@ -2904,17 +2904,18 @@
       <input type="hidden" id="modeToggle" value="${gameState.includeAllgemein ? 'on' : 'off'}">
       ` : ''}
       ${isHost ? `
-      <div onclick="toggleDeckel()" style="display:flex;align-items:center;gap:10px;border:2px solid ${gameState.deckelMode ? '#c9a227' : '#ddd'};border-radius:8px;padding:10px 12px;margin:8px 0;cursor:pointer;background:${gameState.deckelMode ? '#fdf6e3' : 'transparent'};transition:all .25s;">
-        <div style="font-size:1.5rem;">🍺</div>
-        <div style="flex:1;">
-          <div style="font-weight:700;font-size:.9rem;color:var(--ms-blue);">Deckel-Modus ${gameState.deckelMode ? '– AN' : ''}</div>
-          <div style="font-size:.75rem;color:#888;">Fehler = Deckel aus dem Pott (3 pro Spieler +1). Pott leer = Halbzeit vorbei. Die 2 Halbzeit-Verlierer duellieren sich im Finale – der Verlierer zahlt die Runde!</div>
+      <div onclick="toggleDeckel()" style="border:2px solid ${gameState.deckelMode ? '#c9a227' : '#ddd'};border-radius:8px;padding:12px;margin:8px 0;cursor:pointer;background:${gameState.deckelMode ? '#fdf6e3' : 'transparent'};transition:all .25s;-webkit-tap-highlight-color:transparent;user-select:none;">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
+          <div style="font-weight:700;font-size:.95rem;color:${gameState.deckelMode ? '#8a6d1a' : 'var(--ms-blue)'};">🍻 Kneipenrunde</div>
+          <div style="width:44px;height:24px;border-radius:12px;background:${gameState.deckelMode ? '#c9a227' : '#ccc'};position:relative;transition:background .25s;flex-shrink:0;">
+            <div style="position:absolute;top:2px;left:${gameState.deckelMode ? '22px' : '2px'};width:20px;height:20px;border-radius:50%;background:#fff;transition:left .25s;box-shadow:0 1px 3px rgba(0,0,0,.3);"></div>
+          </div>
         </div>
-        <div style="font-size:1.1rem;">${gameState.deckelMode ? '✅' : '⬜'}</div>
+        <div style="font-size:.75rem;color:#888;margin-top:6px;line-height:1.45;">Fehler = Deckel aus dem Pott. Ist der Pott leer, endet die Halbzeit. Die beiden Halbzeit-Verlierer duellieren sich im Finale – der Verlierer zahlt die Runde!</div>
       </div>
       ` : gameState.deckelMode ? `
       <div style="text-align:center;background:#fdf6e3;border:2px solid #c9a227;border-radius:8px;padding:8px;margin:8px 0;font-weight:600;font-size:.85rem;color:#8a6d1a;">
-        🍺 Deckel-Modus aktiv – der Verlierer zahlt die Runde!
+        🍻 Kneipenrunde aktiv – der Verlierer zahlt die Runde!
       </div>
       ` : ''}
       ${isHost ? `<div class="btn-row">
@@ -2954,7 +2955,9 @@
     }
 
     function onStartGame() {
-      const totalRounds = +document.getElementById('roundsSelect').value;
+      // In der Kneipenrunde gibt es kein Runden-Select – der Pott bestimmt die Länge
+      const sel = document.getElementById('roundsSelect');
+      const totalRounds = sel ? +sel.value : 0;
       const modeToggle = document.getElementById('modeToggle');
       if (modeToggle) gameState.includeAllgemein = (modeToggle.value === 'on');
       if (role === 'host') {
