@@ -3507,10 +3507,10 @@
         .map(id => gameState.players.find(p => p.id === id))
         .filter(Boolean);
       if (!losers.length) {
-        return '<p style="text-align:center;color:#888;font-size:0.85rem;margin-top:8px;">🍺 Diese Runde keine Deckel!</p>';
+        return '<p style="text-align:center;color:#888;font-size:0.85rem;margin-top:8px;">✅ Diese Runde keine Deckel!</p>';
       }
       return `<p style="text-align:center;font-weight:700;margin-top:8px;color:#8a6d1a;">
-        🍺 Deckel für: ${losers.map(p => `<span style="color:${p.color}">${p.name} (${gameState.deckel[p.id] || 0})</span>`).join(', ')}
+        ❌ Deckel für: ${losers.map(p => `<span style="color:${p.color}">${p.name} (${gameState.deckel[p.id] || 0})</span>`).join(', ')}
       </p>`;
     }
 
@@ -3741,7 +3741,7 @@
         const isLeader = hasScores && p.score === maxScore;
         return `
           <div class="score-chip ${gameState.phase === 'smart10' && i === gameState.currentPlayerIdx ? 'active' : ''}" style="background:${p.color};position:relative;">
-           ${isLeader ? '👑 ' : ''}${p.name.slice(0, 8)} <span class="pts">${p.score}</span>${gameState.deckelMode && gameState.phase !== 'lobby' ? ` <span style="opacity:0.9;">🍺${gameState.deckel[p.id] || 0}</span>` : ''}${role === 'host' && p.id !== myId ? `<span onclick="if(confirm('${p.name} entfernen?'))kickPlayer('${p.id}')" style="position:absolute;top:-6px;right:-6px;background:rgba(0,0,0,0.55);color:#fff;border-radius:50%;width:16px;height:16px;font-size:10px;line-height:16px;text-align:center;cursor:pointer;">✕</span>` : ''}
+           ${isLeader ? '👑 ' : ''}${p.name.slice(0, 8)} <span class="pts">${p.score}</span>${gameState.deckelMode && gameState.phase !== 'lobby' ? ` <span style="opacity:0.9;">❌${gameState.deckel[p.id] || 0}</span>` : ''}${role === 'host' && p.id !== myId ? `<span onclick="if(confirm('${p.name} entfernen?'))kickPlayer('${p.id}')" style="position:absolute;top:-6px;right:-6px;background:rgba(0,0,0,0.55);color:#fff;border-radius:50%;width:16px;height:16px;font-size:10px;line-height:16px;text-align:center;cursor:pointer;">✕</span>` : ''}
           </div>
         `;
       }).join('')}
