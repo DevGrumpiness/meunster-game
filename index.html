@@ -1875,9 +1875,10 @@
         if (metaArea) metaArea.remove();
 
         if (isEliminated) {
+          const claimLabel = smart10.claims[i] ? '✓ Gehört dazu' : '✗ Gehört nicht dazu';
           tile.insertAdjacentHTML('beforeend',
             `<div class="smart10-tile-note">${guessResult === 'correct' ? '✓ Richtig aufgedeckt' : '✗ Fehlversuch – Spieler raus'}</div>
-             <div class="smart10-tile-meta">${attemptedBy ? `<span style="color:${attemptedBy.color}">${attemptedBy.name}</span>` : ''}</div>`);
+             <div class="smart10-tile-meta">${attemptedBy ? `<span style="color:${attemptedBy.color}">${attemptedBy.name}</span>${guessResult === 'wrong' ? `: ${claimLabel}` : ''}` : ''}</div>`);
         } else if (isMyTurn) {
           tile.insertAdjacentHTML('beforeend',
             `<div class="smart10-actions">
@@ -2892,12 +2893,13 @@
           !isEliminated && isMyTurn ? 'active' : '',
         ].filter(Boolean).join(' ');
 
+        const claimLabel = smart10.claims[i] ? '✓ Gehört dazu' : '✗ Gehört nicht dazu';
         return `
             <div class="${tileClasses}">
               <div class="smart10-option-text">${option}</div>
               ${isEliminated ? `
                 <div class="smart10-tile-note">${guessResult === 'correct' ? '✓ Richtig aufgedeckt' : '✗ Fehlversuch – Spieler raus'}</div>
-                <div class="smart10-tile-meta">${attemptedBy ? `<span style="color:${attemptedBy.color}">${attemptedBy.name}</span>` : ''}</div>
+                <div class="smart10-tile-meta">${attemptedBy ? `<span style="color:${attemptedBy.color}">${attemptedBy.name}</span>${guessResult === 'wrong' ? `: ${claimLabel}` : ''}` : ''}</div>
               ` : isMyTurn ? `
                 <div class="smart10-actions">
                   <button class="smart10-action-btn true" onclick="submitSmart10Choice(${i}, true)">✓</button>
@@ -3066,12 +3068,13 @@
             `;
           }
           const tileClass = solver ? 'truth-true' : 'fehlversuch';
+          const wrongClaimLabel = smart10.claims?.[i] ? '✓ Gehört dazu' : '✗ Gehört nicht dazu';
           return `
             <div class="smart10-tile ${tileClass}">
               <div class="smart10-option-text">${option}</div>
               <div class="smart10-tile-note">${actualTrue ? '✓ Gehört dazu' : '✗ Gehört nicht dazu'}</div>
               <div class="smart10-tile-meta">
-                ${solver ? `+1 für <span style="color:${solver.color}">${solver.name}</span>` : `Fehlversuch: <span style="color:${attempter.color}">${attempter.name}</span>`}
+                ${solver ? `+1 für <span style="color:${solver.color}">${solver.name}</span>` : `Fehlversuch: <span style="color:${attempter.color}">${attempter.name}</span> sagte ${wrongClaimLabel}`}
               </div>
             </div>
           `;
