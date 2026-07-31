@@ -1496,6 +1496,9 @@
       showResult: false,
     };
 
+    const RECENT_QUESTIONS_KEY = 'mk-recent-questions-v1';
+    const RECENT_QUESTIONS_LIMIT = 60;
+
     // ============================================================
     // NETWORKING
     // ============================================================
@@ -1504,6 +1507,35 @@
       let code = '';
       for (let i = 0; i < 4; i++) code += chars[Math.floor(Math.random() * chars.length)];
       return code;
+    }
+
+    function getRecentQuestionIdxs() {
+      try {
+        const raw = localStorage.getItem(RECENT_QUESTIONS_KEY);
+        if (!raw) return [];
+        const parsed = JSON.parse(raw);
+        if (!Array.isArray(parsed)) return [];
+        return parsed.filter(n => Number.isInteger(n) && n >= 0 && n < QUESTIONS.length);
+      } catch (e) {
+        return [];
+      }
+    }
+
+    function rememberQuestionIdx(qIdx) {
+      const recent = getRecentQuestionIdxs().filter(idx => idx !== qIdx);
+      recent.push(qIdx);
+      while (recent.length > RECENT_QUESTIONS_LIMIT) recent.shift();
+      try {
+        localStorage.setItem(RECENT_QUESTIONS_KEY, JSON.stringify(recent));
+      } catch (e) { }
+    }
+
+    function shuffleArray(items) {
+      for (let i = items.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [items[i], items[j]] = [items[j], items[i]];
+      }
+      return items;
     }
 
     const PEER_CONFIG = {
@@ -2163,7 +2195,9 @@
       broadcastState();
     }
 
-    // Build one global shuffled deck of ALL playable questions (Fisher-Yates)
+    // Build one global shuffled deck of ALL playable questions.
+    // Recently seen questions stay in the pool, but move to the back so
+    // new sessions feel fresher without permanently shrinking the pool.
     function buildGlobalDeck() {
       const connectedCount = gameState.players.filter(p => p.connected).length;
       const indices = [];
@@ -2174,11 +2208,16 @@
         if (!gameState.includeAllgemein && q.cat === 'allgemein') return;
         indices.push(i);
       });
-      for (let i = indices.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [indices[i], indices[j]] = [indices[j], indices[i]];
-      }
-      return indices;
+      const recentSet = new Set(getRecentQuestionIdxs());
+      const fresh = [];
+      const recent = [];
+      indices.forEach(i => {
+        if (recentSet.has(i)) recent.push(i);
+        else fresh.push(i);
+      });
+      shuffleArray(fresh);
+      shuffleArray(recent);
+      return fresh.concat(recent);
     }
 
     // Get questions filtered by current mode
@@ -2240,6 +2279,7 @@
 
       gameState.currentQuestion = q;
       gameState.usedQuestionIdxs.push(q.idx);
+      rememberQuestionIdx(q.idx);
       gameState.usedCategories[catId] = (gameState.usedCategories[catId] || 0) + 1;
       gameState.answers = {};
       gameState.questionPlayerIds = gameState.players.filter(p => p.connected).map(p => p.id);
