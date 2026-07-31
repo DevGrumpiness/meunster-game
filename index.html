@@ -3269,8 +3269,8 @@
         ${gameState.players.map((p, i) => {
         const isLeader = hasScores && p.score === maxScore;
         return `
-          <div class="score-chip ${gameState.phase === 'smart10' && i === gameState.currentPlayerIdx ? 'active' : ''} ${p.id === myId ? 'me' : ''}" style="background:${p.color}">
-           ${isLeader ? '👑 ' : ''}${p.name.slice(0, 8)} <span class="pts">${p.score}</span>
+          <div class="score-chip ${gameState.phase === 'smart10' && i === gameState.currentPlayerIdx ? 'active' : ''} ${p.id === myId ? 'me' : ''}" style="background:${p.color};position:relative;">
+           ${isLeader ? '👑 ' : ''}${p.name.slice(0, 8)} <span class="pts">${p.score}</span>${role === 'host' && p.id !== myId ? `<span onclick="if(confirm('${p.name} entfernen?'))kickPlayer('${p.id}')" style="position:absolute;top:-6px;right:-6px;background:rgba(0,0,0,0.55);color:#fff;border-radius:50%;width:16px;height:16px;font-size:10px;line-height:16px;text-align:center;cursor:pointer;">✕</span>` : ''}
           </div>
         `;
       }).join('')}
