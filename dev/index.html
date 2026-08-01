@@ -2897,20 +2897,20 @@
       </div>` : ''}
       ${isHost ? `
       <div id="modeSegmented" style="display:flex;border:2px solid var(--ms-green);border-radius:8px;overflow:hidden;margin:8px 0;">
-        <div id="modeBtn0" onclick="setMode(false)" style="flex:1;padding:10px 8px;text-align:center;font-size:.9rem;font-weight:600;cursor:pointer;transition:all .25s;background:${gameState.includeAllgemein ? 'transparent' : 'var(--ms-green)'};color:${gameState.includeAllgemein ? '#999' : 'white'};">Nur Münster</div>
-        <div id="modeBtn1" onclick="setMode(true)" style="flex:1;padding:10px 8px;text-align:center;font-size:.9rem;font-weight:600;cursor:pointer;transition:all .25s;background:${gameState.includeAllgemein ? 'var(--ms-green)' : 'transparent'};color:${gameState.includeAllgemein ? 'white' : '#999'};">+ Allgemeinwissen</div>
+        <div id="modeBtn0" onclick="setMode(false)" style="flex:1;padding:10px 8px;text-align:center;font-size:.9rem;font-weight:600;cursor:pointer;transition:all .25s;background:${gameState.includeAllgemein ? '#fff' : 'var(--ms-green)'};color:${gameState.includeAllgemein ? '#555' : 'white'};">Nur Münster</div>
+        <div id="modeBtn1" onclick="setMode(true)" style="flex:1;padding:10px 8px;text-align:center;font-size:.9rem;font-weight:600;cursor:pointer;transition:all .25s;background:${gameState.includeAllgemein ? 'var(--ms-green)' : '#fff'};color:${gameState.includeAllgemein ? 'white' : '#555'};">+ Allgemeinwissen</div>
       </div>
       <input type="hidden" id="modeToggle" value="${gameState.includeAllgemein ? 'on' : 'off'}">
       ` : ''}
       ${isHost ? `
-      <div onclick="toggleDeckel()" style="border:2px solid ${gameState.deckelMode ? '#c9a227' : '#ddd'};border-radius:8px;padding:12px;margin:8px 0;cursor:pointer;background:${gameState.deckelMode ? '#fdf6e3' : 'transparent'};transition:all .25s;-webkit-tap-highlight-color:transparent;user-select:none;">
+      <div onclick="toggleDeckel()" style="border:2px solid ${gameState.deckelMode ? '#c9a227' : '#ccc'};border-radius:8px;padding:12px;margin:8px 0;cursor:pointer;background:${gameState.deckelMode ? '#fdf6e3' : '#fff'};transition:all .25s;-webkit-tap-highlight-color:transparent;user-select:none;">
         <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
           <div style="font-weight:700;font-size:.95rem;color:${gameState.deckelMode ? '#8a6d1a' : 'var(--ms-blue)'};">🍻 Kneipenrunde</div>
-          <div style="width:44px;height:24px;border-radius:12px;background:${gameState.deckelMode ? '#c9a227' : '#ccc'};position:relative;transition:background .25s;flex-shrink:0;">
+          <div style="width:44px;height:24px;border-radius:12px;background:${gameState.deckelMode ? '#c9a227' : '#bbb'};position:relative;transition:background .25s;flex-shrink:0;">
             <div style="position:absolute;top:2px;left:${gameState.deckelMode ? '22px' : '2px'};width:20px;height:20px;border-radius:50%;background:#fff;transition:left .25s;box-shadow:0 1px 3px rgba(0,0,0,.3);"></div>
           </div>
         </div>
-        <div style="font-size:.75rem;color:#888;margin-top:6px;line-height:1.45;">13 Deckel im Pott – Fehler = Deckel. Ist der Pott leer, endet die Halbzeit. Die beiden Halbzeit-Verlierer duellieren sich im Finale – der Verlierer zahlt die Runde!</div>
+        <div style="font-size:.8rem;color:#3a3a3a;margin-top:6px;line-height:1.5;">13 Deckel im Pott – Fehler = Deckel. Ist der Pott leer, endet die Halbzeit. Die beiden Halbzeit-Verlierer duellieren sich im Finale – der Verlierer zahlt die Runde!</div>
       </div>
       ` : gameState.deckelMode ? `
       <div style="text-align:center;background:#fdf6e3;border:2px solid #c9a227;border-radius:8px;padding:8px;margin:8px 0;font-weight:600;font-size:.85rem;color:#8a6d1a;">
@@ -2943,11 +2943,11 @@
       const input = document.getElementById('modeToggle');
       if (includeAllgemein) {
         btn1.style.background = 'var(--ms-green)'; btn1.style.color = 'white';
-        btn0.style.background = 'transparent'; btn0.style.color = '#999';
+        btn0.style.background = '#fff'; btn0.style.color = '#555';
         input.value = 'on';
       } else {
         btn0.style.background = 'var(--ms-green)'; btn0.style.color = 'white';
-        btn1.style.background = 'transparent'; btn1.style.color = '#999';
+        btn1.style.background = '#fff'; btn1.style.color = '#555';
         input.value = 'off';
       }
       gameState.includeAllgemein = includeAllgemein;
