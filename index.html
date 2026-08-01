@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="de">
 
 <head>
@@ -957,6 +957,7 @@
 </head>
 
 <body>
+
   <div class="container" id="app"></div>
 
   <script>
@@ -1911,8 +1912,8 @@
       const passRow = document.getElementById('smart10-pass-row');
       if (isMyTurn) {
         const myPts = (smart10.roundPoints && smart10.roundPoints[myId]) || 0;
-        const passHtml = `<button class="btn btn-gold" style="padding:10px 18px;font-size:0.95rem;" onclick="submitSmart10Pass()">🛡️ Passen – ${myPts} Punkt${myPts === 1 ? '' : 'e'} sichern</button>
-        <div style="font-size:0.75rem;color:#888;margin-top:4px;">Weiterraten bringt mehr – aber ein Fehler kostet alles!</div>`;
+        const passHtml = `<button class="btn btn-gold" style="padding:10px 18px;font-size:0.95rem;" onclick="submitSmart10Pass()">${gameState.deckelMode ? '🛡️ Passen – raus ohne Deckel' : `🛡️ Passen – ${myPts} Punkt${myPts === 1 ? '' : 'e'} sichern`}</button>
+        <div style="font-size:0.75rem;color:#888;margin-top:4px;">${gameState.deckelMode ? 'Weiterraten ist mutig – aber ein Fehler gibt einen ❌ Deckel!' : 'Weiterraten bringt mehr – aber ein Fehler kostet alles!'}</div>`;
         if (passRow) {
           passRow.innerHTML = passHtml;
         } else if (banner) {
@@ -1964,7 +1965,9 @@
           const rp = (smart10.roundPoints && smart10.roundPoints[p.id]) || 0;
           const hasPassed = (smart10.passed || []).includes(p.id);
           const isBusted = smart10.playerOut.includes(p.id) && !hasPassed;
-          const statusLabel = hasPassed ? ` 💰 +${(smart10.secured && smart10.secured[p.id]) || 0}` : (isBusted || !p.connected) ? ' – raus' : (rp > 0 ? ` ·+${rp}` : '');
+          const statusLabel = gameState.deckelMode
+            ? (hasPassed ? ' 🛡️' : (isBusted || !p.connected) ? ' – raus' : '')
+            : hasPassed ? ` 💰 +${(smart10.secured && smart10.secured[p.id]) || 0}` : (isBusted || !p.connected) ? ' – raus' : (rp > 0 ? ` ·+${rp}` : '');
           return `
           <div class="smart10-player-pill ${activePlayer && activePlayer.id === p.id ? 'active' : ''} ${smart10.playerOut.includes(p.id) || !p.connected ? 'out' : ''}"
                style="background:${p.color}22;color:${p.color};border-color:${p.color};">
@@ -3123,7 +3126,7 @@
 
       if (q.type === 'quiz') {
         content = `
-      <div class="question-type-label">🧠 Wissensfrage · +2 Punkte</div>
+      <div class="question-type-label">🧠 Wissensfrage · ${gameState.deckelMode ? 'Falsch = ❌ Deckel' : '+2 Punkte'}</div>
       <div class="question-text">${q.q}</div>
       <div class="answers">
         ${q.answers.map((a, i) => `
@@ -3136,7 +3139,7 @@
     `;
       } else if (q.type === 'estimate') {
         content = `
-      <div class="question-type-label">🔢 Schätzfrage · +3 Punkte (nächste Schätzung)</div>
+      <div class="question-type-label">🔢 Schätzfrage · ${gameState.deckelMode ? 'Am weitesten weg = ❌ Deckel' : '+3 Punkte (nächste Schätzung)'}</div>
       <div class="question-text">${q.q}</div>
       ${!iAnswered ? `
         <div class="estimate-input">
@@ -3152,7 +3155,7 @@
     `;
       } else if (q.type === 'höher_tiefer') {
         content = `
-      <div class="question-type-label">⬆️⬇️ Höher oder Tiefer? · +2 Punkte</div>
+      <div class="question-type-label">⬆️⬇️ Höher oder Tiefer? · ${gameState.deckelMode ? 'Falsch = ❌ Deckel' : '+2 Punkte'}</div>
       <div class="question-text">${q.q}</div>
       <div class="result-box info" style="margin-bottom:16px;">
         <div class="result-big">${formatNumber(q.reference)} ${q.unit || ''}</div>
@@ -3171,7 +3174,7 @@
     `;
       } else if (q.type === 'vote') {
         content = `
-      <div class="question-type-label">🗳️ Abstimmung · +1 Punkt (Mehrheit gewinnt)</div>
+      <div class="question-type-label">🗳️ Abstimmung · ${gameState.deckelMode ? 'ohne Deckel-Risiko' : '+1 Punkt (Mehrheit gewinnt)'}</div>
       <div class="question-text">${q.q}</div>
       <div>
         ${q.options.map((o, i) => `
@@ -3256,8 +3259,8 @@
       </div>
       ${isMyTurn ? `
       <div id="smart10-pass-row" style="text-align:center;margin:8px 0;">
-        <button class="btn btn-gold" style="padding:10px 18px;font-size:0.95rem;" onclick="submitSmart10Pass()">🛡️ Passen – ${(smart10.roundPoints && smart10.roundPoints[myId]) || 0} Punkt${((smart10.roundPoints && smart10.roundPoints[myId]) || 0) === 1 ? '' : 'e'} sichern</button>
-        <div style="font-size:0.75rem;color:#888;margin-top:4px;">Weiterraten bringt mehr – aber ein Fehler kostet alles!</div>
+        <button class="btn btn-gold" style="padding:10px 18px;font-size:0.95rem;" onclick="submitSmart10Pass()">${gameState.deckelMode ? '🛡️ Passen – raus ohne Deckel' : `🛡️ Passen – ${(smart10.roundPoints && smart10.roundPoints[myId]) || 0} Punkt${((smart10.roundPoints && smart10.roundPoints[myId]) || 0) === 1 ? '' : 'e'} sichern`}</button>
+        <div style="font-size:0.75rem;color:#888;margin-top:4px;">${gameState.deckelMode ? 'Weiterraten ist mutig – aber ein Fehler gibt einen ❌ Deckel!' : 'Weiterraten bringt mehr – aber ein Fehler kostet alles!'}</div>
       </div>` : ''}
       <div class="question-text">${q.q}</div>
       <div class="smart10-status-row">
@@ -3265,7 +3268,9 @@
         const rp = (smart10.roundPoints && smart10.roundPoints[p.id]) || 0;
         const hasPassed = (smart10.passed || []).includes(p.id);
         const isBusted = smart10.playerOut.includes(p.id) && !hasPassed;
-        const statusLabel = hasPassed ? ` 💰 +${(smart10.secured && smart10.secured[p.id]) || 0}` : (isBusted || !p.connected) ? ' – raus' : (rp > 0 ? ` ·+${rp}` : '');
+        const statusLabel = gameState.deckelMode
+          ? (hasPassed ? ' 🛡️' : (isBusted || !p.connected) ? ' – raus' : '')
+          : hasPassed ? ` 💰 +${(smart10.secured && smart10.secured[p.id]) || 0}` : (isBusted || !p.connected) ? ' – raus' : (rp > 0 ? ` ·+${rp}` : '');
         return `
           <div class="smart10-player-pill ${activePlayer && activePlayer.id === p.id ? 'active' : ''} ${smart10.playerOut.includes(p.id) || !p.connected ? 'out' : ''}"
                style="background:${p.color}22;color:${p.color};border-color:${p.color};">
@@ -3337,7 +3342,7 @@
       </div>
       ${correctPlayers.length > 0 ? `
         <p style="text-align:center;font-weight:600;margin-top:8px;">
-          +2 Punkte für: ${correctPlayers.map(p => `<span style="color:${p.color}">${p.name}</span>`).join(', ')}
+          ${gameState.deckelMode ? '✅ Richtig:' : '+2 Punkte für:'} ${correctPlayers.map(p => `<span style="color:${p.color}">${p.name}</span>`).join(', ')}
         </p>
       ` : '<p style="text-align:center;color:#888;">Niemand hatte recht!</p>'}
     `;
@@ -3350,9 +3355,9 @@
           .sort((a, b) => a.diff - b.diff);
 
         const winnerText = winners.length > 1
-          ? `🏆 ${winners.map(w => `<span style="color:${w.color}">${w.name}</span>`).join(' & ')} waren gleich nah dran! Je +3 Punkte`
+          ? `🏆 ${winners.map(w => `<span style="color:${w.color}">${w.name}</span>`).join(' & ')} waren gleich nah dran!${gameState.deckelMode ? '' : ' Je +3 Punkte'}`
           : winners.length === 1
-            ? `🏆 ${winners[0].name} war am nächsten! +3 Punkte`
+            ? `🏆 ${winners[0].name} war am nächsten!${gameState.deckelMode ? '' : ' +3 Punkte'}`
             : '';
         const winnerColor = winners.length === 1 ? winners[0].color : '#1d3557';
 
@@ -3391,7 +3396,7 @@
       </div>
       ${correctPlayers.length > 0 ? `
         <p style="text-align:center;font-weight:600;margin-top:8px;">
-          +2 Punkte für: ${correctPlayers.map(p => '<span style="color:' + p.color + '">' + p.name + '</span>').join(', ')}
+          ${gameState.deckelMode ? '✅ Richtig:' : '+2 Punkte für:'} ${correctPlayers.map(p => '<span style="color:' + p.color + '">' + p.name + '</span>').join(', ')}
         </p>
       ` : '<p style="text-align:center;color:#888;">Niemand hatte recht!</p>'}
     `;
@@ -3421,11 +3426,11 @@
       </div>
       ${isTie ? `
         <p style="text-align:center;font-weight:600;margin-top:8px;color:#888;">
-          ⚖️ Gleichstand – keine Punkte!
+          ⚖️ Gleichstand${gameState.deckelMode ? '!' : ' – keine Punkte!'}
         </p>
       ` : `
         <p style="text-align:center;font-weight:600;margin-top:8px;">
-          +1 Punkt für Mehrheit: ${majorityPlayers.map(p => `<span style="color:${p.color}">${p.name}</span>`).join(', ')}
+          ${gameState.deckelMode ? '👑 Mehrheit:' : '+1 Punkt für Mehrheit:'} ${majorityPlayers.map(p => `<span style="color:${p.color}">${p.name}</span>`).join(', ')}
         </p>
       `}
     `;
@@ -3446,17 +3451,23 @@
           .filter(p => (smart10.playerOut || []).includes(p.id) && !passed.includes(p.id) && (gameState.questionPlayerIds || []).includes(p.id))
           .map(p => ({ ...p, lostPts: lost[p.id] || 0 }));
 
-        const myBoxClass = mySecured > 0 ? 'success' : iBusted ? 'fail' : 'info';
-        const myBig = iBusted
-          ? (myLost > 0 ? `💥 Verzockt! ${myLost} Punkt${myLost === 1 ? '' : 'e'} verloren` : '❌ Raus')
-          : mySecured > 0
-            ? `+${mySecured} Punkt${mySecured === 1 ? '' : 'e'} gesichert`
-            : '🧩 Runde vorbei';
-        const myDetail = iBusted
-          ? (myLost > 0 ? 'Ein Fehlgriff – deine ungesicherten Punkte sind weg.' : 'Ein Fehlgriff hat dich aus der Runde genommen.')
-          : mySecured > 0
-            ? (iPassed ? 'Rechtzeitig gepasst und Punkte gebunkert. 💰' : 'Runde beendet – Punkte automatisch gesichert.')
-            : 'Alle Felder sind jetzt aufgedeckt.';
+        const myBoxClass = gameState.deckelMode
+          ? (iBusted ? 'fail' : 'success')
+          : mySecured > 0 ? 'success' : iBusted ? 'fail' : 'info';
+        const myBig = gameState.deckelMode
+          ? (iBusted ? '💥 Verzockt – ❌ Deckel!' : '🛡️ Kein Deckel!')
+          : iBusted
+            ? (myLost > 0 ? `💥 Verzockt! ${myLost} Punkt${myLost === 1 ? '' : 'e'} verloren` : '❌ Raus')
+            : mySecured > 0
+              ? `+${mySecured} Punkt${mySecured === 1 ? '' : 'e'} gesichert`
+              : '🧩 Runde vorbei';
+        const myDetail = gameState.deckelMode
+          ? (iBusted ? 'Ein Fehlgriff – das gibt einen Deckel.' : (iPassed ? 'Rechtzeitig gepasst – sauber durch die Runde.' : 'Sauber durch die Runde.'))
+          : iBusted
+            ? (myLost > 0 ? 'Ein Fehlgriff – deine ungesicherten Punkte sind weg.' : 'Ein Fehlgriff hat dich aus der Runde genommen.')
+            : mySecured > 0
+              ? (iPassed ? 'Rechtzeitig gepasst und Punkte gebunkert. 💰' : 'Runde beendet – Punkte automatisch gesichert.')
+              : 'Alle Felder sind jetzt aufgedeckt.';
 
         resultContent = `
       <div class="result-box ${myBoxClass}">
@@ -3484,13 +3495,13 @@
               <div class="smart10-option-text">${option}</div>
               <div class="smart10-tile-note">${actualTrue ? '✓ Gehört dazu' : '✗ Gehört nicht dazu'}</div>
               <div class="smart10-tile-meta">
-                ${solver ? `+1 für <span style="color:${solver.color}">${solver.name}</span>` : `Fehlversuch: <span style="color:${attempter.color}">${attempter.name}</span> sagte ${wrongClaimLabel}`}
+                ${solver ? `${gameState.deckelMode ? 'Gelöst von' : '+1 für'} <span style="color:${solver.color}">${solver.name}</span>` : `Fehlversuch: <span style="color:${attempter.color}">${attempter.name}</span> sagte ${wrongClaimLabel}`}
               </div>
             </div>
           `;
         }).join('')}
       </div>
-      ${scorers.length ? `
+      ${gameState.deckelMode ? '' : scorers.length ? `
         <p style="text-align:center;font-weight:700;margin-top:8px;">
           Gesichert: ${scorers.map(p => `<span style="color:${p.color}">${p.name} +${p.sec}${passed.includes(p.id) ? ' 💰' : ''}</span>`).join(' · ')}
         </p>
@@ -3588,9 +3599,10 @@
       app.innerHTML = `
     <div class="card">
       <h1>🏆 Spielende!</h1>
-      <p class="subtitle">${ranked[0].name} gewinnt das Münster Game!</p>
+      ${gameState.deckelMode ? '<p class="subtitle">Kneipenrunde beendet – Prost!</p>' : `<p class="subtitle">${ranked[0].name} gewinnt das Münster Game!</p>`}
       ${deckelBlock}
 
+      ${gameState.deckelMode ? '' : `
       <div class="podium">
         ${podiumOrder.map((p, i) => {
         const rank = ranked.indexOf(p);
@@ -3617,6 +3629,7 @@
           `).join('')}
         </ul>
       ` : ''}
+      `}
 
       ${role === 'host' ? `
         <div class="btn-row">
@@ -3759,7 +3772,7 @@
         const isLeader = hasScores && p.score === maxScore;
         return `
           <div class="score-chip ${gameState.phase === 'smart10' && i === gameState.currentPlayerIdx ? 'active' : ''}" style="background:${p.color};position:relative;">
-           ${isLeader ? '👑 ' : ''}${p.name.slice(0, 8)} <span class="pts">${p.score}</span>${gameState.deckelMode && gameState.phase !== 'lobby' ? ` <span style="opacity:0.9;">❌${gameState.deckel[p.id] || 0}</span>` : ''}${role === 'host' && p.id !== myId ? `<span onclick="if(confirm('${p.name} entfernen?'))kickPlayer('${p.id}')" style="position:absolute;top:-6px;right:-6px;background:rgba(0,0,0,0.55);color:#fff;border-radius:50%;width:16px;height:16px;font-size:10px;line-height:16px;text-align:center;cursor:pointer;">✕</span>` : ''}
+           ${!gameState.deckelMode && isLeader ? '👑 ' : ''}${p.name.slice(0, 8)}${gameState.deckelMode ? '' : ` <span class="pts">${p.score}</span>`}${gameState.deckelMode && gameState.phase !== 'lobby' ? ` <span style="opacity:0.9;">❌${gameState.deckel[p.id] || 0}</span>` : ''}${role === 'host' && p.id !== myId ? `<span onclick="if(confirm('${p.name} entfernen?'))kickPlayer('${p.id}')" style="position:absolute;top:-6px;right:-6px;background:rgba(0,0,0,0.55);color:#fff;border-radius:50%;width:16px;height:16px;font-size:10px;line-height:16px;text-align:center;cursor:pointer;">✕</span>` : ''}
           </div>
         `;
       }).join('')}
