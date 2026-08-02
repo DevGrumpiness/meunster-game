@@ -23,7 +23,7 @@
       --ms-red: #e63946;
       --ms-bg: #f1faee;
       --ms-card: #ffffff;
-      --ms-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+      --ms-shadow: 0 4px 20px rgba(0, 0, 0, 0.14);
       --ms-radius: 16px;
     }
 
@@ -35,27 +35,14 @@
 
     body {
       font-family: 'Nunito', sans-serif;
-      background: #1d3557;
+      background: linear-gradient(165deg, #1d3557 0%, #24555e 55%, #2d6a4f 100%);
+      background-attachment: fixed;
       min-height: 100vh;
       min-height: 100dvh;
       color: #1d1d1d;
       overflow-x: hidden;
       -webkit-tap-highlight-color: transparent;
       position: relative;
-    }
-
-    body::before {
-      content: '';
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/M%C3%BCnster%2C_Prinzipalmarkt_--_2019_--_3558.jpg/1920px-M%C3%BCnster%2C_Prinzipalmarkt_--_2019_--_3558.jpg');
-      background-size: cover;
-      background-position: center;
-      filter: blur(8px) brightness(0.4);
-      z-index: -1;
     }
 
     .container {
@@ -71,10 +58,10 @@
     }
 
     .card {
-      background: rgba(255, 255, 255, 0.8);
+      background: #ffffff;
       border-radius: var(--ms-radius);
       box-shadow: var(--ms-shadow);
-      padding: 28px 20px;
+      padding: 24px 20px;
       width: 100%;
       animation: fadeIn 0.35s ease;
     }
@@ -319,17 +306,19 @@
       display: flex;
       align-items: center;
       gap: 5px;
-      padding: 5px 10px;
+      padding: 4px 10px;
       border-radius: 20px;
-      font-weight: 400;
+      font-weight: 800;
       font-size: 0.75rem;
-      color: white;
       transition: all 0.3s;
     }
 
     .score-chip.active {
-      transform: scale(1.08);
-      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+      background: var(--pc) !important;
+      border-color: var(--pc) !important;
+      color: #fff !important;
+      transform: scale(1.06);
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.18);
     }
 
     .score-chip .pts {
@@ -358,12 +347,12 @@
 
     .question-type-label {
       text-align: center;
-      font-size: 0.8rem;
+      font-size: 0.68rem;
       font-weight: 600;
       text-transform: uppercase;
-      letter-spacing: 1px;
+      letter-spacing: 0.8px;
       margin-bottom: 6px;
-      color: var(--ms-green-light);
+      color: #97a1ab;
     }
 
     .question-text {
@@ -631,8 +620,10 @@
     }
 
     .smart10-player-pill.active {
-      transform: scale(1.04);
-      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.12);
+      background: var(--pc) !important;
+      color: #fff !important;
+      transform: scale(1.05);
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15);
     }
 
     .smart10-player-pill.out {
@@ -662,17 +653,20 @@
     }
 
     .result-box.success {
-      background: #d4edda;
+      background: #f0faf4;
+      border: 1px solid #b7e4c7;
       color: var(--ms-green);
     }
 
     .result-box.fail {
-      background: #f8d7da;
+      background: #fdf1f2;
+      border: 1px solid #f2c6cb;
       color: var(--ms-red);
     }
 
     .result-box.info {
-      background: #e8f4f8;
+      background: #eef6fb;
+      border: 1px solid #cfe2f0;
       color: var(--ms-blue);
     }
 
@@ -776,16 +770,6 @@
     }
 
     /* Current player banner */
-    .turn-banner {
-      text-align: center;
-      padding: 10px;
-      border-radius: 12px;
-      margin-bottom: 14px;
-      font-weight: 600;
-      font-size: 1rem;
-      color: white;
-    }
-
     /* Podium */
     .podium {
       display: flex;
@@ -863,8 +847,8 @@
       text-align: center;
       margin-bottom: 12px;
       font-weight: 600;
-      color: #666;
-      font-size: 0.9rem;
+      color: #8a94a1;
+      font-size: 0.8rem;
     }
 
     .answer-count {
@@ -957,7 +941,17 @@
   </style>
 </head>
 
-<body>
+<body>  <button id="fb-open-btn" onclick="openAppFeedback()" style="position:fixed;top:8px;left:8px;z-index:99998;background:rgba(255,255,255,0.92);border:1px solid #d5dbe1;border-radius:20px;padding:4px 12px;font-size:0.72rem;color:#5a6572;cursor:pointer;font-family:inherit;box-shadow:0 1px 4px rgba(0,0,0,0.08);">Feedback</button>
+  <div id="fb-modal" style="display:none;position:fixed;inset:0;z-index:100000;background:rgba(29,53,87,0.45);align-items:center;justify-content:center;padding:20px;" onclick="if(event.target===this)closeAppFeedback()">
+    <div style="background:#fff;border-radius:14px;padding:18px;max-width:340px;width:100%;box-shadow:0 10px 40px rgba(0,0,0,0.25);">
+      <div style="font-weight:700;color:#1d3557;font-size:0.95rem;margin-bottom:8px;">Feedback</div>
+      <textarea id="fb-text" maxlength="500" rows="4" placeholder="Was gefällt dir, was fehlt, was nervt?" style="width:100%;box-sizing:border-box;border:1.5px solid #d5dbe1;border-radius:10px;padding:10px;font-size:0.85rem;font-family:inherit;resize:vertical;"></textarea>
+      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:10px;">
+        <button onclick="closeAppFeedback()" style="background:none;border:none;color:#8a94a0;font-size:0.8rem;cursor:pointer;padding:6px 10px;font-family:inherit;">Abbrechen</button>
+        <button onclick="submitAppFeedback()" style="background:#1d3557;color:#fff;border:none;border-radius:10px;padding:7px 16px;font-size:0.8rem;font-weight:600;cursor:pointer;font-family:inherit;">Senden</button>
+      </div>
+    </div>
+  </div>
 
   <div class="container" id="app"></div>
 
@@ -1634,7 +1628,7 @@
       myName = name;
       role = 'host';
 
-      const peerId = 'msk-' + roomCode.toLowerCase();
+      const peerId = 'msk-dev-' + roomCode.toLowerCase();
       peer = new Peer(peerId, PEER_CONFIG);
 
       peer.on('open', (id) => {
@@ -1672,7 +1666,7 @@
 
       peer.on('open', (id) => {
         myId = id;
-        const hostPeerId = 'msk-' + roomCode.toLowerCase();
+        const hostPeerId = 'msk-dev-' + roomCode.toLowerCase();
         hostConn = peer.connect(hostPeerId, { reliable: true });
 
         hostConn.on('open', () => {
@@ -1805,6 +1799,10 @@
         }
         case 'qfeedback': {
           hostAddFeedback(conn._playerId || data.playerId, data.verdict, data.reason);
+          break;
+        }
+        case 'appfeedback': {
+          hostAddAppFeedback(conn._playerId || data.playerId, data.text);
           break;
         }
         case 'leave': {
@@ -1986,6 +1984,32 @@
       el.innerHTML = renderReadySectionContent();
     }
 
+    function smart10PassRowInnerHtml(smart10) {
+      const pids = (gameState.questionPlayerIds || []).length
+        ? gameState.questionPlayerIds
+        : gameState.players.filter(p => p.connected).map(p => p.id);
+      const myPts = (smart10.roundPoints && smart10.roundPoints[myId]) || 0;
+      let hint;
+      if (gameState.deckelMode) {
+        const effNow = pids.map(id => {
+          const hp = (smart10.passed || []).includes(id);
+          const bu = smart10.playerOut.includes(id) && !hp;
+          return hp ? ((smart10.secured && smart10.secured[id]) || 0) : bu ? 0 : ((smart10.roundPoints && smart10.roundPoints[id]) || 0);
+        });
+        const bestNow = effNow.length ? Math.max(...effNow) : 0;
+        hint = myPts >= bestNow
+          ? 'Der Letzte zahlt den Abstand zum Besten in Deckeln – du liegst vorn.'
+          : `Der Letzte zahlt den Abstand zum Besten in Deckeln – Bester hat ${bestNow}, du ${myPts}.`;
+      } else {
+        hint = 'Weiterraten bringt mehr – ein Fehler kostet alles.';
+      }
+      const label = gameState.deckelMode
+        ? `Passen – ${myPts} Richtige sichern`
+        : `Passen – ${myPts} Punkt${myPts === 1 ? '' : 'e'} sichern`;
+      return `<button class="btn btn-small" style="background:#fff;color:#2b3440;border:1.5px solid #d9ba55;box-shadow:none;padding:8px 16px;font-size:0.85rem;" onclick="submitSmart10Pass()">${label}</button>
+        <div style="font-size:0.72rem;color:#98a1ab;margin-top:5px;">${hint}</div>`;
+    }
+
     function updateSmart10Partial() {
       const q = gameState.currentQuestion;
       const smart10 = gameState.smart10State;
@@ -2002,18 +2026,6 @@
       const playersStillIn = participantPlayers.filter(p => p.connected && !smart10.playerOut.includes(p.id)).length;
       const isParticipating = participantIds.includes(myId);
 
-      // Update turn banner
-      const banner = document.querySelector('.turn-banner');
-      if (banner) {
-        const bannerText = !activePlayer ? 'Die Runde endet...'
-          : isMyTurn ? '🟢 Du bist dran!'
-            : isOut ? 'Du bist raus – schau zu!'
-              : !isParticipating ? `${activePlayer.name} spielt diese Runde`
-                : `${activePlayer.name} ist dran`;
-        banner.innerHTML = bannerText;
-        banner.style.background = activePlayer ? activePlayer.color : '';
-      }
-
       // Update scoreboard chips: highlight whose turn it is
       document.querySelectorAll('.score-chip').forEach((chip, i) => {
         const p = gameState.players[i];
@@ -2023,27 +2035,12 @@
       // Update pass button (appears only on my turn)
       const passRow = document.getElementById('smart10-pass-row');
       if (isMyTurn) {
-        const myPts = (smart10.roundPoints && smart10.roundPoints[myId]) || 0;
-        let liveHint;
-        if (gameState.deckelMode) {
-          const effNow = participantIds.map(id => {
-            const hp = (smart10.passed || []).includes(id);
-            const bu = smart10.playerOut.includes(id) && !hp;
-            return hp ? ((smart10.secured && smart10.secured[id]) || 0) : bu ? 0 : ((smart10.roundPoints && smart10.roundPoints[id]) || 0);
-          });
-          const bestNow = effNow.length ? Math.max(...effNow) : 0;
-          liveHint = myPts >= bestNow
-            ? 'Der Letzte zahlt den Abstand zum Besten in ❌ Deckeln – du liegst vorn!'
-            : `Der Letzte zahlt den Abstand zum Besten in ❌ Deckeln – Bester hat ${bestNow}, du ${myPts}`;
-        } else {
-          liveHint = 'Weiterraten bringt mehr – aber ein Fehler kostet alles!';
-        }
-        const passHtml = `<button class="btn btn-gold" style="padding:10px 18px;font-size:0.95rem;" onclick="submitSmart10Pass()">${gameState.deckelMode ? `🛡️ Passen – ${myPts} Richtige sichern` : `🛡️ Passen – ${myPts} Punkt${myPts === 1 ? '' : 'e'} sichern`}</button>
-        <div style="font-size:0.75rem;color:#888;margin-top:4px;">${liveHint}</div>`;
+        const passHtml = smart10PassRowInnerHtml(smart10);
         if (passRow) {
           passRow.innerHTML = passHtml;
-        } else if (banner) {
-          banner.insertAdjacentHTML('afterend', `<div id="smart10-pass-row" style="text-align:center;margin:8px 0;">${passHtml}</div>`);
+        } else {
+          const anchor = document.querySelector('.question-type-label');
+          if (anchor) anchor.insertAdjacentHTML('afterend', `<div id="smart10-pass-row" style="text-align:center;margin:8px 0;">${passHtml}</div>`);
         }
       } else if (passRow) {
         passRow.remove();
@@ -2096,8 +2093,8 @@
             : hasPassed ? ` 💰 +${(smart10.secured && smart10.secured[p.id]) || 0}` : (isBusted || !p.connected) ? ' – raus' : (rp > 0 ? ` ·+${rp}` : '');
           return `
           <div class="smart10-player-pill ${activePlayer && activePlayer.id === p.id ? 'active' : ''} ${smart10.playerOut.includes(p.id) || !p.connected ? 'out' : ''}"
-               style="background:${p.color}22;color:${p.color};border-color:${p.color};">
-            ${activePlayer && activePlayer.id === p.id ? '🎯 ' : ''}${p.name}${statusLabel}
+               style="--pc:${p.color};background:${p.color}22;color:${p.color};border-color:${p.color};">
+            ${p.name}${statusLabel}
           </div>
         `;
         }).join('');
@@ -2158,7 +2155,7 @@
       const savedGameId = myId;
       if (peer) { try { peer.destroy(); } catch (e) { } }
 
-      const peerId = 'msk-' + roomCode.toLowerCase();
+      const peerId = 'msk-dev-' + roomCode.toLowerCase();
       peer = new Peer(peerId, PEER_CONFIG);
 
       peer.on('open', (id) => {
@@ -2207,7 +2204,7 @@
 
       peer.on('open', (id) => {
         myId = id;
-        const hostPeerId = 'msk-' + roomCode.toLowerCase();
+        const hostPeerId = 'msk-dev-' + roomCode.toLowerCase();
         hostConn = peer.connect(hostPeerId, { reliable: true });
 
         hostConn.on('open', () => {
@@ -3311,7 +3308,7 @@
 
       if (q.type === 'quiz') {
         content = `
-      <div class="question-type-label">🧠 Wissensfrage · ${gameState.deckelMode ? 'Falsch = ❌ Deckel' : '+2 Punkte'}</div>
+      <div class="question-type-label">Wissensfrage · ${gameState.deckelMode ? 'Falsch = 1 Deckel' : '+2 Punkte'}</div>
       <div class="question-text">${q.q}</div>
       <div class="answers">
         ${q.answers.map((a, i) => `
@@ -3324,7 +3321,7 @@
     `;
       } else if (q.type === 'estimate') {
         content = `
-      <div class="question-type-label">🔢 Schätzfrage · ${gameState.deckelMode ? 'Am weitesten weg = ❌ Deckel' : '+3 Punkte (nächste Schätzung)'}</div>
+      <div class="question-type-label">Schätzfrage · ${gameState.deckelMode ? 'am weitesten weg = 1 Deckel' : '+3 Punkte (nächste Schätzung)'}</div>
       <div class="question-text">${q.q}</div>
       ${!iAnswered ? `
         <div class="estimate-input">
@@ -3340,7 +3337,7 @@
     `;
       } else if (q.type === 'höher_tiefer') {
         content = `
-      <div class="question-type-label">⬆️⬇️ Höher oder Tiefer? · ${gameState.deckelMode ? 'Falsch = ❌ Deckel' : '+2 Punkte'}</div>
+      <div class="question-type-label">Höher oder Tiefer · ${gameState.deckelMode ? 'Falsch = 1 Deckel' : '+2 Punkte'}</div>
       <div class="question-text">${q.q}</div>
       <div class="result-box info" style="margin-bottom:16px;">
         <div class="result-big">${formatNumber(q.reference)} ${q.unit || ''}</div>
@@ -3359,7 +3356,7 @@
     `;
       } else if (q.type === 'vote') {
         content = `
-      <div class="question-type-label">🗳️ Abstimmung · ${gameState.deckelMode ? 'ohne Deckel-Risiko' : '+1 Punkt (Mehrheit gewinnt)'}</div>
+      <div class="question-type-label">Abstimmung · ${gameState.deckelMode ? 'ohne Deckel-Risiko' : '+1 Punkt (Mehrheit gewinnt)'}</div>
       <div class="question-text">${q.q}</div>
       <div>
         ${q.options.map((o, i) => `
@@ -3374,7 +3371,7 @@
 
       app.innerHTML = `
     <div class="category-badge-wrapper"><div class="category-badge" style="background:${cat.color}">${cat.icon} ${cat.name}</div></div>
-    <div class="card" style="border:3px solid ${cat.color}">
+    <div class="card" style="border-top:5px solid ${cat.color};border-radius:0 0 var(--ms-radius) var(--ms-radius);">
       ${renderScoreboard()}
       ${renderRoundInfo()}
       ${inFinale ? `<div style="text-align:center;background:#1d3557;color:#fff;border-radius:8px;padding:8px;margin-bottom:10px;font-weight:700;font-size:.9rem;">🥊 FINALE: ${finalists.map(p => `<span style="color:#ffd166">${p.name}</span>`).join(' vs ')}${isSpectator ? ' – du schaust zu!' : ''}</div>` : ''}
@@ -3423,43 +3420,15 @@
       const eliminatedCount = smart10.eliminated.filter(Boolean).length;
       const playersStillIn = participantPlayers.filter(p => p.connected && !smart10.playerOut.includes(p.id)).length;
 
-      const bannerText = !activePlayer
-        ? 'Die Runde endet...'
-        : isMyTurn
-          ? '🟢 Du bist dran!'
-          : isOut
-            ? 'Du bist raus – schau zu!'
-            : !isParticipating
-              ? `${activePlayer.name} spielt diese Runde`
-              : `${activePlayer.name} ist dran`;
-
-      let deckelHint = '';
-      if (gameState.deckelMode && isMyTurn) {
-        const effNow = participantPlayers.map(p => {
-          const hp = (smart10.passed || []).includes(p.id);
-          const bu = smart10.playerOut.includes(p.id) && !hp;
-          return hp ? ((smart10.secured && smart10.secured[p.id]) || 0) : bu ? 0 : ((smart10.roundPoints && smart10.roundPoints[p.id]) || 0);
-        });
-        const bestNow = effNow.length ? Math.max(...effNow) : 0;
-        const myNow = (smart10.roundPoints && smart10.roundPoints[myId]) || 0;
-        deckelHint = myNow >= bestNow
-          ? 'Der Letzte zahlt den Abstand zum Besten in ❌ Deckeln – du liegst vorn!'
-          : `Der Letzte zahlt den Abstand zum Besten in ❌ Deckeln – Bester hat ${bestNow}, du ${myNow}`;
-      }
-
       app.innerHTML = `
     <div class="category-badge-wrapper"><div class="category-badge" style="background:${cat.color}">${cat.icon} ${cat.name}</div></div>
-    <div class="card" style="border:3px solid ${cat.color}">
+    <div class="card" style="border-top:5px solid ${cat.color};border-radius:0 0 var(--ms-radius) var(--ms-radius);">
       ${renderScoreboard()}
       ${renderRoundInfo()}
-      <div class="question-type-label">🧩 Wahr oder Falsch – Reihum rätseln!</div>
-      <div class="turn-banner" style="background:${activePlayer ? activePlayer.color : cat.color}">
-        ${bannerText}
-      </div>
+      <div class="question-type-label">Wahr oder Falsch · reihum</div>
       ${isMyTurn ? `
       <div id="smart10-pass-row" style="text-align:center;margin:8px 0;">
-        <button class="btn btn-gold" style="padding:10px 18px;font-size:0.95rem;" onclick="submitSmart10Pass()">${gameState.deckelMode ? `🛡️ Passen – ${(smart10.roundPoints && smart10.roundPoints[myId]) || 0} Richtige sichern` : `🛡️ Passen – ${(smart10.roundPoints && smart10.roundPoints[myId]) || 0} Punkt${((smart10.roundPoints && smart10.roundPoints[myId]) || 0) === 1 ? '' : 'e'} sichern`}</button>
-        <div style="font-size:0.75rem;color:#888;margin-top:4px;">${gameState.deckelMode ? deckelHint : 'Weiterraten bringt mehr – aber ein Fehler kostet alles!'}</div>
+        ${smart10PassRowInnerHtml(smart10)}
       </div>` : ''}
       <div class="question-text">${q.q}</div>
       <div class="smart10-status-row">
@@ -3472,8 +3441,8 @@
           : hasPassed ? ` 💰 +${(smart10.secured && smart10.secured[p.id]) || 0}` : (isBusted || !p.connected) ? ' – raus' : (rp > 0 ? ` ·+${rp}` : '');
         return `
           <div class="smart10-player-pill ${activePlayer && activePlayer.id === p.id ? 'active' : ''} ${smart10.playerOut.includes(p.id) || !p.connected ? 'out' : ''}"
-               style="background:${p.color}22;color:${p.color};border-color:${p.color};">
-            ${activePlayer && activePlayer.id === p.id ? '🎯 ' : ''}${p.name}${statusLabel}
+               style="--pc:${p.color};background:${p.color}22;color:${p.color};border-color:${p.color};">
+            ${p.name}${statusLabel}
           </div>
         `;
       }).join('')}
@@ -3729,7 +3698,7 @@
 
       app.innerHTML = `
     <div class="category-badge-wrapper"><div class="category-badge" style="background:${cat.color}">${cat.icon} ${cat.name}</div></div>
-    <div class="card" style="border:3px solid ${cat.color}">
+    <div class="card" style="border-top:5px solid ${cat.color};border-radius:0 0 var(--ms-radius) var(--ms-radius);">
       ${renderScoreboard()}
       ${renderRoundInfo()}
       <div class="question-text">${q.q}</div>
@@ -4026,7 +3995,7 @@
         ${gameState.players.map((p, i) => {
         const isLeader = hasScores && p.score === maxScore;
         return `
-          <div class="score-chip ${p.id === s10ActiveId ? 'active' : ''}" style="background:${p.color};position:relative;">
+          <div class="score-chip ${p.id === s10ActiveId ? 'active' : ''}" style="--pc:${p.color};background:${p.color}1a;border:1.5px solid ${p.color}55;color:#2b3a4d;position:relative;">
            ${!gameState.deckelMode && isLeader ? '👑 ' : ''}${gameState.deckelMode && (gameState.halbzeitLosers || []).includes(p.id) ? '🥊 ' : ''}${p.name.slice(0, 8)}${gameState.deckelMode ? '' : ` <span class="pts">${p.score}</span>`}${gameState.deckelMode && gameState.phase !== 'lobby' ? ` <span style="opacity:0.9;">❌${gameState.deckel[p.id] || 0}</span>` : ''}${role === 'host' && p.id !== myId ? `<span onclick="if(confirm('${p.name} entfernen?'))kickPlayer('${p.id}')" style="position:absolute;top:-6px;right:-6px;background:rgba(0,0,0,0.55);color:#fff;border-radius:50%;width:16px;height:16px;font-size:10px;line-height:16px;text-align:center;cursor:pointer;">✕</span>` : ''}
           </div>
         `;
@@ -4392,7 +4361,7 @@
     function renderFeedbackRow() {
       const q = gameState.currentQuestion;
       if (!q || myId === 'test-host') return '';
-      return `<div id="fb-row" style="text-align:center;margin-top:12px;">${renderFeedbackRowContent()}</div>`;
+      return `<div id="fb-row" style="text-align:center;margin-top:14px;padding-top:10px;border-top:1px solid #eef1f4;">${renderFeedbackRowContent()}</div>`;
     }
     function renderFeedbackRowContent() {
       const q = gameState.currentQuestion;
@@ -4416,27 +4385,89 @@
     }
     function renderFeedbackSummary() {
       const entries = Object.values(gameState.qFeedback || {});
-      if (!entries.length) return '';
+      const appFb = gameState.appFeedback || [];
+      if (!entries.length && !appFb.length) return '';
       const ups = entries.reduce((s, e) => s + (e.up || []).length, 0);
       const downs = entries.reduce((s, e) => s + (e.down || []).length, 0);
       const flagged = entries.filter(e => (e.down || []).length > 0).sort((a, b) => b.down.length - a.down.length);
       return `
         <div style="background:#f8f9fa;border-radius:10px;padding:12px;margin-top:14px;text-align:left;">
-          <div style="font-weight:700;font-size:0.9rem;color:#1d3557;">📝 Fragen-Feedback: 👍 ${ups} · 👎 ${downs}</div>
+          ${entries.length ? `<div style="font-weight:700;font-size:0.9rem;color:#1d3557;">📝 Fragen-Feedback: 👍 ${ups} · 👎 ${downs}</div>` : ''}
           ${flagged.slice(0, 5).map(e => {
         const counts = {};
         Object.values(e.reasons || {}).forEach(r => counts[r] = (counts[r] || 0) + 1);
         const reasonTxt = Object.entries(counts).map(([r, n]) => `${FB_REASON_LABELS[r] || r}${n > 1 ? ' ×' + n : ''}`).join(', ');
         return `<div style="font-size:0.78rem;color:#555;margin-top:6px;">👎${e.down.length} „${escapeHtml(e.q.slice(0, 60))}${e.q.length > 60 ? '…' : ''}"${reasonTxt ? ` – <em>${reasonTxt}</em>` : ''}</div>`;
       }).join('')}
+          ${appFb.length ? `<div style="font-weight:700;font-size:0.85rem;color:#1d3557;margin-top:${entries.length ? '10px' : '0'};">💬 Allgemeines Feedback</div>
+          ${appFb.slice(-8).map(f => `<div style="font-size:0.78rem;color:#555;margin-top:4px;"><strong>${escapeHtml(f.name)}:</strong> ${escapeHtml(f.text)}</div>`).join('')}` : ''}
           <button onclick="copyFeedback()" style="margin-top:10px;background:#fff;border:1.5px solid #ccc;border-radius:8px;padding:5px 12px;font-size:0.75rem;cursor:pointer;color:#555;">📋 Feedback-Daten kopieren</button>
         </div>`;
     }
     function copyFeedback() {
-      const data = JSON.stringify(gameState.qFeedback || {}, null, 2);
+      const data = JSON.stringify({ fragen: gameState.qFeedback || {}, allgemein: gameState.appFeedback || [] }, null, 2);
       try {
         navigator.clipboard.writeText(data).then(() => alert('Feedback als JSON kopiert! 📋'), () => prompt('Feedback JSON:', data));
       } catch (e) { prompt('Feedback JSON:', data); }
+    }
+
+    // ============================================================
+    // APP-FEEDBACK (Freitext, Button oben links)
+    // Sicherheit: Text wird NIE als HTML interpretiert – Anzeige nur
+    // über escapeHtml, Übertragung als JSON-String, kein User-Text in
+    // Attributen/onclick. Host validiert Typ, Länge, Rate-Limit.
+    // ============================================================
+    const _appFbLastTs = {};
+    function openAppFeedback() {
+      const m = document.getElementById('fb-modal');
+      if (!m) return;
+      m.style.display = 'flex';
+      const t = document.getElementById('fb-text');
+      if (t) { t.value = ''; setTimeout(() => { try { t.focus(); } catch (e) { } }, 60); }
+    }
+    function closeAppFeedback() {
+      const m = document.getElementById('fb-modal');
+      if (m) m.style.display = 'none';
+    }
+    function submitAppFeedback() {
+      const t = document.getElementById('fb-text');
+      const text = (t && typeof t.value === 'string' ? t.value : '').trim().slice(0, 500);
+      closeAppFeedback();
+      if (!text) return;
+      if (roomCode && role === 'host') {
+        hostAddAppFeedback(myId, text);
+      } else if (roomCode && role === 'client') {
+        sendToHost({ type: 'appfeedback', playerId: myId, text });
+        persistAppFeedback({ name: (myName || 'Anonym').slice(0, 30), text, ts: Date.now() });
+      } else {
+        persistAppFeedback({ name: (myName || 'Anonym').slice(0, 30), text, ts: Date.now() });
+      }
+      const btn = document.getElementById('fb-open-btn');
+      if (btn) { btn.textContent = '✓ Danke'; setTimeout(() => { btn.textContent = 'Feedback'; }, 2500); }
+    }
+    function hostAddAppFeedback(pid, text) {
+      if (typeof text !== 'string') return;
+      const cleaned = text.trim().slice(0, 500);
+      if (!cleaned) return;
+      const now = Date.now();
+      if (_appFbLastTs[pid] && now - _appFbLastTs[pid] < 3000) return;
+      _appFbLastTs[pid] = now;
+      const p = gameState.players.find(pl => pl.id === pid);
+      if (!gameState.appFeedback) gameState.appFeedback = [];
+      const entry = { name: p ? String(p.name).slice(0, 30) : 'Unbekannt', text: cleaned, ts: now };
+      gameState.appFeedback.push(entry);
+      if (gameState.appFeedback.length > 40) gameState.appFeedback = gameState.appFeedback.slice(-40);
+      persistAppFeedback(entry);
+    }
+    function persistAppFeedback(entry) {
+      try {
+        const key = 'mk-app-feedback';
+        let log = [];
+        try { log = JSON.parse(localStorage.getItem(key)) || []; } catch (e) { }
+        if (!Array.isArray(log)) log = [];
+        log.push(entry);
+        localStorage.setItem(key, JSON.stringify(log.slice(-50)));
+      } catch (e) { }
     }
 
     // ============================================================
