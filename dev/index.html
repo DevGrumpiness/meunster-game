@@ -11,6 +11,7 @@
   <link rel="icon"
     href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🚲</text></svg>">
   <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
+  <script src="https://unpkg.com/qrcode-generator@1.4.4/qrcode.js"></script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap');
 
@@ -962,6 +963,32 @@
 
   <div class="container" id="app"></div>
 
+  <div id="sound-toggle" onclick="toggleSound()"
+    style="position:fixed;top:8px;right:8px;z-index:9000;width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,0.22);color:#fff;display:none;align-items:center;justify-content:center;font-size:1.05rem;cursor:pointer;user-select:none;-webkit-tap-highlight-color:transparent;">
+    🔊</div>
+
+  <div id="chat-dock"
+    style="display:none;position:fixed;bottom:22px;left:0;right:0;max-width:600px;margin:0 auto;padding:0 16px;z-index:500;box-sizing:border-box;">
+    <div style="background:rgba(255,255,255,0.95);border-radius:12px;box-shadow:0 2px 12px rgba(0,0,0,0.25);overflow:hidden;">
+      <div id="chat-header" onclick="toggleChat()"
+        style="display:flex;justify-content:space-between;align-items:center;padding:9px 14px;cursor:pointer;user-select:none;font-weight:700;color:#1d3557;font-size:0.9rem;-webkit-tap-highlight-color:transparent;">
+        <span>💬 Chat <span id="chat-unread"
+            style="display:none;background:#e63946;color:#fff;border-radius:10px;font-size:0.7rem;padding:1px 7px;margin-left:4px;"></span></span>
+        <span id="chat-arrow" style="color:#888;">▸</span>
+      </div>
+      <div id="chat-body" style="display:none;">
+        <div id="chat-msgs" style="max-height:180px;overflow-y:auto;padding:0 12px 6px;font-size:0.85rem;line-height:1.5;color:#333;"></div>
+        <div style="display:flex;gap:6px;padding:8px 10px;border-top:1px solid #eee;">
+          <input id="chat-input" maxlength="200" placeholder="Nachricht…" autocomplete="off"
+            style="flex:1;min-width:0;border:1.5px solid #ccc;border-radius:8px;padding:8px 10px;font-size:16px;font-family:inherit;outline:none;"
+            onkeydown="if(event.key==='Enter'){sendChat();}" />
+          <button onclick="sendChat()"
+            style="background:var(--ms-green);color:#fff;border:none;border-radius:8px;padding:8px 14px;font-weight:700;cursor:pointer;font-size:1rem;">➤</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script>
     // ============================================================
     // MÜNSTER GAME – MULTIPLAYER (PeerJS WebRTC)
@@ -1497,6 +1524,8 @@
       finalLoserId: null,      // who pays the round
       _roundDeckel: [],        // who got a Deckel this round (for result screen)
       _deckelEvent: null,      // transition banner: {kind:'halftime'|'finaleStart', ...}
+      chat: [],                // chat messages: { pid, name, color, text, ts }
+      qFeedback: {},           // question feedback: qText -> { q, cat, type, up:[pid], down:[pid], reasons:{pid:reason} }
     };
 
     // Local UI state (per device)
@@ -1729,6 +1758,14 @@
           broadcastState();
           break;
         }
+        case 'chat': {
+          hostAddChat(conn._playerId || data.playerId, data.text);
+          break;
+        }
+        case 'qfeedback': {
+          hostAddFeedback(conn._playerId || data.playerId, data.verdict, data.reason);
+          break;
+        }
       }
     }
 
@@ -1828,7 +1865,14 @@
         const oldPhase = gameState.phase;
         const oldAnswerCount = Object.keys(gameState.answers || {}).length;
         const oldReadyCount = (gameState.readyPlayers || []).length;
+        const oldChatLen = (gameState.chat || []).length;
         gameState = data.state;
+
+        // Chat-only update: refresh dock without re-rendering (preserves inputs)
+        if (oldPhase === gameState.phase && (gameState.chat || []).length !== oldChatLen) {
+          updateChatDock();
+          return;
+        }
 
         // If we're still in the question phase and only the answer count changed,
         // just update the counter instead of full re-render (preserves local input state)
@@ -2728,6 +2772,12 @@
     // RENDERING
     // ============================================================
     function render() {
+      // Subtle sound on phase transitions (round end / game end)
+      if (gameState.phase !== _lastSoundPhase) {
+        if (gameState.phase === 'result') soundRoundEnd();
+        else if (gameState.phase === 'final') soundGameEnd();
+        _lastSoundPhase = gameState.phase;
+      }
       switch (gameState.phase) {
         case 'home': renderHome(); break;
         case 'lobby': renderLobby(); break;
@@ -2741,6 +2791,8 @@
         case 'error': renderError(); break;
         default: renderHome(); break;
       }
+      updateChatDock();
+      updateSoundToggle();
     }
 
     function renderHome() {
@@ -2759,9 +2811,10 @@
         <button class="btn btn-secondary" onclick="onShowJoin()">🔗 Raum beitreten</button>
       </div>
 
-      <div id="joinSection" class="hidden" style="margin-top:20px;">
+      <div id="joinSection" class="${joinLinkCode ? '' : 'hidden'}" style="margin-top:20px;">
+        ${joinLinkCode ? `<div style="text-align:center;background:#e8f4ea;border:2px solid var(--ms-green);border-radius:8px;padding:8px;margin-bottom:10px;font-size:0.85rem;font-weight:600;color:#2d6a4f;">🔗 Einladung für Raum ${joinLinkCode} – nur noch Name eingeben!</div>` : ''}
         <label style="font-weight:700;display:block;margin-bottom:6px;">Raum-Code:</label>
-        <input class="input-field code-input" id="codeInput" placeholder="ABCD" maxlength="4" />
+        <input class="input-field code-input" id="codeInput" placeholder="ABCD" maxlength="4" value="${joinLinkCode}" />
         <div class="btn-row">
           <button class="btn btn-gold" onclick="onJoinRoom()">Beitreten!</button>
         </div>
@@ -2868,6 +2921,11 @@
       <p style="text-align:center;font-weight:600;margin-bottom:6px;">Raum-Code:</p>
       <div class="room-code">${roomCode}</div>
       <p style="text-align:center;color:#888;font-size:0.85rem;">Teilt diesen Code, damit andere beitreten können.</p>
+      <div style="display:flex;justify-content:center;gap:8px;margin:10px 0 4px;">
+        <button onclick="toggleQR()" style="background:#fff;border:2px solid var(--ms-blue);color:var(--ms-blue);border-radius:10px;padding:8px 16px;font-size:0.85rem;font-weight:700;cursor:pointer;font-family:inherit;">📱 QR-Code</button>
+        <button onclick="shareRoom()" style="background:var(--ms-blue);border:2px solid var(--ms-blue);color:#fff;border-radius:10px;padding:8px 16px;font-size:0.85rem;font-weight:700;cursor:pointer;font-family:inherit;">📤 Link teilen</button>
+      </div>
+      <div id="qr-box" style="display:none;text-align:center;margin:8px 0;"></div>
 
       <div class="divider"></div>
       <h2>👥 Spieler (${gameState.players.length})</h2>
@@ -3524,6 +3582,8 @@
       ${resultContent}
       ${renderDeckelResultLine()}
       ${q.fact ? `<div class="fun-fact"><strong>💡 Wusstest du?</strong> ${q.fact}</div>` : ''}
+      ${renderFeedbackRow()}
+      ${renderMyTab()}
       ${renderReadySection()}
     </div>
   `;
@@ -3632,6 +3692,9 @@
         </ul>
       ` : ''}
       `}
+
+      ${renderMyTab()}
+      ${renderFeedbackSummary()}
 
       ${role === 'host' ? `
         <div class="btn-row">
@@ -3811,6 +3874,325 @@
         setTimeout(() => el.remove(), 6000);
       }
     }
+
+    // ============================================================
+    // SOUND (subtle round-end tones, WebAudio, no assets)
+    // ============================================================
+    let soundOn = true;
+    try { soundOn = localStorage.getItem('mk-sound') !== 'off'; } catch (e) { }
+    let _audioCtx = null;
+    let _lastSoundPhase = '';
+    function getAudioCtx() {
+      const AC = (typeof window !== 'undefined') && (window.AudioContext || window.webkitAudioContext);
+      if (!AC) return null;
+      if (!_audioCtx) { try { _audioCtx = new AC(); } catch (e) { return null; } }
+      if (_audioCtx.state === 'suspended') { try { _audioCtx.resume(); } catch (e) { } }
+      return _audioCtx;
+    }
+    function playTone(freq, delay, dur, vol) {
+      if (!soundOn) return;
+      const ctx = getAudioCtx();
+      if (!ctx) return;
+      try {
+        const t = ctx.currentTime + delay;
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.value = freq;
+        gain.gain.setValueAtTime(0.0001, t);
+        gain.gain.exponentialRampToValueAtTime(vol || 0.045, t + 0.02);
+        gain.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+        osc.connect(gain); gain.connect(ctx.destination);
+        osc.start(t); osc.stop(t + dur + 0.05);
+      } catch (e) { }
+    }
+    function soundRoundEnd() { playTone(660, 0, 0.2); playTone(880, 0.16, 0.28); }
+    function soundGameEnd() { playTone(523, 0, 0.18); playTone(659, 0.14, 0.18); playTone(784, 0.28, 0.34, 0.05); }
+    function toggleSound() {
+      soundOn = !soundOn;
+      try { localStorage.setItem('mk-sound', soundOn ? 'on' : 'off'); } catch (e) { }
+      updateSoundToggle();
+      if (soundOn) soundRoundEnd();
+    }
+    function updateSoundToggle() {
+      const btn = document.getElementById('sound-toggle');
+      if (!btn) return;
+      const show = gameState.phase !== 'home';
+      btn.style.display = show ? 'flex' : 'none';
+      btn.textContent = soundOn ? '🔊' : '🔇';
+    }
+
+    // ============================================================
+    // ROOM SHARING (QR code + share link)
+    // ============================================================
+    function roomLink() {
+      return location.origin + location.pathname + '?join=' + roomCode;
+    }
+    function toggleQR() {
+      const box = document.getElementById('qr-box');
+      if (!box) return;
+      if (box.style.display !== 'none') { box.style.display = 'none'; return; }
+      let inner = '';
+      if (typeof qrcode !== 'undefined') {
+        try {
+          const qr = qrcode(0, 'M');
+          qr.addData(roomLink());
+          qr.make();
+          inner = qr.createImgTag(5, 10);
+        } catch (e) { }
+      }
+      if (!inner) inner = `<p style="font-weight:700;word-break:break-all;font-size:0.85rem;">${roomLink()}</p>`;
+      box.innerHTML = `<div style="background:#fff;border-radius:12px;padding:14px;display:inline-block;box-shadow:0 2px 8px rgba(0,0,0,0.15);">
+        ${inner}
+        <div style="font-size:0.75rem;color:#666;margin-top:6px;">Scannen → Name eingeben → drin!</div>
+      </div>`;
+      box.style.display = 'block';
+    }
+    async function shareRoom() {
+      const link = roomLink();
+      if (typeof navigator !== 'undefined' && navigator.share) {
+        try {
+          await navigator.share({ title: 'Münster Game', text: `Komm in meine Münster-Game-Runde! Raum-Code: ${roomCode}`, url: link });
+          return;
+        } catch (e) { if (e && e.name === 'AbortError') return; }
+      }
+      try {
+        await navigator.clipboard.writeText(link);
+        alert('Einladungs-Link kopiert! 📋\n\n' + link);
+      } catch (e) {
+        prompt('Link zum Teilen:', link);
+      }
+    }
+
+    // ============================================================
+    // CHAT (host-authoritative, HTML-escaped, rate-limited)
+    // ============================================================
+    let chatOpen = false;
+    let chatSeenCount = 0;
+    const _chatLastTs = {};
+    function escapeHtml(s) {
+      return String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    }
+    function chatVisible() {
+      return !!roomCode && myId !== 'test-host' &&
+        ['lobby', 'categorySelect', 'question', 'smart10', 'result', 'final'].includes(gameState.phase);
+    }
+    function hostAddChat(pid, text) {
+      const p = gameState.players.find(pl => pl.id === pid);
+      if (!p || typeof text !== 'string') return;
+      const t = text.trim().slice(0, 200);
+      if (!t) return;
+      const now = Date.now();
+      if (_chatLastTs[pid] && now - _chatLastTs[pid] < 600) return;
+      _chatLastTs[pid] = now;
+      if (!gameState.chat) gameState.chat = [];
+      gameState.chat.push({ pid, name: p.name, color: p.color, text: t, ts: now });
+      if (gameState.chat.length > 60) gameState.chat = gameState.chat.slice(-60);
+      broadcastChatUpdate();
+    }
+    function broadcastChatUpdate() {
+      const stateMsg = { type: 'state', state: gameState };
+      connections.forEach(c => { try { c.send(stateMsg); } catch (e) { } });
+      updateChatDock();
+    }
+    function sendChat() {
+      const inp = document.getElementById('chat-input');
+      if (!inp) return;
+      const text = (inp.value || '').trim().slice(0, 200);
+      if (!text) return;
+      inp.value = '';
+      if (role === 'host') hostAddChat(myId, text);
+      else sendToHost({ type: 'chat', playerId: myId, text });
+    }
+    function toggleChat() {
+      chatOpen = !chatOpen;
+      updateChatDock();
+      if (chatOpen) {
+        const inp = document.getElementById('chat-input');
+        if (inp && inp.focus) { try { inp.focus(); } catch (e) { } }
+      }
+    }
+    function updateChatDock() {
+      const dock = document.getElementById('chat-dock');
+      if (!dock) return;
+      const vis = chatVisible();
+      dock.style.display = vis ? 'block' : 'none';
+      if (!vis) return;
+      const body = document.getElementById('chat-body');
+      const arrow = document.getElementById('chat-arrow');
+      const unread = document.getElementById('chat-unread');
+      const msgs = gameState.chat || [];
+      if (body) body.style.display = chatOpen ? 'block' : 'none';
+      if (arrow) arrow.textContent = chatOpen ? '▾' : '▸';
+      if (chatOpen) {
+        const msgsEl = document.getElementById('chat-msgs');
+        if (msgsEl) {
+          msgsEl.innerHTML = msgs.length
+            ? msgs.map(m => `<div style="margin-top:6px;"><strong style="color:${escapeHtml(m.color)}">${escapeHtml(m.name)}:</strong> ${escapeHtml(m.text)}</div>`).join('')
+            : '<div style="color:#999;margin-top:6px;">Noch keine Nachrichten…</div>';
+          msgsEl.scrollTop = msgsEl.scrollHeight;
+        }
+        chatSeenCount = msgs.length;
+      }
+      if (unread) {
+        const n = msgs.length - chatSeenCount;
+        if (!chatOpen && n > 0) { unread.style.display = 'inline-block'; unread.textContent = n; }
+        else unread.style.display = 'none';
+      }
+    }
+
+    // ============================================================
+    // QUESTION FEEDBACK (👍/👎 with reason, collected at host)
+    // ============================================================
+    let _fbVote = null, _fbVotedFor = null, _fbReasonDone = false;
+    const FB_REASON_LABELS = { zu_einfach: 'zu einfach', zu_schwer: 'zu schwer', unwahr: 'stimmt nicht', kein_muenster: 'kein Münster-Bezug' };
+    function hostAddFeedback(pid, verdict, reason) {
+      const q = gameState.currentQuestion;
+      if (!q || !pid) return;
+      if (verdict !== 'up' && verdict !== 'down') return;
+      if (!gameState.qFeedback) gameState.qFeedback = {};
+      const key = q.q;
+      const fb = gameState.qFeedback[key] || (gameState.qFeedback[key] = { q: q.q, cat: q.cat, type: q.type, up: [], down: [], reasons: {} });
+      fb.up = fb.up.filter(id => id !== pid);
+      fb.down = fb.down.filter(id => id !== pid);
+      (verdict === 'up' ? fb.up : fb.down).push(pid);
+      if (verdict === 'down' && FB_REASON_LABELS[reason]) fb.reasons[pid] = reason;
+      if (verdict === 'up') delete fb.reasons[pid];
+      persistFeedbackLog();
+    }
+    function persistFeedbackLog() {
+      try {
+        const key = 'mk-feedback-log';
+        let log = [];
+        try { log = JSON.parse(localStorage.getItem(key)) || []; } catch (e) { }
+        if (!Array.isArray(log)) log = [];
+        const sid = roomCode + '-' + new Date().toISOString().slice(0, 10);
+        const entry = { sid, ts: Date.now(), feedback: gameState.qFeedback };
+        const idx = log.findIndex(l => l && l.sid === sid);
+        if (idx >= 0) log[idx] = entry; else log.push(entry);
+        localStorage.setItem(key, JSON.stringify(log.slice(-20)));
+      } catch (e) { }
+    }
+    function voteFeedback(v) {
+      const q = gameState.currentQuestion;
+      if (!q) return;
+      _fbVote = v; _fbVotedFor = q.q; _fbReasonDone = (v === 'up');
+      if (role === 'host') hostAddFeedback(myId, v);
+      else sendToHost({ type: 'qfeedback', playerId: myId, verdict: v });
+      const row = document.getElementById('fb-row');
+      if (row) row.innerHTML = renderFeedbackRowContent();
+    }
+    function voteFeedbackReason(r) {
+      const q = gameState.currentQuestion;
+      if (!q) return;
+      _fbReasonDone = true;
+      if (role === 'host') hostAddFeedback(myId, 'down', r);
+      else sendToHost({ type: 'qfeedback', playerId: myId, verdict: 'down', reason: r });
+      const row = document.getElementById('fb-row');
+      if (row) row.innerHTML = renderFeedbackRowContent();
+    }
+    function renderFeedbackRow() {
+      const q = gameState.currentQuestion;
+      if (!q || myId === 'test-host') return '';
+      return `<div id="fb-row" style="text-align:center;margin-top:12px;">${renderFeedbackRowContent()}</div>`;
+    }
+    function renderFeedbackRowContent() {
+      const q = gameState.currentQuestion;
+      if (!q) return '';
+      const voted = _fbVotedFor === q.q ? _fbVote : null;
+      if (!voted) {
+        return `<span style="font-size:0.75rem;color:#999;margin-right:8px;">Frage gut?</span>
+          <button onclick="voteFeedback('up')" style="background:#fff;border:1.5px solid #ddd;border-radius:8px;padding:4px 14px;font-size:1rem;cursor:pointer;">👍</button>
+          <button onclick="voteFeedback('down')" style="background:#fff;border:1.5px solid #ddd;border-radius:8px;padding:4px 14px;font-size:1rem;cursor:pointer;margin-left:6px;">👎</button>`;
+      }
+      if (voted === 'down' && !_fbReasonDone) {
+        const reasons = [['zu_einfach', 'Zu einfach'], ['zu_schwer', 'Zu schwer'], ['unwahr', 'Stimmt nicht']];
+        if (!gameState.includeAllgemein) reasons.push(['kein_muenster', 'Kein Münster-Bezug']);
+        return `<span style="font-size:0.75rem;color:#999;display:block;margin-bottom:6px;">Was war das Problem?</span>
+          <div style="display:flex;flex-wrap:wrap;gap:6px;justify-content:center;">
+            ${reasons.map(([k, label]) => `<button onclick="voteFeedbackReason('${k}')" style="background:#fff;border:1.5px solid #ccc;border-radius:8px;padding:5px 10px;font-size:0.75rem;cursor:pointer;color:#555;">${label}</button>`).join('')}
+            <button onclick="_fbReasonDone=true;document.getElementById('fb-row').innerHTML=renderFeedbackRowContent();" style="background:none;border:none;font-size:0.75rem;cursor:pointer;color:#aaa;text-decoration:underline;">überspringen</button>
+          </div>`;
+      }
+      return `<span style="font-size:0.75rem;color:#2d6a4f;font-weight:600;">✓ Danke fürs Feedback!</span>`;
+    }
+    function renderFeedbackSummary() {
+      const entries = Object.values(gameState.qFeedback || {});
+      if (!entries.length) return '';
+      const ups = entries.reduce((s, e) => s + (e.up || []).length, 0);
+      const downs = entries.reduce((s, e) => s + (e.down || []).length, 0);
+      const flagged = entries.filter(e => (e.down || []).length > 0).sort((a, b) => b.down.length - a.down.length);
+      return `
+        <div style="background:#f8f9fa;border-radius:10px;padding:12px;margin-top:14px;text-align:left;">
+          <div style="font-weight:700;font-size:0.9rem;color:#1d3557;">📝 Fragen-Feedback: 👍 ${ups} · 👎 ${downs}</div>
+          ${flagged.slice(0, 5).map(e => {
+        const counts = {};
+        Object.values(e.reasons || {}).forEach(r => counts[r] = (counts[r] || 0) + 1);
+        const reasonTxt = Object.entries(counts).map(([r, n]) => `${FB_REASON_LABELS[r] || r}${n > 1 ? ' ×' + n : ''}`).join(', ');
+        return `<div style="font-size:0.78rem;color:#555;margin-top:6px;">👎${e.down.length} „${escapeHtml(e.q.slice(0, 60))}${e.q.length > 60 ? '…' : ''}"${reasonTxt ? ` – <em>${reasonTxt}</em>` : ''}</div>`;
+      }).join('')}
+          <button onclick="copyFeedback()" style="margin-top:10px;background:#fff;border:1.5px solid #ccc;border-radius:8px;padding:5px 12px;font-size:0.75rem;cursor:pointer;color:#555;">📋 Feedback-Daten kopieren</button>
+        </div>`;
+    }
+    function copyFeedback() {
+      const data = JSON.stringify(gameState.qFeedback || {}, null, 2);
+      try {
+        navigator.clipboard.writeText(data).then(() => alert('Feedback als JSON kopiert! 📋'), () => prompt('Feedback JSON:', data));
+      } catch (e) { prompt('Feedback JSON:', data); }
+    }
+
+    // ============================================================
+    // MEIN BIERDECKEL (self-managed drink tally, local only)
+    // ============================================================
+    function getMyTab() {
+      try { return parseInt(localStorage.getItem('mk-tab-' + roomCode)) || 0; } catch (e) { return 0; }
+    }
+    function bumpMyTab(d) {
+      const v = Math.max(0, getMyTab() + d);
+      try { localStorage.setItem('mk-tab-' + roomCode, String(v)); } catch (e) { }
+      const el = document.getElementById('my-tab-count');
+      if (el) el.textContent = v;
+    }
+    function renderMyTab() {
+      if (!gameState.deckelMode || myId === 'test-host') return '';
+      return `
+        <div style="background:#fdf6e3;border:2px dashed #c9a227;border-radius:10px;padding:8px 12px;margin-top:12px;display:flex;align-items:center;justify-content:space-between;gap:8px;">
+          <div>
+            <div style="font-weight:700;font-size:0.85rem;color:#8a6d1a;">🍺 Mein Bierdeckel</div>
+            <div style="font-size:0.68rem;color:#999;">Deine Strichliste – zählt nicht ins Spiel</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;flex-shrink:0;">
+            <button onclick="bumpMyTab(-1)" style="width:34px;height:34px;border-radius:50%;border:1.5px solid #c9a227;background:#fff;font-size:1.1rem;font-weight:700;color:#8a6d1a;cursor:pointer;-webkit-tap-highlight-color:transparent;">−</button>
+            <span id="my-tab-count" style="font-family:'Fredoka One',cursive;font-size:1.3rem;color:#8a6d1a;min-width:24px;text-align:center;">${getMyTab()}</span>
+            <button onclick="bumpMyTab(1)" style="width:34px;height:34px;border-radius:50%;border:1.5px solid #c9a227;background:#c9a227;color:#fff;font-size:1.1rem;font-weight:700;cursor:pointer;-webkit-tap-highlight-color:transparent;">＋</button>
+          </div>
+        </div>`;
+    }
+
+    // ============================================================
+    // CONNECTION RESILIENCE (share sheet / app switch must not kill the session)
+    // ============================================================
+    if (typeof document !== 'undefined' && document.addEventListener) {
+      document.addEventListener('pointerdown', function () { getAudioCtx(); }, { once: true });
+      document.addEventListener('visibilitychange', function () {
+        if (typeof document.visibilityState !== 'undefined' && document.visibilityState !== 'visible') return;
+        // Back in foreground: revive signaling connection + audio
+        if (peer && peer.disconnected && !peer.destroyed) { try { peer.reconnect(); } catch (e) { } }
+        if (role === 'player' && hostConn && hostConn.open === false &&
+          gameState.phase !== 'home' && gameState.phase !== 'kicked' && gameState.phase !== 'disconnected') {
+          reconnectAsPlayer();
+        }
+        getAudioCtx();
+      });
+    }
+
+    // Deeplink: ?join=CODE prefills the join flow
+    let joinLinkCode = '';
+    try {
+      const params = new URLSearchParams(location.search || '');
+      const jc = (params.get('join') || '').toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 4);
+      if (jc.length === 4) joinLinkCode = jc;
+    } catch (e) { }
 
     // INIT
     render();
