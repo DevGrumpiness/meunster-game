@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Münster Game – Feedback-Auswertung</title>
+  <meta name="robots" content="noindex, nofollow">
+  <title>Münster Game – Betreiber-Analyse</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
@@ -11,104 +12,179 @@
       background: linear-gradient(165deg, #1d3557 0%, #2b4a75 55%, #3d5a80 100%);
       min-height: 100vh; padding: 24px 14px; color: #2b3a4d;
     }
-    .wrap { max-width: 640px; margin: 0 auto; }
+    .wrap { max-width: 680px; margin: 0 auto; }
     h1 { color: #fff; font-size: 1.15rem; margin-bottom: 4px; }
-    .sub { color: rgba(255,255,255,0.65); font-size: 0.75rem; margin-bottom: 18px; }
+    .sub { color: rgba(255,255,255,0.65); font-size: 0.75rem; margin-bottom: 18px; line-height: 1.5; }
     .card { background: #fff; border-radius: 14px; padding: 16px; margin-bottom: 14px; box-shadow: 0 4px 18px rgba(0,0,0,0.15); }
     h2 { font-size: 0.9rem; color: #1d3557; margin-bottom: 10px; }
     .empty { color: #8a94a0; font-size: 0.8rem; }
     .fb-item { font-size: 0.8rem; padding: 8px 0; border-top: 1px solid #eef1f4; }
-    .fb-item:first-of-type { border-top: none; }
+    .fb-item:first-child { border-top: none; }
     .meta { color: #8a94a0; font-size: 0.68rem; margin-top: 2px; }
     .q-row { font-size: 0.78rem; padding: 7px 0; border-top: 1px solid #eef1f4; display: flex; gap: 10px; align-items: baseline; }
-    .q-row:first-of-type { border-top: none; }
+    .q-row:first-child { border-top: none; }
     .votes { white-space: nowrap; font-size: 0.75rem; }
     .up { color: #2d6a4f; font-weight: 600; }
     .down { color: #b02a37; font-weight: 600; }
     .reasons { color: #b02a37; font-size: 0.7rem; font-style: italic; }
-    .sess { font-size: 0.68rem; color: #8a94a0; margin: 12px 0 4px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; }
-    .btn-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 4px; }
+    .status { font-size: 0.72rem; color: #8a94a0; margin-bottom: 10px; }
+    .status.err { color: #b02a37; }
+    .btn-row { display: flex; gap: 8px; flex-wrap: wrap; }
     button {
       background: #fff; border: 1.5px solid #d5dbe1; border-radius: 10px; padding: 7px 14px;
       font-size: 0.75rem; color: #445; cursor: pointer; font-family: inherit;
     }
+    button.primary { background: #1d3557; color: #fff; border-color: #1d3557; font-weight: 600; }
     button.danger { color: #b02a37; border-color: #e8c5c9; }
     .back { display: inline-block; color: rgba(255,255,255,0.8); font-size: 0.75rem; text-decoration: none; margin-top: 6px; }
   </style>
 </head>
 <body>
   <div class="wrap">
-    <h1>Feedback-Auswertung</h1>
-    <div class="sub">Zeigt Daten von diesem Gerät (Browser-Speicher). Fragen-Feedback sammelt der Host, allgemeines Feedback jeder selbst.</div>
+    <h1>Betreiber-Analyse</h1>
+    <div class="sub">Zieht alle Einsendungen vom zentralen Kanal (ntfy) und merkt sie sich dauerhaft auf diesem Gerät.
+      Der Kanal puffert ~12&nbsp;h – Seite gelegentlich öffnen (oder Topic in der ntfy-App abonnieren), dann geht nichts verloren.</div>
 
     <div class="card">
-      <h2>Allgemeines Feedback</h2>
-      <div id="app-fb"><div class="empty">Keine Einträge auf diesem Gerät.</div></div>
-    </div>
-
-    <div class="card">
-      <h2>Fragen-Feedback</h2>
-      <div id="q-fb"><div class="empty">Keine Einträge auf diesem Gerät.</div></div>
-    </div>
-
-    <div class="card">
+      <div class="status" id="status">Lade …</div>
       <div class="btn-row">
-        <button onclick="copyAll()">JSON kopieren</button>
-        <button class="danger" onclick="clearAll()">Alles löschen</button>
+        <button class="primary" onclick="refresh()">Aktualisieren</button>
+        <button onclick="copyAll()">JSON exportieren</button>
+        <button class="danger" onclick="clearAll()">Archiv löschen</button>
       </div>
     </div>
-    <a class="back" href="/">← zurück zum Spiel</a>
+
+    <div class="card">
+      <h2>Allgemeines Feedback (<span id="app-count">0</span>)</h2>
+      <div id="app-fb"><div class="empty">Noch nichts eingegangen.</div></div>
+    </div>
+
+    <div class="card">
+      <h2>Fragen-Feedback – aggregiert (<span id="q-count">0</span> Fragen)</h2>
+      <div id="q-fb"><div class="empty">Noch nichts eingegangen.</div></div>
+    </div>
+
+    <a class="back" href="/">← zum Spiel</a>
   </div>
 
   <script>
     'use strict';
+    const TOPIC_URL = 'https://ntfy.sh/msgame-fb-ziyqckpnpsfu';
+    const STORE_KEY = 'mk-operator-feedback';
     const REASON_LABELS = { zu_einfach: 'zu einfach', zu_schwer: 'zu schwer', unwahr: 'stimmt nicht', kein_muenster: 'kein Münster-Bezug' };
+
     function esc(s) {
       return String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
     }
-    function load(key) {
-      try { const v = JSON.parse(localStorage.getItem(key)); return Array.isArray(v) ? v : []; } catch (e) { return []; }
+    function loadStore() {
+      try {
+        const v = JSON.parse(localStorage.getItem(STORE_KEY));
+        if (v && typeof v === 'object') return { app: Array.isArray(v.app) ? v.app : [], sessions: v.sessions && typeof v.sessions === 'object' ? v.sessions : {}, seen: Array.isArray(v.seen) ? v.seen : [] };
+      } catch (e) { }
+      return { app: [], sessions: {}, seen: [] };
+    }
+    function saveStore(s) {
+      try { localStorage.setItem(STORE_KEY, JSON.stringify(s)); } catch (e) { }
     }
     function fmtTs(ts) {
       try { return new Date(ts).toLocaleString('de-DE', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }); } catch (e) { return ''; }
     }
-    function render() {
-      const appFb = load('mk-app-feedback');
-      if (appFb.length) {
-        document.getElementById('app-fb').innerHTML = appFb.slice().reverse().map(f => `
-          <div class="fb-item"><strong>${esc(f && f.name || 'Anonym')}:</strong> ${esc(f && f.text || '')}
-            <div class="meta">${esc(fmtTs(f && f.ts))}</div>
+
+    async function refresh() {
+      const st = document.getElementById('status');
+      st.className = 'status'; st.textContent = 'Hole neue Einsendungen …';
+      const store = loadStore();
+      let added = 0;
+      try {
+        const res = await fetch(TOPIC_URL + '/json?poll=1&since=all', { cache: 'no-store' });
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        const text = await res.text();
+        const seen = new Set(store.seen);
+        for (const line of text.split('\n')) {
+          if (!line.trim()) continue;
+          let ev; try { ev = JSON.parse(line); } catch (e) { continue; }
+          if (!ev || ev.event !== 'message' || !ev.id || seen.has(ev.id)) continue;
+          seen.add(ev.id);
+          let payload; try { payload = JSON.parse(ev.message); } catch (e) { continue; }
+          if (!payload || payload.v !== 1 || !payload.data) continue;
+          if (payload.kind === 'app') {
+            const d = payload.data;
+            if (typeof d.text !== 'string' || !d.text.trim()) continue;
+            store.app.push({
+              name: String(d.name || 'Anonym').slice(0, 30),
+              text: String(d.text).slice(0, 500),
+              room: typeof d.room === 'string' ? d.room.slice(0, 12) : null,
+              ts: Number(payload.ts) || Date.now()
+            });
+            added++;
+          } else if (payload.kind === 'questions') {
+            const d = payload.data;
+            if (!d.sid || !Array.isArray(d.items)) continue;
+            const prev = store.sessions[d.sid];
+            // kumulativ: neuester Push pro Session gewinnt
+            if (!prev || (Number(payload.ts) || 0) >= (prev.ts || 0)) {
+              store.sessions[d.sid] = { ts: Number(payload.ts) || Date.now(), players: Number(d.players) || 0, items: d.items.slice(0, 30) };
+            }
+            added++;
+          }
+        }
+        store.seen = [...seen].slice(-2000);
+        store.app = store.app.slice(-500);
+        saveStore(store);
+        st.textContent = 'Stand ' + fmtTs(Date.now()) + ' – ' + added + ' neue Einsendung' + (added === 1 ? '' : 'en') + '.';
+      } catch (e) {
+        st.className = 'status err';
+        st.textContent = 'Abruf fehlgeschlagen (' + esc(e && e.message || '?') + ') – zeige Archiv.';
+      }
+      render(store);
+    }
+
+    function render(store) {
+      const app = store.app.slice().sort((a, b) => b.ts - a.ts);
+      document.getElementById('app-count').textContent = app.length;
+      if (app.length) {
+        document.getElementById('app-fb').innerHTML = app.map(f => `
+          <div class="fb-item"><strong>${esc(f.name)}:</strong> ${esc(f.text)}
+            <div class="meta">${esc(fmtTs(f.ts))}${f.room ? ' · Raum ' + esc(f.room) : ''}</div>
           </div>`).join('');
       }
-      const log = load('mk-feedback-log');
-      if (log.length) {
-        document.getElementById('q-fb').innerHTML = log.slice().reverse().map(sess => {
-          const entries = Object.values(sess && sess.feedback || {});
-          if (!entries.length) return '';
-          return `<div class="sess">${esc(sess.sid || '?')}</div>` + entries.map(e => {
-            const counts = {};
-            Object.values(e.reasons || {}).forEach(r => counts[r] = (counts[r] || 0) + 1);
-            const reasonTxt = Object.entries(counts).map(([r, n]) => `${REASON_LABELS[r] || r}${n > 1 ? ' ×' + n : ''}`).join(', ');
-            return `<div class="q-row">
-              <span class="votes"><span class="up">👍${(e.up || []).length}</span> <span class="down">👎${(e.down || []).length}</span></span>
-              <span>${esc(e.q || '?')}${reasonTxt ? ` <span class="reasons">– ${esc(reasonTxt)}</span>` : ''}</span>
-            </div>`;
-          }).join('');
-        }).join('') || '<div class="empty">Keine Einträge auf diesem Gerät.</div>';
+      // Fragen über alle Sessions aggregieren
+      const agg = {};
+      Object.values(store.sessions).forEach(sess => {
+        (sess.items || []).forEach(it => {
+          if (!it || typeof it.q !== 'string') return;
+          const a = agg[it.q] || (agg[it.q] = { q: it.q, cat: it.cat, up: 0, down: 0, reasons: {} });
+          a.up += Number(it.up) || 0;
+          a.down += Number(it.down) || 0;
+          Object.entries(it.reasons || {}).forEach(([r, n]) => a.reasons[r] = (a.reasons[r] || 0) + (Number(n) || 0));
+        });
+      });
+      const rows = Object.values(agg).sort((a, b) => (b.down - b.up) - (a.down - a.up));
+      document.getElementById('q-count').textContent = rows.length;
+      if (rows.length) {
+        document.getElementById('q-fb').innerHTML = rows.map(e => {
+          const reasonTxt = Object.entries(e.reasons).map(([r, n]) => `${REASON_LABELS[r] || r}${n > 1 ? ' ×' + n : ''}`).join(', ');
+          return `<div class="q-row">
+            <span class="votes"><span class="up">👍${e.up}</span> <span class="down">👎${e.down}</span></span>
+            <span>${esc(e.q)}${reasonTxt ? ` <span class="reasons">– ${esc(reasonTxt)}</span>` : ''}</span>
+          </div>`;
+        }).join('');
       }
     }
+
     function copyAll() {
-      const data = JSON.stringify({ allgemein: load('mk-app-feedback'), fragen: load('mk-feedback-log') }, null, 2);
+      const s = loadStore();
+      const data = JSON.stringify({ allgemein: s.app, sessions: s.sessions }, null, 2);
       try {
-        navigator.clipboard.writeText(data).then(() => alert('JSON kopiert'), () => prompt('Feedback JSON:', data));
-      } catch (e) { prompt('Feedback JSON:', data); }
+        navigator.clipboard.writeText(data).then(() => alert('JSON kopiert'), () => prompt('JSON:', data));
+      } catch (e) { prompt('JSON:', data); }
     }
     function clearAll() {
-      if (!confirm('Feedback-Daten auf diesem Gerät wirklich löschen?')) return;
-      try { localStorage.removeItem('mk-app-feedback'); localStorage.removeItem('mk-feedback-log'); } catch (e) { }
+      if (!confirm('Lokales Archiv wirklich löschen? (Bereits gepufferte Kanal-Nachrichten werden beim nächsten Abruf erneut geladen)')) return;
+      try { localStorage.removeItem(STORE_KEY); } catch (e) { }
       location.reload();
     }
-    render();
+    refresh();
   </script>
 </body>
 </html>

@@ -3765,6 +3765,7 @@
 
     // FINAL
     function renderFinal() {
+      pushQuestionFeedbackIfAny();
       const ranked = [...gameState.players].sort((a, b) => b.score - a.score);
       const podiumOrder = ranked.length >= 3 ? [ranked[1], ranked[0], ranked[2]] : ranked.length >= 2 ? [ranked[1], ranked[0]] : [ranked[0]];
       const heights = [140, 200, 110];
@@ -3839,6 +3840,7 @@
     }
 
     function restartGame() {
+      _qfbSentSid = null; // Fragen-Feedback am Ende des nächsten Spiels erneut pushen (kumulativ, Konsole dedupliziert per sid)
       // Drop players who left or disconnected – no ghost players in the new game
       gameState.players = gameState.players.filter(p => p.connected);
       gameState.currentPlayerIdx = 0;
@@ -4419,7 +4421,32 @@
     // Sicherheit: Text wird NIE als HTML interpretiert – Anzeige nur
     // über escapeHtml, Übertragung als JSON-String, kein User-Text in
     // Attributen/onclick. Host validiert Typ, Länge, Rate-Limit.
+    // Zusätzlich: Push an zentralen Betreiber-Kanal (ntfy) zur Analyse –
+    // fire-and-forget, Fehler beeinträchtigen das Spiel nie.
     // ============================================================
+    const FB_PUSH_URL = 'https://ntfy.sh/msgame-fb-ziyqckpnpsfu';
+    function pushFeedbackRemote(kind, data) {
+      try {
+        const body = JSON.stringify({ v: 1, kind, ts: Date.now(), data });
+        if (body.length > 4000) return;
+        fetch(FB_PUSH_URL, { method: 'POST', body, headers: { 'Title': 'msgame-' + kind } }).catch(() => { });
+      } catch (e) { }
+    }
+    let _qfbSentSid = null;
+    function pushQuestionFeedbackIfAny() {
+      if (role !== 'host') return;
+      const entries = Object.values(gameState.qFeedback || {});
+      if (!entries.length) return;
+      const sid = roomCode + '-' + new Date().toISOString().slice(0, 10);
+      if (_qfbSentSid === sid) return;
+      _qfbSentSid = sid;
+      const compact = entries.map(e => {
+        const counts = {};
+        Object.values(e.reasons || {}).forEach(r => counts[r] = (counts[r] || 0) + 1);
+        return { q: String(e.q || '').slice(0, 80), cat: e.cat, up: (e.up || []).length, down: (e.down || []).length, reasons: counts };
+      });
+      pushFeedbackRemote('questions', { sid, players: gameState.players.length, items: compact.slice(0, 25) });
+    }
     const _appFbLastTs = {};
     function openAppFeedback() {
       const m = document.getElementById('fb-modal');
@@ -4437,6 +4464,7 @@
       const text = (t && typeof t.value === 'string' ? t.value : '').trim().slice(0, 500);
       closeAppFeedback();
       if (!text) return;
+      pushFeedbackRemote('app', { name: (myName || 'Anonym').slice(0, 30), text, room: roomCode || null });
       if (roomCode && role === 'host') {
         hostAddAppFeedback(myId, text);
       } else if (roomCode && role === 'client') {
