@@ -3765,7 +3765,7 @@
 
     // FINAL
     function renderFinal() {
-      pushQuestionFeedbackIfAny();
+      pushQuestionFeedback();
       const ranked = [...gameState.players].sort((a, b) => b.score - a.score);
       const podiumOrder = ranked.length >= 3 ? [ranked[1], ranked[0], ranked[2]] : ranked.length >= 2 ? [ranked[1], ranked[0]] : [ranked[0]];
       const heights = [140, 200, 110];
@@ -3840,7 +3840,6 @@
     }
 
     function restartGame() {
-      _qfbSentSid = null; // Fragen-Feedback am Ende des nächsten Spiels erneut pushen (kumulativ, Konsole dedupliziert per sid)
       // Drop players who left or disconnected – no ghost players in the new game
       gameState.players = gameState.players.filter(p => p.connected);
       gameState.currentPlayerIdx = 0;
@@ -4331,6 +4330,7 @@
       if (verdict === 'down' && FB_REASON_LABELS[reason]) fb.reasons[pid] = reason;
       if (verdict === 'up') delete fb.reasons[pid];
       persistFeedbackLog();
+      scheduleQfbPush();
     }
     function persistFeedbackLog() {
       try {
@@ -4425,28 +4425,57 @@
     // fire-and-forget, Fehler beeinträchtigen das Spiel nie.
     // ============================================================
     const FB_PUSH_URL = 'https://ntfy.sh/msgame-fb-ziyqckpnpsfu';
-    function pushFeedbackRemote(kind, data) {
+    function pushFeedbackRemote(kind, data, ts) {
       try {
-        const body = JSON.stringify({ v: 1, kind, ts: Date.now(), data });
+        const body = JSON.stringify({ v: 1, kind, ts: ts || Date.now(), data });
         if (body.length > 4000) return;
         fetch(FB_PUSH_URL, { method: 'POST', body, headers: { 'Title': 'msgame-' + kind } }).catch(() => { });
       } catch (e) { }
     }
-    let _qfbSentSid = null;
-    function pushQuestionFeedbackIfAny() {
-      if (role !== 'host') return;
-      const entries = Object.values(gameState.qFeedback || {});
-      if (!entries.length) return;
-      const sid = roomCode + '-' + new Date().toISOString().slice(0, 10);
-      if (_qfbSentSid === sid) return;
-      _qfbSentSid = sid;
-      const compact = entries.map(e => {
+    let _qfbTimer = null, _qfbLastBody = '';
+    function compactQfb(feedback) {
+      return Object.values(feedback || {}).map(e => {
         const counts = {};
         Object.values(e.reasons || {}).forEach(r => counts[r] = (counts[r] || 0) + 1);
         return { q: String(e.q || '').slice(0, 80), cat: e.cat, up: (e.up || []).length, down: (e.down || []).length, reasons: counts };
       });
-      pushFeedbackRemote('questions', { sid, players: gameState.players.length, items: compact.slice(0, 25) });
     }
+    // Host pusht laufend (10s-Debounce nach jedem Vote) statt nur am Spielende –
+    // sonst geht Feedback verloren, wenn eine Runde nie das Finale erreicht.
+    // Konsole dedupliziert pro sid (neuester Stand gewinnt), Mehrfachsenden ist ok.
+    function pushQuestionFeedback() {
+      if (role !== 'host' || !roomCode) return;
+      const items = compactQfb(gameState.qFeedback);
+      if (!items.length) return;
+      const sid = roomCode + '-' + new Date().toISOString().slice(0, 10);
+      const payload = { sid, players: gameState.players.length, items: items.slice(0, 25) };
+      while (JSON.stringify(payload).length > 3800 && payload.items.length > 1) payload.items.pop();
+      const bodyKey = sid + '|' + JSON.stringify(payload.items);
+      if (bodyKey === _qfbLastBody) return;
+      _qfbLastBody = bodyKey;
+      pushFeedbackRemote('questions', payload);
+    }
+    function scheduleQfbPush() {
+      if (role !== 'host') return;
+      clearTimeout(_qfbTimer);
+      _qfbTimer = setTimeout(pushQuestionFeedback, 10000);
+    }
+    // Früher wurde nur am Spielende gepusht – auf Geräten früherer Hosts liegen
+    // Votes noch nur lokal (mk-feedback-log). Einmalig pro Gerät nachreichen.
+    function backfillLocalFeedbackOnce() {
+      try {
+        if (localStorage.getItem('mk-qfb-backfill') === '1') return;
+        const log = JSON.parse(localStorage.getItem('mk-feedback-log')) || [];
+        localStorage.setItem('mk-qfb-backfill', '1');
+        if (!Array.isArray(log)) return;
+        log.slice(-10).forEach(l => {
+          if (!l || !l.sid || !l.feedback) return;
+          const items = compactQfb(l.feedback).slice(0, 25);
+          if (items.length) pushFeedbackRemote('questions', { sid: l.sid, players: 0, items }, l.ts);
+        });
+      } catch (e) { }
+    }
+    setTimeout(backfillLocalFeedbackOnce, 3000);
     const _appFbLastTs = {};
     function openAppFeedback() {
       const m = document.getElementById('fb-modal');
