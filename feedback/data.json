@@ -1,20 +1,10 @@
 [
  {
   "id": "2U1hZQ4Gd1rT",
-  "kind": "app",
-  "ts": 1785680714229,
-  "data": {
-   "name": "Anonym",
-   "text": "Top!",
-   "room": null
-  }
+  "kind": "deleted"
  },
  {
   "id": "WP42kk9u7fiJ",
-  "kind": "e2e-test",
-  "ts": 1785681964409,
-  "data": {
-   "note": "Pipeline-Test, id fuer Dedupe behalten"
-  }
+  "kind": "deleted"
  }
 ]
