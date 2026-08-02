@@ -2008,7 +2008,7 @@
       const passRow = document.getElementById('smart10-pass-row');
       if (isMyTurn) {
         const myPts = (smart10.roundPoints && smart10.roundPoints[myId]) || 0;
-        const passHtml = `<button class="btn btn-gold" style="padding:10px 18px;font-size:0.95rem;" onclick="submitSmart10Pass()">${gameState.deckelMode ? '🛡️ Passen – raus ohne Deckel' : `🛡️ Passen – ${myPts} Punkt${myPts === 1 ? '' : 'e'} sichern`}</button>
+        const passHtml = `<button class="btn btn-gold" style="padding:10px 18px;font-size:0.95rem;" onclick="submitSmart10Pass()">${gameState.deckelMode ? `🛡️ Passen – ${myPts} Richtige sichern` : `🛡️ Passen – ${myPts} Punkt${myPts === 1 ? '' : 'e'} sichern`}</button>
         <div style="font-size:0.75rem;color:#888;margin-top:4px;">${gameState.deckelMode ? 'Weiterraten ist mutig – aber ein Fehler gibt einen ❌ Deckel!' : 'Weiterraten bringt mehr – aber ein Fehler kostet alles!'}</div>`;
         if (passRow) {
           passRow.innerHTML = passHtml;
@@ -2062,7 +2062,7 @@
           const hasPassed = (smart10.passed || []).includes(p.id);
           const isBusted = smart10.playerOut.includes(p.id) && !hasPassed;
           const statusLabel = gameState.deckelMode
-            ? (hasPassed ? ' 🛡️' : (isBusted || !p.connected) ? ' – raus' : '')
+            ? (hasPassed ? ` 🛡️ ${(smart10.secured && smart10.secured[p.id]) || 0}` : isBusted ? ' 💥 0' : !p.connected ? ' – raus' : (rp > 0 ? ` ·${rp}` : ''))
             : hasPassed ? ` 💰 +${(smart10.secured && smart10.secured[p.id]) || 0}` : (isBusted || !p.connected) ? ' – raus' : (rp > 0 ? ` ·+${rp}` : '');
           return `
           <div class="smart10-player-pill ${activePlayer && activePlayer.id === p.id ? 'active' : ''} ${smart10.playerOut.includes(p.id) || !p.connected ? 'out' : ''}"
@@ -2691,11 +2691,22 @@
           losers.push(...worstIds);
         }
       } else if (q.type === 'smart10') {
+        // Wenigste Richtige kriegt den Deckel – Verzockt zählt 0.
         const smart10 = gameState.smart10State;
-        if (smart10) {
+        if (smart10 && participantIds.length > 1) {
+          const passedArr = smart10.passed || [];
+          const isBust = id => smart10.playerOut.includes(id) && !passedArr.includes(id);
+          const eff = {};
           participantIds.forEach(id => {
-            if (smart10.playerOut.includes(id) && !(smart10.passed || []).includes(id)) losers.push(id);
+            eff[id] = isBust(id) ? 0 : ((smart10.secured && smart10.secured[id]) || 0);
           });
+          const minEff = Math.min(...participantIds.map(id => eff[id]));
+          let worst = participantIds.filter(id => eff[id] === minEff);
+          // Voller Gleichstand: nur wer sich verzockt hat, kriegt einen (sonst keiner)
+          if (worst.length === participantIds.length) {
+            worst = worst.filter(isBust);
+          }
+          losers.push(...worst);
         }
       }
       // vote: no Deckel – there is no "wrong" answer
@@ -3396,8 +3407,8 @@
       </div>
       ${isMyTurn ? `
       <div id="smart10-pass-row" style="text-align:center;margin:8px 0;">
-        <button class="btn btn-gold" style="padding:10px 18px;font-size:0.95rem;" onclick="submitSmart10Pass()">${gameState.deckelMode ? '🛡️ Passen – raus ohne Deckel' : `🛡️ Passen – ${(smart10.roundPoints && smart10.roundPoints[myId]) || 0} Punkt${((smart10.roundPoints && smart10.roundPoints[myId]) || 0) === 1 ? '' : 'e'} sichern`}</button>
-        <div style="font-size:0.75rem;color:#888;margin-top:4px;">${gameState.deckelMode ? 'Weiterraten ist mutig – aber ein Fehler gibt einen ❌ Deckel!' : 'Weiterraten bringt mehr – aber ein Fehler kostet alles!'}</div>
+        <button class="btn btn-gold" style="padding:10px 18px;font-size:0.95rem;" onclick="submitSmart10Pass()">${gameState.deckelMode ? `🛡️ Passen – ${(smart10.roundPoints && smart10.roundPoints[myId]) || 0} Richtige sichern` : `🛡️ Passen – ${(smart10.roundPoints && smart10.roundPoints[myId]) || 0} Punkt${((smart10.roundPoints && smart10.roundPoints[myId]) || 0) === 1 ? '' : 'e'} sichern`}</button>
+        <div style="font-size:0.75rem;color:#888;margin-top:4px;">${gameState.deckelMode ? 'Wenigste Richtige kriegt den ❌ Deckel – Verzocken zählt null!' : 'Weiterraten bringt mehr – aber ein Fehler kostet alles!'}</div>
       </div>` : ''}
       <div class="question-text">${q.q}</div>
       <div class="smart10-status-row">
@@ -3406,7 +3417,7 @@
         const hasPassed = (smart10.passed || []).includes(p.id);
         const isBusted = smart10.playerOut.includes(p.id) && !hasPassed;
         const statusLabel = gameState.deckelMode
-          ? (hasPassed ? ' 🛡️' : (isBusted || !p.connected) ? ' – raus' : '')
+          ? (hasPassed ? ` 🛡️ ${(smart10.secured && smart10.secured[p.id]) || 0}` : isBusted ? ' 💥 0' : !p.connected ? ' – raus' : (rp > 0 ? ` ·${rp}` : ''))
           : hasPassed ? ` 💰 +${(smart10.secured && smart10.secured[p.id]) || 0}` : (isBusted || !p.connected) ? ' – raus' : (rp > 0 ? ` ·+${rp}` : '');
         return `
           <div class="smart10-player-pill ${activePlayer && activePlayer.id === p.id ? 'active' : ''} ${smart10.playerOut.includes(p.id) || !p.connected ? 'out' : ''}"
@@ -3588,18 +3599,21 @@
           .filter(p => (smart10.playerOut || []).includes(p.id) && !passed.includes(p.id) && (gameState.questionPlayerIds || []).includes(p.id))
           .map(p => ({ ...p, lostPts: lost[p.id] || 0 }));
 
+        const gotDeckel = gameState.deckelMode && (gameState._roundDeckel || []).includes(myId);
         const myBoxClass = gameState.deckelMode
-          ? (iBusted ? 'fail' : 'success')
+          ? (gotDeckel ? 'fail' : 'success')
           : mySecured > 0 ? 'success' : iBusted ? 'fail' : 'info';
         const myBig = gameState.deckelMode
-          ? (iBusted ? '💥 Verzockt – ❌ Deckel!' : '🛡️ Kein Deckel!')
+          ? (gotDeckel ? '❌ Deckel!' : '🛡️ Kein Deckel!')
           : iBusted
             ? (myLost > 0 ? `💥 Verzockt! ${myLost} Punkt${myLost === 1 ? '' : 'e'} verloren` : '❌ Raus')
             : mySecured > 0
               ? `+${mySecured} Punkt${mySecured === 1 ? '' : 'e'} gesichert`
               : '🧩 Runde vorbei';
         const myDetail = gameState.deckelMode
-          ? (iBusted ? 'Ein Fehlgriff – das gibt einen Deckel.' : (iPassed ? 'Rechtzeitig gepasst – sauber durch die Runde.' : 'Sauber durch die Runde.'))
+          ? (gotDeckel
+              ? (iBusted ? 'Verzockt – deine Richtigen zählen null.' : `Nur ${mySecured} Richtige – wenigste am Tisch.`)
+              : (iBusted ? 'Verzockt, aber Gleichstand rettet dich.' : `${mySecured} Richtige – das reicht.`))
           : iBusted
             ? (myLost > 0 ? 'Ein Fehlgriff – deine ungesicherten Punkte sind weg.' : 'Ein Fehlgriff hat dich aus der Runde genommen.')
             : mySecured > 0
@@ -3638,12 +3652,21 @@
           `;
         }).join('')}
       </div>
-      ${gameState.deckelMode ? '' : scorers.length ? `
+      ${gameState.deckelMode ? `
+        <p style="text-align:center;font-weight:700;margin-top:8px;">
+          Richtige: ${(gameState.questionPlayerIds || []).map(pid => {
+            const p = gameState.players.find(pl => pl.id === pid);
+            if (!p) return '';
+            const pBust = (smart10.playerOut || []).includes(pid) && !passed.includes(pid);
+            return `<span style="color:${p.color}">${p.name} ${pBust ? '💥 0' : (secured[pid] || 0)}</span>`;
+          }).filter(Boolean).join(' · ')}
+        </p>
+      ` : scorers.length ? `
         <p style="text-align:center;font-weight:700;margin-top:8px;">
           Gesichert: ${scorers.map(p => `<span style="color:${p.color}">${p.name} +${p.sec}${passed.includes(p.id) ? ' 💰' : ''}</span>`).join(' · ')}
         </p>
       ` : '<p style="text-align:center;color:#888;">In dieser Runde hat niemand gepunktet.</p>'}
-      ${busted.length ? `
+      ${busted.length && !gameState.deckelMode ? `
         <p style="text-align:center;color:#666;font-weight:600;margin-top:6px;">
           💥 Verzockt: ${busted.map(p => `<span style="color:${p.color}">${p.name}${p.lostPts > 0 ? ` (−${p.lostPts})` : ''}</span>`).join(', ')}
         </p>
@@ -4361,6 +4384,7 @@
     function bumpTabItem(i, d) {
       const items = getTabItems();
       if (!items[i]) return;
+      if (d < 0 && items[i].c === 0) { removeTabItem(i); return; }
       items[i].c = Math.max(0, items[i].c + d);
       saveTabItems(items);
       updateTabBox();
@@ -4398,10 +4422,9 @@
               <div style="font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escapeHtml(it.n)}</div>
               ${it.p > 0 ? `<div style="font-size:0.7rem;color:#a58a3d;">${fmtEur(it.p)} · ${fmtEur(it.p * it.c)}</div>` : ''}
             </div>
-            <button onclick="bumpTabItem(${i},-1)" style="width:30px;height:30px;border-radius:50%;border:1.5px solid #c9a227;background:#fff;font-weight:700;color:#8a6d1a;cursor:pointer;-webkit-tap-highlight-color:transparent;">−</button>
+            <button onclick="bumpTabItem(${i},-1)" style="width:30px;height:30px;border-radius:50%;border:1.5px solid ${it.c === 0 ? '#c0752f' : '#c9a227'};background:#fff;font-weight:700;color:${it.c === 0 ? '#c0752f' : '#8a6d1a'};cursor:pointer;-webkit-tap-highlight-color:transparent;">${it.c === 0 ? '✕' : '−'}</button>
             <span style="font-family:'Fredoka One',cursive;font-size:1.05rem;min-width:20px;text-align:center;">${it.c}</span>
             <button onclick="bumpTabItem(${i},1)" style="width:30px;height:30px;border-radius:50%;border:1.5px solid #c9a227;background:#c9a227;color:#fff;font-weight:700;cursor:pointer;-webkit-tap-highlight-color:transparent;">＋</button>
-            <button onclick="removeTabItem(${i})" style="width:26px;height:26px;border:none;background:none;color:#c0752f;font-size:0.9rem;cursor:pointer;-webkit-tap-highlight-color:transparent;">✕</button>
           </div>`).join('') +
         `<div style="display:flex;justify-content:space-between;margin-top:10px;padding-top:8px;border-top:1px solid #eadfc0;font-weight:700;">
             <span>Gesamt</span><span>${fmtEur(total)}</span>
