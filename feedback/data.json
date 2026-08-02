@@ -8,5 +8,13 @@
    "text": "Top!",
    "room": null
   }
+ },
+ {
+  "id": "WP42kk9u7fiJ",
+  "kind": "e2e-test",
+  "ts": 1785681964409,
+  "data": {
+   "note": "Pipeline-Test, id fuer Dedupe behalten"
+  }
  }
 ]
