@@ -30,6 +30,8 @@
     .status { font-size: 0.72rem; color: #8a94a0; margin-bottom: 10px; }
     .status.err { color: #b02a37; }
     .live-tag { background: #fdf3d7; color: #8a6d1a; font-size: 0.62rem; border-radius: 6px; padding: 1px 6px; margin-left: 6px; vertical-align: middle; }
+    .day-head { font-size: 0.72rem; font-weight: 700; color: #1d3557; background: #eef2f7; border-radius: 8px; padding: 4px 10px; margin: 12px 0 2px; }
+    .day-head:first-child { margin-top: 0; }
     .btn-row { display: flex; gap: 8px; flex-wrap: wrap; }
     button {
       background: #fff; border: 1.5px solid #d5dbe1; border-radius: 10px; padding: 7px 14px;
@@ -55,8 +57,7 @@
 
   <div class="wrap" id="console-view" style="display:none;">
     <h1>Feedback-Analyse</h1>
-    <div class="sub">Datenbank: <code>feedback/data.json</code> im Repo. Eine GitHub Action archiviert alle 4&nbsp;Stunden
-      automatisch neue Einsendungen vom Kanal dorthin. Diese Seite zeigt Archiv + noch nicht archivierte Live-Einträge.</div>
+    <div class="sub">Eingesendetes Feedback aus dem Spiel, gruppiert nach Tag.</div>
 
     <div class="card">
       <div class="status" id="status">Lade …</div>
@@ -136,7 +137,7 @@
         return Array.isArray(v) ? v : [];
       } catch (e) { return []; }
     }
-    async function loadLive(knownIds) {
+    async function loadLive(knownIds, purgeTs) {
       const out = [];
       try {
         const res = await fetch(TOPIC_URL + '/json?poll=1&since=all', { cache: 'no-store' });
@@ -148,7 +149,9 @@
           if (!ev || ev.event !== 'message' || !ev.id || knownIds.has(ev.id)) continue;
           let payload; try { payload = JSON.parse(ev.message); } catch (e) { continue; }
           if (!payload || payload.v !== 1 || typeof payload.kind !== 'string' || !payload.data) continue;
-          out.push({ id: ev.id, kind: payload.kind, ts: Number(payload.ts) || (ev.time * 1000), data: payload.data, live: true });
+          const ts = Number(payload.ts) || (ev.time * 1000);
+          if (ts <= purgeTs) continue; // vor der letzten Leerung eingesendet
+          out.push({ id: ev.id, kind: payload.kind, ts, data: payload.data, live: true });
         }
       } catch (e) { }
       return out;
@@ -158,30 +161,53 @@
       const st = document.getElementById('status');
       st.className = 'status'; st.textContent = 'Lade …';
       const archive = await loadArchive();
-      const live = await loadLive(new Set(archive.map(e => e && e.id)));
-      _entries = archive.concat(live);
-      st.textContent = 'Stand ' + fmtTs(Date.now()) + ' – ' + archive.length + ' archiviert, ' + live.length + ' neu (Auto-Archiv alle 4 h).';
+      const purgeTs = Math.max(0, ...archive.filter(e => e && e.kind === 'purge').map(e => Number(e.ts) || 0));
+      const kept = archive.filter(e => e && (Number(e.ts) || 0) > purgeTs);
+      const live = await loadLive(new Set(archive.map(e => e && e.id)), purgeTs);
+      _entries = kept.concat(live);
       render();
+      const nApp = _entries.filter(e => e.kind === 'app').length;
+      st.textContent = 'Stand ' + fmtTs(Date.now()) + ' – ' + nApp + ' allgemein, ' + document.getElementById('q-count').textContent + ' Fragen bewertet.';
+    }
+
+    function dayKey(ts) {
+      const d = new Date(ts);
+      return isNaN(d) ? '0000-00-00' : d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+    }
+    function dayLabel(key) {
+      const d = new Date(key + 'T12:00:00');
+      if (isNaN(d)) return key;
+      return d.toLocaleDateString('de-DE', { weekday: 'short', day: '2-digit', month: '2-digit', year: 'numeric' });
     }
 
     function render() {
+      // Allgemeines Feedback: nach Tag gruppiert, neuester Tag zuerst
       const app = _entries.filter(e => e.kind === 'app' && e.data && typeof e.data.text === 'string')
         .sort((a, b) => (b.ts || 0) - (a.ts || 0));
       document.getElementById('app-count').textContent = app.length;
       if (app.length) {
-        document.getElementById('app-fb').innerHTML = app.map(f => `
-          <div class="fb-item"><strong>${esc(String(f.data.name || 'Anonym').slice(0, 30))}:</strong> ${esc(String(f.data.text).slice(0, 500))}${f.live ? '<span class="live-tag">neu</span>' : ''}
+        const byDay = {};
+        app.forEach(f => { const k = dayKey(f.ts); (byDay[k] = byDay[k] || []).push(f); });
+        document.getElementById('app-fb').innerHTML = Object.keys(byDay).sort().reverse().map(k => `
+          <div class="day-head">${esc(dayLabel(k))}</div>` + byDay[k].map(f => `
+          <div class="fb-item"><strong>${esc(String(f.data.name || 'Anonym').slice(0, 30))}:</strong> ${esc(String(f.data.text).slice(0, 500))}
             <div class="meta">${esc(fmtTs(f.ts))}${f.data.room ? ' · Raum ' + esc(String(f.data.room).slice(0, 12)) : ''}</div>
-          </div>`).join('');
+          </div>`).join('')).join('');
+      } else {
+        document.getElementById('app-fb').innerHTML = '<div class="empty">Noch nichts eingegangen.</div>';
       }
-      // Fragen: pro Session neuester Push, dann über Sessions aggregieren
+      // Fragen: pro Session neuester Push, dann pro Tag aggregieren
       const sessions = {};
       _entries.filter(e => e.kind === 'questions' && e.data && e.data.sid && Array.isArray(e.data.items)).forEach(e => {
         const prev = sessions[e.data.sid];
-        if (!prev || (e.ts || 0) >= (prev.ts || 0)) sessions[e.data.sid] = { ts: e.ts, items: e.data.items };
+        if (!prev || (e.ts || 0) >= (prev.ts || 0)) sessions[e.data.sid] = { ts: e.ts, sid: e.data.sid, items: e.data.items };
       });
-      const agg = {};
+      const days = {};
+      let total = 0;
       Object.values(sessions).forEach(sess => {
+        const sidDate = String(sess.sid).slice(-10);
+        const k = /^\d{4}-\d{2}-\d{2}$/.test(sidDate) ? sidDate : dayKey(sess.ts);
+        const agg = days[k] = days[k] || {};
         sess.items.forEach(it => {
           if (!it || typeof it.q !== 'string') return;
           const a = agg[it.q] || (agg[it.q] = { q: it.q, up: 0, down: 0, reasons: {} });
@@ -190,16 +216,22 @@
           Object.entries(it.reasons || {}).forEach(([r, n]) => a.reasons[r] = (a.reasons[r] || 0) + (Number(n) || 0));
         });
       });
-      const rows = Object.values(agg).sort((a, b) => (b.down - b.up) - (a.down - a.up));
-      document.getElementById('q-count').textContent = rows.length;
-      if (rows.length) {
-        document.getElementById('q-fb').innerHTML = rows.map(e => {
-          const reasonTxt = Object.entries(e.reasons).map(([r, n]) => `${REASON_LABELS[r] || r}${n > 1 ? ' ×' + n : ''}`).join(', ');
-          return `<div class="q-row">
-            <span class="votes"><span class="up">👍${e.up}</span> <span class="down">👎${e.down}</span></span>
-            <span>${esc(e.q.slice(0, 120))}${reasonTxt ? ` <span class="reasons">– ${esc(reasonTxt)}</span>` : ''}</span>
-          </div>`;
+      const dayKeys = Object.keys(days).sort().reverse();
+      dayKeys.forEach(k => total += Object.keys(days[k]).length);
+      document.getElementById('q-count').textContent = total;
+      if (total) {
+        document.getElementById('q-fb').innerHTML = dayKeys.map(k => {
+          const rows = Object.values(days[k]).sort((a, b) => (b.down - b.up) - (a.down - a.up));
+          return `<div class="day-head">${esc(dayLabel(k))}</div>` + rows.map(e => {
+            const reasonTxt = Object.entries(e.reasons).map(([r, n]) => `${REASON_LABELS[r] || r}${n > 1 ? ' ×' + n : ''}`).join(', ');
+            return `<div class="q-row">
+              <span class="votes"><span class="up">👍${e.up}</span> <span class="down">👎${e.down}</span></span>
+              <span>${esc(e.q.slice(0, 120))}${reasonTxt ? ` <span class="reasons">– ${esc(reasonTxt)}</span>` : ''}</span>
+            </div>`;
+          }).join('');
         }).join('');
+      } else {
+        document.getElementById('q-fb').innerHTML = '<div class="empty">Noch nichts eingegangen.</div>';
       }
     }
 

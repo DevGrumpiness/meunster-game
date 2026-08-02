@@ -13,6 +13,8 @@ try { archive = JSON.parse(fs.readFileSync(FILE, 'utf8')); } catch (e) { }
 if (!Array.isArray(archive)) archive = [];
 
 const seen = new Set(archive.map(e => e && e.id));
+// Leerungs-Marker: alles mit ts davor wird nie wieder archiviert
+const purgeTs = Math.max(0, ...archive.filter(e => e && e.kind === 'purge').map(e => Number(e.ts) || 0));
 let added = 0;
 for (const line of text.split('\n')) {
   if (!line.trim()) continue;
@@ -20,10 +22,12 @@ for (const line of text.split('\n')) {
   if (!ev || ev.event !== 'message' || !ev.id || seen.has(ev.id)) continue;
   let payload; try { payload = JSON.parse(ev.message); } catch (e) { continue; }
   if (!payload || payload.v !== 1 || typeof payload.kind !== 'string' || !payload.data) continue;
+  const ts = Number(payload.ts) || (ev.time * 1000) || Date.now();
+  if (ts <= purgeTs) continue;
   archive.push({
     id: String(ev.id).slice(0, 30),
     kind: payload.kind.slice(0, 20),
-    ts: Number(payload.ts) || (ev.time * 1000) || Date.now(),
+    ts,
     data: payload.data
   });
   seen.add(ev.id);

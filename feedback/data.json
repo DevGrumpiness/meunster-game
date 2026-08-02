@@ -1,10 +1,7 @@
-[
+﻿[
  {
-  "id": "2U1hZQ4Gd1rT",
-  "kind": "deleted"
- },
- {
-  "id": "WP42kk9u7fiJ",
-  "kind": "deleted"
+  "id": "purge-1785682786179",
+  "kind": "purge",
+  "ts": 1785682786179
  }
 ]
