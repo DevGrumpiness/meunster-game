@@ -2742,8 +2742,27 @@
             });
           }
         }
+      } else if (q.type === 'vote') {
+        // Differenz zum Gewinner: Minderheits-Wähler kriegen (Siegerstimmen − eigene Stimmen) Deckel.
+        // Patt = keine Deckel, keine Stimme = kein Deckel.
+        const counts = {};
+        participantIds.forEach(id => {
+          const v = gameState.answers[id];
+          if (v !== undefined) counts[v] = (counts[v] || 0) + 1;
+        });
+        let maxVotes = 0;
+        Object.values(counts).forEach(cnt => { if (cnt > maxVotes) maxVotes = cnt; });
+        const topOptions = Object.keys(counts).filter(opt => counts[opt] === maxVotes);
+        if (topOptions.length === 1) {
+          const majorityOpt = +topOptions[0];
+          participantIds.forEach(id => {
+            const v = gameState.answers[id];
+            if (v === undefined || v === majorityOpt) return;
+            const diff = maxVotes - (counts[v] || 0);
+            for (let k = 0; k < diff; k++) losers.push(id);
+          });
+        }
       }
-      // vote: no Deckel – there is no "wrong" answer
 
       losers.forEach(id => {
         gameState.deckel[id] = (gameState.deckel[id] || 0) + 1;
