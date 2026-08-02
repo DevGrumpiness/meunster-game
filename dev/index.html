@@ -972,9 +972,11 @@
     <div id="tab-box"
       style="display:none;background:rgba(253,246,227,0.97);border:1.5px dashed #c9a227;border-radius:12px;box-shadow:0 2px 12px rgba(0,0,0,0.25);overflow:hidden;margin-bottom:8px;">
       <div id="tab-header" onclick="toggleTab()"
-        style="display:flex;justify-content:space-between;align-items:center;padding:9px 14px;cursor:pointer;user-select:none;font-weight:700;color:#8a6d1a;font-size:0.9rem;-webkit-tap-highlight-color:transparent;">
-        <span>🍺 Mein Deckel <span id="tab-total" style="font-weight:600;color:#a58a3d;font-size:0.8rem;"></span></span>
-        <span id="tab-arrow" style="color:#b39b57;">▸</span>
+        style="padding:4px 14px 9px;cursor:pointer;user-select:none;-webkit-tap-highlight-color:transparent;">
+        <div style="width:38px;height:4px;border-radius:2px;background:#d8c98e;margin:4px auto 7px;"></div>
+        <div style="display:flex;justify-content:center;align-items:center;font-weight:700;color:#8a6d1a;font-size:0.9rem;">
+          <span>🍺 Mein Deckel <span id="tab-total" style="font-weight:600;color:#a58a3d;font-size:0.8rem;"></span></span>
+        </div>
       </div>
       <div id="tab-body" style="display:none;">
         <div id="tab-items" style="padding:0 12px 4px;font-size:0.85rem;color:#5c4d1e;"></div>
@@ -4197,7 +4199,7 @@
       if (!dock) return;
       const vis = chatVisible();
       dock.style.display = vis ? 'block' : 'none';
-      if (!vis) return;
+      if (!vis) { syncDockPadding(); return; }
       const body = document.getElementById('chat-body');
       const arrow = document.getElementById('chat-arrow');
       const unread = document.getElementById('chat-unread');
@@ -4219,6 +4221,7 @@
         if (!chatOpen && n > 0) { unread.style.display = 'inline-block'; unread.textContent = n; }
         else unread.style.display = 'none';
       }
+      syncDockPadding();
     }
 
     // ============================================================
@@ -4377,17 +4380,15 @@
       if (!box) return;
       const vis = tabVisible();
       box.style.display = vis ? 'block' : 'none';
-      if (!vis) return;
+      if (!vis) { syncDockPadding(); return; }
       const items = getTabItems();
       const total = items.reduce((s, it) => s + it.p * it.c, 0);
       const count = items.reduce((s, it) => s + it.c, 0);
       const totalEl = document.getElementById('tab-total');
       if (totalEl) totalEl.textContent = count ? `· ${count}× · ${fmtEur(total)}` : '';
       const body = document.getElementById('tab-body');
-      const arrow = document.getElementById('tab-arrow');
       if (body) body.style.display = tabOpen ? 'block' : 'none';
-      if (arrow) arrow.textContent = tabOpen ? '▾' : '▸';
-      if (!tabOpen) return;
+      if (!tabOpen) { syncDockPadding(); return; }
       const list = document.getElementById('tab-items');
       if (!list) return;
       list.innerHTML = items.length
@@ -4405,7 +4406,20 @@
         `<div style="display:flex;justify-content:space-between;margin-top:10px;padding-top:8px;border-top:1px solid #eadfc0;font-weight:700;">
             <span>Gesamt</span><span>${fmtEur(total)}</span>
           </div>`
-        : '<div style="color:#b39b57;margin-top:6px;">Noch nichts auf dem Deckel. Zählt nicht ins Spiel – nur für dich.</div>';
+        : '';
+      syncDockPadding();
+    }
+    // Keep the card's bottom reachable: pad #app by the docks' current height
+    function syncDockPadding() {
+      const appEl = document.getElementById('app');
+      const dock = document.getElementById('chat-dock');
+      if (!appEl || !dock) return;
+      let h = 0;
+      if (dock.style.display !== 'none') {
+        const oh = dock.offsetHeight;
+        if (typeof oh === 'number' && oh > 0) h = oh;
+      }
+      appEl.style.paddingBottom = h ? (h + 34) + 'px' : '';
     }
 
     // ============================================================
