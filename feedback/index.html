@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Münster Game – Feedback-Auswertung</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: linear-gradient(165deg, #1d3557 0%, #2b4a75 55%, #3d5a80 100%);
+      min-height: 100vh; padding: 24px 14px; color: #2b3a4d;
+    }
+    .wrap { max-width: 640px; margin: 0 auto; }
+    h1 { color: #fff; font-size: 1.15rem; margin-bottom: 4px; }
+    .sub { color: rgba(255,255,255,0.65); font-size: 0.75rem; margin-bottom: 18px; }
+    .card { background: #fff; border-radius: 14px; padding: 16px; margin-bottom: 14px; box-shadow: 0 4px 18px rgba(0,0,0,0.15); }
+    h2 { font-size: 0.9rem; color: #1d3557; margin-bottom: 10px; }
+    .empty { color: #8a94a0; font-size: 0.8rem; }
+    .fb-item { font-size: 0.8rem; padding: 8px 0; border-top: 1px solid #eef1f4; }
+    .fb-item:first-of-type { border-top: none; }
+    .meta { color: #8a94a0; font-size: 0.68rem; margin-top: 2px; }
+    .q-row { font-size: 0.78rem; padding: 7px 0; border-top: 1px solid #eef1f4; display: flex; gap: 10px; align-items: baseline; }
+    .q-row:first-of-type { border-top: none; }
+    .votes { white-space: nowrap; font-size: 0.75rem; }
+    .up { color: #2d6a4f; font-weight: 600; }
+    .down { color: #b02a37; font-weight: 600; }
+    .reasons { color: #b02a37; font-size: 0.7rem; font-style: italic; }
+    .sess { font-size: 0.68rem; color: #8a94a0; margin: 12px 0 4px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; }
+    .btn-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 4px; }
+    button {
+      background: #fff; border: 1.5px solid #d5dbe1; border-radius: 10px; padding: 7px 14px;
+      font-size: 0.75rem; color: #445; cursor: pointer; font-family: inherit;
+    }
+    button.danger { color: #b02a37; border-color: #e8c5c9; }
+    .back { display: inline-block; color: rgba(255,255,255,0.8); font-size: 0.75rem; text-decoration: none; margin-top: 6px; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>Feedback-Auswertung</h1>
+    <div class="sub">Zeigt Daten von diesem Gerät (Browser-Speicher). Fragen-Feedback sammelt der Host, allgemeines Feedback jeder selbst.</div>
+
+    <div class="card">
+      <h2>Allgemeines Feedback</h2>
+      <div id="app-fb"><div class="empty">Keine Einträge auf diesem Gerät.</div></div>
+    </div>
+
+    <div class="card">
+      <h2>Fragen-Feedback</h2>
+      <div id="q-fb"><div class="empty">Keine Einträge auf diesem Gerät.</div></div>
+    </div>
+
+    <div class="card">
+      <div class="btn-row">
+        <button onclick="copyAll()">JSON kopieren</button>
+        <button class="danger" onclick="clearAll()">Alles löschen</button>
+      </div>
+    </div>
+    <a class="back" href="/">← zurück zum Spiel</a>
+  </div>
+
+  <script>
+    'use strict';
+    const REASON_LABELS = { zu_einfach: 'zu einfach', zu_schwer: 'zu schwer', unwahr: 'stimmt nicht', kein_muenster: 'kein Münster-Bezug' };
+    function esc(s) {
+      return String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    }
+    function load(key) {
+      try { const v = JSON.parse(localStorage.getItem(key)); return Array.isArray(v) ? v : []; } catch (e) { return []; }
+    }
+    function fmtTs(ts) {
+      try { return new Date(ts).toLocaleString('de-DE', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }); } catch (e) { return ''; }
+    }
+    function render() {
+      const appFb = load('mk-app-feedback');
+      if (appFb.length) {
+        document.getElementById('app-fb').innerHTML = appFb.slice().reverse().map(f => `
+          <div class="fb-item"><strong>${esc(f && f.name || 'Anonym')}:</strong> ${esc(f && f.text || '')}
+            <div class="meta">${esc(fmtTs(f && f.ts))}</div>
+          </div>`).join('');
+      }
+      const log = load('mk-feedback-log');
+      if (log.length) {
+        document.getElementById('q-fb').innerHTML = log.slice().reverse().map(sess => {
+          const entries = Object.values(sess && sess.feedback || {});
+          if (!entries.length) return '';
+          return `<div class="sess">${esc(sess.sid || '?')}</div>` + entries.map(e => {
+            const counts = {};
+            Object.values(e.reasons || {}).forEach(r => counts[r] = (counts[r] || 0) + 1);
+            const reasonTxt = Object.entries(counts).map(([r, n]) => `${REASON_LABELS[r] || r}${n > 1 ? ' ×' + n : ''}`).join(', ');
+            return `<div class="q-row">
+              <span class="votes"><span class="up">👍${(e.up || []).length}</span> <span class="down">👎${(e.down || []).length}</span></span>
+              <span>${esc(e.q || '?')}${reasonTxt ? ` <span class="reasons">– ${esc(reasonTxt)}</span>` : ''}</span>
+            </div>`;
+          }).join('');
+        }).join('') || '<div class="empty">Keine Einträge auf diesem Gerät.</div>';
+      }
+    }
+    function copyAll() {
+      const data = JSON.stringify({ allgemein: load('mk-app-feedback'), fragen: load('mk-feedback-log') }, null, 2);
+      try {
+        navigator.clipboard.writeText(data).then(() => alert('JSON kopiert'), () => prompt('Feedback JSON:', data));
+      } catch (e) { prompt('Feedback JSON:', data); }
+    }
+    function clearAll() {
+      if (!confirm('Feedback-Daten auf diesem Gerät wirklich löschen?')) return;
+      try { localStorage.removeItem('mk-app-feedback'); localStorage.removeItem('mk-feedback-log'); } catch (e) { }
+      location.reload();
+    }
+    render();
+  </script>
+</body>
+</html>
