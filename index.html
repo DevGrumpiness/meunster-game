@@ -958,6 +958,7 @@
 </head>
 
 <body>
+
   <div class="container" id="app"></div>
 
   <div id="sound-toggle" onclick="toggleSound()"
@@ -966,7 +967,28 @@
 
   <div id="chat-dock"
     style="display:none;position:fixed;bottom:22px;left:0;right:0;max-width:600px;margin:0 auto;padding:0 16px;z-index:500;box-sizing:border-box;">
-    <div style="background:rgba(255,255,255,0.95);border-radius:12px;box-shadow:0 2px 12px rgba(0,0,0,0.25);overflow:hidden;">
+    <div id="tab-box"
+      style="display:none;background:rgba(253,246,227,0.97);border:1.5px dashed #c9a227;border-radius:12px;box-shadow:0 2px 12px rgba(0,0,0,0.25);overflow:hidden;margin-bottom:8px;">
+      <div id="tab-header" onclick="toggleTab()"
+        style="display:flex;justify-content:space-between;align-items:center;padding:9px 14px;cursor:pointer;user-select:none;font-weight:700;color:#8a6d1a;font-size:0.9rem;-webkit-tap-highlight-color:transparent;">
+        <span>🍺 Mein Deckel <span id="tab-total" style="font-weight:600;color:#a58a3d;font-size:0.8rem;"></span></span>
+        <span id="tab-arrow" style="color:#b39b57;">▸</span>
+      </div>
+      <div id="tab-body" style="display:none;">
+        <div id="tab-items" style="padding:0 12px 4px;font-size:0.85rem;color:#5c4d1e;"></div>
+        <div style="display:flex;gap:6px;padding:8px 10px;border-top:1px solid #eadfc0;">
+          <input id="tab-item-name" maxlength="30" placeholder="z. B. Großes Bier" autocomplete="off"
+            style="flex:1;min-width:0;border:1.5px solid #d8c98e;border-radius:8px;padding:8px 10px;font-size:16px;font-family:inherit;outline:none;background:#fff;"
+            onkeydown="if(event.key==='Enter'){addTabItem();}" />
+          <input id="tab-item-price" type="number" step="0.10" min="0" inputmode="decimal" placeholder="€"
+            style="width:64px;border:1.5px solid #d8c98e;border-radius:8px;padding:8px 6px;font-size:16px;font-family:inherit;outline:none;background:#fff;"
+            onkeydown="if(event.key==='Enter'){addTabItem();}" />
+          <button onclick="addTabItem()"
+            style="background:#c9a227;color:#fff;border:none;border-radius:8px;padding:8px 14px;font-weight:700;cursor:pointer;font-size:1rem;">＋</button>
+        </div>
+      </div>
+    </div>
+    <div id="chat-card" style="background:rgba(255,255,255,0.95);border-radius:12px;box-shadow:0 2px 12px rgba(0,0,0,0.25);overflow:hidden;">
       <div id="chat-header" onclick="toggleChat()"
         style="display:flex;justify-content:space-between;align-items:center;padding:9px 14px;cursor:pointer;user-select:none;font-weight:700;color:#1d3557;font-size:0.9rem;-webkit-tap-highlight-color:transparent;">
         <span>💬 Chat <span id="chat-unread"
@@ -2823,6 +2845,7 @@
         default: renderHome(); break;
       }
       updateChatDock();
+      updateTabBox();
       updateSoundToggle();
     }
 
@@ -3614,7 +3637,6 @@
       ${renderDeckelResultLine()}
       ${q.fact ? `<div class="fun-fact"><strong>💡 Wusstest du?</strong> ${q.fact}</div>` : ''}
       ${renderFeedbackRow()}
-      ${renderMyTab()}
       ${renderReadySection()}
     </div>
   `;
@@ -3724,7 +3746,6 @@
       ` : ''}
       `}
 
-      ${renderMyTab()}
       ${renderFeedbackSummary()}
 
       ${role === 'host' ? `
@@ -4132,7 +4153,7 @@
       if (!q) return '';
       const voted = _fbVotedFor === q.q ? _fbVote : null;
       if (!voted) {
-        return `<span style="font-size:0.75rem;color:#999;margin-right:8px;">Frage gut?</span>
+        return `<span style="font-size:0.75rem;color:#999;margin-right:8px;">Feedback:</span>
           <button onclick="voteFeedback('up')" style="background:#fff;border:1.5px solid #ddd;border-radius:8px;padding:4px 14px;font-size:1rem;cursor:pointer;">👍</button>
           <button onclick="voteFeedback('down')" style="background:#fff;border:1.5px solid #ddd;border-radius:8px;padding:4px 14px;font-size:1rem;cursor:pointer;margin-left:6px;">👎</button>`;
       }
@@ -4173,31 +4194,90 @@
     }
 
     // ============================================================
-    // MEIN BIERDECKEL (self-managed drink tally, local only)
+    // MEIN DECKEL (self-managed tally: name + price + counter, local only)
     // ============================================================
-    function getMyTab() {
-      try { return parseInt(localStorage.getItem('mk-tab-' + roomCode)) || 0; } catch (e) { return 0; }
+    let tabOpen = false;
+    function tabVisible() {
+      return !!roomCode && myId !== 'test-host' && !!gameState.deckelMode &&
+        ['lobby', 'categorySelect', 'question', 'smart10', 'result', 'final'].includes(gameState.phase);
     }
-    function bumpMyTab(d) {
-      const v = Math.max(0, getMyTab() + d);
-      try { localStorage.setItem('mk-tab-' + roomCode, String(v)); } catch (e) { }
-      const el = document.getElementById('my-tab-count');
-      if (el) el.textContent = v;
+    function getTabItems() {
+      try {
+        const parsed = JSON.parse(localStorage.getItem('mk-tab-' + roomCode));
+        if (!Array.isArray(parsed)) return [];
+        return parsed
+          .filter(it => it && typeof it.n === 'string')
+          .map(it => ({ n: it.n.slice(0, 30), p: Math.max(0, Number(it.p) || 0), c: Math.max(0, parseInt(it.c, 10) || 0) }));
+      } catch (e) { return []; }
     }
-    function renderMyTab() {
-      if (!gameState.deckelMode || myId === 'test-host') return '';
-      return `
-        <div style="background:#fdf6e3;border:2px dashed #c9a227;border-radius:10px;padding:8px 12px;margin-top:12px;display:flex;align-items:center;justify-content:space-between;gap:8px;">
-          <div>
-            <div style="font-weight:700;font-size:0.85rem;color:#8a6d1a;">🍺 Mein Bierdeckel</div>
-            <div style="font-size:0.68rem;color:#999;">Deine Strichliste – zählt nicht ins Spiel</div>
-          </div>
-          <div style="display:flex;align-items:center;gap:10px;flex-shrink:0;">
-            <button onclick="bumpMyTab(-1)" style="width:34px;height:34px;border-radius:50%;border:1.5px solid #c9a227;background:#fff;font-size:1.1rem;font-weight:700;color:#8a6d1a;cursor:pointer;-webkit-tap-highlight-color:transparent;">−</button>
-            <span id="my-tab-count" style="font-family:'Fredoka One',cursive;font-size:1.3rem;color:#8a6d1a;min-width:24px;text-align:center;">${getMyTab()}</span>
-            <button onclick="bumpMyTab(1)" style="width:34px;height:34px;border-radius:50%;border:1.5px solid #c9a227;background:#c9a227;color:#fff;font-size:1.1rem;font-weight:700;cursor:pointer;-webkit-tap-highlight-color:transparent;">＋</button>
-          </div>
-        </div>`;
+    function saveTabItems(items) {
+      try { localStorage.setItem('mk-tab-' + roomCode, JSON.stringify(items)); } catch (e) { }
+    }
+    function fmtEur(v) { return v.toFixed(2).replace('.', ',') + ' €'; }
+    function addTabItem() {
+      const nameEl = document.getElementById('tab-item-name');
+      const priceEl = document.getElementById('tab-item-price');
+      const n = ((nameEl && nameEl.value) || '').trim().slice(0, 30);
+      if (!n) return;
+      const p = Math.max(0, parseFloat(String((priceEl && priceEl.value) || '').replace(',', '.')) || 0);
+      const items = getTabItems();
+      items.push({ n, p, c: 1 });
+      saveTabItems(items);
+      if (nameEl) nameEl.value = '';
+      if (priceEl) priceEl.value = '';
+      updateTabBox();
+    }
+    function bumpTabItem(i, d) {
+      const items = getTabItems();
+      if (!items[i]) return;
+      items[i].c = Math.max(0, items[i].c + d);
+      saveTabItems(items);
+      updateTabBox();
+    }
+    function removeTabItem(i) {
+      const items = getTabItems();
+      items.splice(i, 1);
+      saveTabItems(items);
+      updateTabBox();
+    }
+    function toggleTab() {
+      tabOpen = !tabOpen;
+      updateTabBox();
+    }
+    function updateTabBox() {
+      const box = document.getElementById('tab-box');
+      if (!box) return;
+      const vis = tabVisible();
+      box.style.display = vis ? 'block' : 'none';
+      if (!vis) return;
+      const items = getTabItems();
+      const total = items.reduce((s, it) => s + it.p * it.c, 0);
+      const count = items.reduce((s, it) => s + it.c, 0);
+      const totalEl = document.getElementById('tab-total');
+      if (totalEl) totalEl.textContent = count ? `· ${count}× · ${fmtEur(total)}` : '';
+      const body = document.getElementById('tab-body');
+      const arrow = document.getElementById('tab-arrow');
+      if (body) body.style.display = tabOpen ? 'block' : 'none';
+      if (arrow) arrow.textContent = tabOpen ? '▾' : '▸';
+      if (!tabOpen) return;
+      const list = document.getElementById('tab-items');
+      if (!list) return;
+      list.innerHTML = items.length
+        ? items.map((it, i) => `
+          <div style="display:flex;align-items:center;gap:8px;margin-top:8px;">
+            <div style="flex:1;min-width:0;">
+              <div style="font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escapeHtml(it.n)}</div>
+              ${it.p > 0 ? `<div style="font-size:0.7rem;color:#a58a3d;">${fmtEur(it.p)} · ${fmtEur(it.p * it.c)}</div>` : ''}
+            </div>
+            <button onclick="bumpTabItem(${i},-1)" style="width:30px;height:30px;border-radius:50%;border:1.5px solid #c9a227;background:#fff;font-weight:700;color:#8a6d1a;cursor:pointer;-webkit-tap-highlight-color:transparent;">−</button>
+            <span style="font-family:'Fredoka One',cursive;font-size:1.05rem;min-width:20px;text-align:center;">${it.c}</span>
+            <button onclick="bumpTabItem(${i},1)" style="width:30px;height:30px;border-radius:50%;border:1.5px solid #c9a227;background:#c9a227;color:#fff;font-weight:700;cursor:pointer;-webkit-tap-highlight-color:transparent;">＋</button>
+            <button onclick="removeTabItem(${i})" style="width:26px;height:26px;border:none;background:none;color:#c0752f;font-size:0.9rem;cursor:pointer;-webkit-tap-highlight-color:transparent;">✕</button>
+          </div>`).join('') +
+        `<div style="display:flex;justify-content:space-between;margin-top:10px;padding-top:8px;border-top:1px solid #eadfc0;font-weight:700;">
+            <span>Gesamt</span><span>${fmtEur(total)}</span>
+          </div>`
+        : '<div style="color:#b39b57;margin-top:6px;">Noch nichts auf dem Deckel. Zählt nicht ins Spiel – nur für dich.</div>';
     }
 
     // ============================================================
