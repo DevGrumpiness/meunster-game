@@ -40,7 +40,20 @@
   </style>
 </head>
 <body>
-  <div class="wrap">
+  <div class="wrap" id="login-view" style="display:none;">
+    <h1>Feedback-Analyse</h1>
+    <div class="sub">Zugang nur für Betreiber.</div>
+    <div class="card" style="max-width:340px;">
+      <h2>Anmelden</h2>
+      <input id="login-user" type="text" placeholder="Benutzer" autocomplete="username" style="width:100%;box-sizing:border-box;border:1.5px solid #d5dbe1;border-radius:10px;padding:9px 10px;font-size:0.85rem;font-family:inherit;margin-bottom:8px;">
+      <input id="login-pass" type="password" placeholder="Passwort" autocomplete="current-password" style="width:100%;box-sizing:border-box;border:1.5px solid #d5dbe1;border-radius:10px;padding:9px 10px;font-size:0.85rem;font-family:inherit;margin-bottom:10px;">
+      <div class="status err" id="login-err" style="display:none;">Falsche Zugangsdaten.</div>
+      <button class="primary" onclick="doLogin()" style="width:100%;">Anmelden</button>
+    </div>
+    <a class="back" href="/">← zum Spiel</a>
+  </div>
+
+  <div class="wrap" id="console-view" style="display:none;">
     <h1>Feedback-Analyse</h1>
     <div class="sub">Datenbank: <code>feedback/data.json</code> im Repo. Eine GitHub Action archiviert alle 4&nbsp;Stunden
       automatisch neue Einsendungen vom Kanal dorthin. Diese Seite zeigt Archiv + noch nicht archivierte Live-Einträge.</div>
@@ -68,6 +81,41 @@
 
   <script>
     'use strict';
+    // Zugangsschutz: SHA-256-Verifier (GitHub Pages kann kein .htaccess).
+    // Schützt die Konsole vor Zufallsbesuchern; data.json bleibt technisch
+    // erreichbar, enthält aber nur das ohnehin freiwillig gesendete Feedback.
+    const AUTH_HASH = '637f5689951e2848d56963620c34abe2ae5be695c058d678cb42f2d7985e7bf3';
+    const AUTH_SALT = '|ms-game-fb-v1';
+    const AUTH_KEY = 'mk-fb-auth';
+
+    async function sha256Hex(s) {
+      const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s));
+      return [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2, '0')).join('');
+    }
+    async function doLogin() {
+      const u = (document.getElementById('login-user').value || '').trim().toLowerCase();
+      const p = document.getElementById('login-pass').value || '';
+      const h = await sha256Hex(u + ':' + p + AUTH_SALT);
+      if (h === AUTH_HASH) {
+        try { sessionStorage.setItem(AUTH_KEY, h); } catch (e) { }
+        showConsole();
+      } else {
+        document.getElementById('login-err').style.display = 'block';
+      }
+    }
+    function showConsole() {
+      document.getElementById('login-view').style.display = 'none';
+      document.getElementById('console-view').style.display = 'block';
+      refresh();
+    }
+    function initAuth() {
+      let ok = false;
+      try { ok = sessionStorage.getItem(AUTH_KEY) === AUTH_HASH; } catch (e) { }
+      if (ok) { showConsole(); return; }
+      document.getElementById('login-view').style.display = 'block';
+      document.getElementById('login-pass').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+    }
+
     const TOPIC_URL = 'https://ntfy.sh/msgame-fb-ziyqckpnpsfu';
     const REASON_LABELS = { zu_einfach: 'zu einfach', zu_schwer: 'zu schwer', unwahr: 'stimmt nicht', kein_muenster: 'kein Münster-Bezug' };
 
@@ -161,7 +209,7 @@
         navigator.clipboard.writeText(data).then(() => alert('JSON kopiert'), () => prompt('JSON:', data));
       } catch (e) { prompt('JSON:', data); }
     }
-    refresh();
+    initAuth();
   </script>
 </body>
 </html>
