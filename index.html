@@ -3641,6 +3641,12 @@
         const roundDeckelIds = gameState._roundDeckel || [];
         const myDeckelCount = gameState.deckelMode ? roundDeckelIds.filter(id => id === myId).length : 0;
         const gotDeckel = myDeckelCount > 0;
+        // Gleichstands-Erkennung (wie in awardDeckelForRound): alle effektiv gleich?
+        const s10Pids = gameState.questionPlayerIds || [];
+        const s10IsBust = id => (smart10.playerOut || []).includes(id) && !passed.includes(id);
+        const s10Effs = s10Pids.map(id => s10IsBust(id) ? 0 : (secured[id] || 0));
+        const s10Tie = s10Effs.length > 1 && Math.max(...s10Effs) === Math.min(...s10Effs);
+        const s10AllBusted = s10Pids.length > 0 && s10Pids.every(s10IsBust);
         const myBoxClass = gameState.deckelMode
           ? (gotDeckel ? 'fail' : 'success')
           : mySecured > 0 ? 'success' : iBusted ? 'fail' : 'info';
@@ -3653,7 +3659,9 @@
               : '🧩 Runde vorbei';
         const myDetail = gameState.deckelMode
           ? (gotDeckel
-              ? (iBusted ? 'Verzockt – volle Distanz zum Besten kassiert.' : `Nur ${mySecured} Richtige – Letzter zahlt den Abstand zum Besten.`)
+              ? (s10Tie
+                  ? (s10AllBusted ? 'Alle verzockt – jeder kriegt 1 Deckel.' : 'Gleichstand – nur Verzockte kriegen 1 Deckel.')
+                  : (iBusted ? 'Verzockt – volle Distanz zum Besten kassiert.' : `Nur ${mySecured} Richtige – Letzter zahlt den Abstand zum Besten.`))
               : (iBusted ? 'Verzockt, aber Gleichstand rettet dich.' : `${mySecured} Richtige – das reicht.`))
           : iBusted
             ? (myLost > 0 ? 'Ein Fehlgriff – deine ungesicherten Punkte sind weg.' : 'Ein Fehlgriff hat dich aus der Runde genommen.')
@@ -3745,7 +3753,7 @@
         return '<p style="text-align:center;color:#888;font-size:0.85rem;margin-top:8px;">✅ Diese Runde keine Deckel!</p>';
       }
       return `<p style="text-align:center;font-weight:700;margin-top:8px;color:#8a6d1a;">
-        ❌ Deckel für: ${losers.map(p => `<span style="color:${p.color}">${p.name} ${counts[p.id] > 1 ? `+${counts[p.id]} ` : ''}(${gameState.deckel[p.id] || 0})</span>`).join(', ')}${gameState.halbzeit < 3 ? `<span style="font-weight:400;color:#888;"> · Pott: ${gameState.deckelPot}</span>` : ''}
+        ❌ Deckel für: ${losers.map(p => `<span style="color:${p.color}">${p.name} +${counts[p.id]} (${gameState.deckel[p.id] || 0})</span>`).join(', ')}${gameState.halbzeit < 3 ? `<span style="font-weight:400;color:#888;"> · Pott: ${gameState.deckelPot}</span>` : ''}
       </p>`;
     }
 
