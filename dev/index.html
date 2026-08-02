@@ -314,8 +314,11 @@
     }
 
     .score-chip.active {
-      transform: scale(1.08);
-      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+      background: var(--pc) !important;
+      border-color: var(--pc) !important;
+      color: #fff !important;
+      transform: scale(1.06);
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.18);
     }
 
     .score-chip .pts {
@@ -617,8 +620,10 @@
     }
 
     .smart10-player-pill.active {
-      transform: scale(1.04);
-      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.12);
+      background: var(--pc) !important;
+      color: #fff !important;
+      transform: scale(1.05);
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15);
     }
 
     .smart10-player-pill.out {
@@ -765,25 +770,6 @@
     }
 
     /* Current player banner */
-    .turn-banner {
-      text-align: center;
-      padding: 7px 10px;
-      border-radius: 8px;
-      margin-bottom: 10px;
-      font-weight: 600;
-      font-size: 0.85rem;
-      color: #2b3440;
-    }
-
-    .turn-dot {
-      display: inline-block;
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      margin-right: 7px;
-      vertical-align: 1px;
-    }
-
     /* Podium */
     .podium {
       display: flex;
@@ -2028,19 +2014,11 @@
       const playersStillIn = participantPlayers.filter(p => p.connected && !smart10.playerOut.includes(p.id)).length;
       const isParticipating = participantIds.includes(myId);
 
-      // Update turn banner
-      const banner = document.querySelector('.turn-banner');
-      if (banner) {
-        const bannerText = !activePlayer ? 'Die Runde endet …'
-          : isMyTurn ? 'Du bist dran'
-            : isOut ? 'Du bist raus – schau zu'
-              : !isParticipating ? `${activePlayer.name} spielt diese Runde`
-                : `${activePlayer.name} ist dran`;
-        const bc = activePlayer ? activePlayer.color : '#457b9d';
-        banner.innerHTML = `<span class="turn-dot" style="background:${bc}"></span>${bannerText}`;
-        banner.style.background = bc + '12';
-        banner.style.border = `1px solid ${bc}40`;
-      }
+      // Update scoreboard chips: highlight whose turn it is
+      document.querySelectorAll('.score-chip').forEach((chip, i) => {
+        const p = gameState.players[i];
+        chip.classList.toggle('active', !!p && !!activePlayer && p.id === activePlayer.id);
+      });
 
       // Update pass button (appears only on my turn)
       const passRow = document.getElementById('smart10-pass-row');
@@ -2048,8 +2026,9 @@
         const passHtml = smart10PassRowInnerHtml(smart10);
         if (passRow) {
           passRow.innerHTML = passHtml;
-        } else if (banner) {
-          banner.insertAdjacentHTML('afterend', `<div id="smart10-pass-row" style="text-align:center;margin:8px 0;">${passHtml}</div>`);
+        } else {
+          const anchor = document.querySelector('.question-type-label');
+          if (anchor) anchor.insertAdjacentHTML('afterend', `<div id="smart10-pass-row" style="text-align:center;margin:8px 0;">${passHtml}</div>`);
         }
       } else if (passRow) {
         passRow.remove();
@@ -2102,8 +2081,8 @@
             : hasPassed ? ` 💰 +${(smart10.secured && smart10.secured[p.id]) || 0}` : (isBusted || !p.connected) ? ' – raus' : (rp > 0 ? ` ·+${rp}` : '');
           return `
           <div class="smart10-player-pill ${activePlayer && activePlayer.id === p.id ? 'active' : ''} ${smart10.playerOut.includes(p.id) || !p.connected ? 'out' : ''}"
-               style="background:${p.color}22;color:${p.color};border-color:${p.color};">
-            ${activePlayer && activePlayer.id === p.id ? '🎯 ' : ''}${p.name}${statusLabel}
+               style="--pc:${p.color};background:${p.color}22;color:${p.color};border-color:${p.color};">
+            ${p.name}${statusLabel}
           </div>
         `;
         }).join('');
@@ -3429,26 +3408,12 @@
       const eliminatedCount = smart10.eliminated.filter(Boolean).length;
       const playersStillIn = participantPlayers.filter(p => p.connected && !smart10.playerOut.includes(p.id)).length;
 
-      const bannerText = !activePlayer
-        ? 'Die Runde endet …'
-        : isMyTurn
-          ? 'Du bist dran'
-          : isOut
-            ? 'Du bist raus – schau zu'
-            : !isParticipating
-              ? `${activePlayer.name} spielt diese Runde`
-              : `${activePlayer.name} ist dran`;
-      const bannerColor = activePlayer ? activePlayer.color : cat.color;
-
       app.innerHTML = `
     <div class="category-badge-wrapper"><div class="category-badge" style="background:${cat.color}">${cat.icon} ${cat.name}</div></div>
     <div class="card" style="border-top:5px solid ${cat.color};border-radius:0 0 var(--ms-radius) var(--ms-radius);">
       ${renderScoreboard()}
       ${renderRoundInfo()}
       <div class="question-type-label">Wahr oder Falsch · reihum</div>
-      <div class="turn-banner" style="background:${bannerColor}12;border:1px solid ${bannerColor}40;">
-        <span class="turn-dot" style="background:${bannerColor}"></span>${bannerText}
-      </div>
       ${isMyTurn ? `
       <div id="smart10-pass-row" style="text-align:center;margin:8px 0;">
         ${smart10PassRowInnerHtml(smart10)}
@@ -3464,8 +3429,8 @@
           : hasPassed ? ` 💰 +${(smart10.secured && smart10.secured[p.id]) || 0}` : (isBusted || !p.connected) ? ' – raus' : (rp > 0 ? ` ·+${rp}` : '');
         return `
           <div class="smart10-player-pill ${activePlayer && activePlayer.id === p.id ? 'active' : ''} ${smart10.playerOut.includes(p.id) || !p.connected ? 'out' : ''}"
-               style="background:${p.color}22;color:${p.color};border-color:${p.color};">
-            ${activePlayer && activePlayer.id === p.id ? '🎯 ' : ''}${p.name}${statusLabel}
+               style="--pc:${p.color};background:${p.color}22;color:${p.color};border-color:${p.color};">
+            ${p.name}${statusLabel}
           </div>
         `;
       }).join('')}
@@ -4009,14 +3974,17 @@
     function renderScoreboard() {
       const maxScore = Math.max(...gameState.players.map(p => p.score));
       const hasScores = maxScore > 0;
+      const s10ActiveId = gameState.phase === 'smart10' && gameState.smart10State
+        ? (gameState.players[gameState.smart10State.currentTurnIdx] || {}).id
+        : null;
       return `
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
       <div class="scoreboard" style="margin-bottom:0;flex:1;">
         ${gameState.players.map((p, i) => {
         const isLeader = hasScores && p.score === maxScore;
         return `
-          <div class="score-chip ${gameState.phase === 'smart10' && i === gameState.currentPlayerIdx ? 'active' : ''}" style="background:${p.color}1a;border:1.5px solid ${p.color}55;color:#2b3a4d;position:relative;">
-           <span style="width:8px;height:8px;border-radius:50%;background:${p.color};flex-shrink:0;"></span>${!gameState.deckelMode && isLeader ? '👑 ' : ''}${gameState.deckelMode && (gameState.halbzeitLosers || []).includes(p.id) ? '🥊 ' : ''}${p.name.slice(0, 8)}${gameState.deckelMode ? '' : ` <span class="pts">${p.score}</span>`}${gameState.deckelMode && gameState.phase !== 'lobby' ? ` <span style="opacity:0.9;">❌${gameState.deckel[p.id] || 0}</span>` : ''}${role === 'host' && p.id !== myId ? `<span onclick="if(confirm('${p.name} entfernen?'))kickPlayer('${p.id}')" style="position:absolute;top:-6px;right:-6px;background:rgba(0,0,0,0.55);color:#fff;border-radius:50%;width:16px;height:16px;font-size:10px;line-height:16px;text-align:center;cursor:pointer;">✕</span>` : ''}
+          <div class="score-chip ${p.id === s10ActiveId ? 'active' : ''}" style="--pc:${p.color};background:${p.color}1a;border:1.5px solid ${p.color}55;color:#2b3a4d;position:relative;">
+           ${!gameState.deckelMode && isLeader ? '👑 ' : ''}${gameState.deckelMode && (gameState.halbzeitLosers || []).includes(p.id) ? '🥊 ' : ''}${p.name.slice(0, 8)}${gameState.deckelMode ? '' : ` <span class="pts">${p.score}</span>`}${gameState.deckelMode && gameState.phase !== 'lobby' ? ` <span style="opacity:0.9;">❌${gameState.deckel[p.id] || 0}</span>` : ''}${role === 'host' && p.id !== myId ? `<span onclick="if(confirm('${p.name} entfernen?'))kickPlayer('${p.id}')" style="position:absolute;top:-6px;right:-6px;background:rgba(0,0,0,0.55);color:#fff;border-radius:50%;width:16px;height:16px;font-size:10px;line-height:16px;text-align:center;cursor:pointer;">✕</span>` : ''}
           </div>
         `;
       }).join('')}

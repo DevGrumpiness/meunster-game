@@ -2014,6 +2014,12 @@
         banner.style.background = activePlayer ? activePlayer.color : '';
       }
 
+      // Update scoreboard chips: highlight whose turn it is
+      document.querySelectorAll('.score-chip').forEach((chip, i) => {
+        const p = gameState.players[i];
+        chip.classList.toggle('active', !!p && !!activePlayer && p.id === activePlayer.id);
+      });
+
       // Update pass button (appears only on my turn)
       const passRow = document.getElementById('smart10-pass-row');
       if (isMyTurn) {
@@ -4011,13 +4017,16 @@
     function renderScoreboard() {
       const maxScore = Math.max(...gameState.players.map(p => p.score));
       const hasScores = maxScore > 0;
+      const s10ActiveId = gameState.phase === 'smart10' && gameState.smart10State
+        ? (gameState.players[gameState.smart10State.currentTurnIdx] || {}).id
+        : null;
       return `
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
       <div class="scoreboard" style="margin-bottom:0;flex:1;">
         ${gameState.players.map((p, i) => {
         const isLeader = hasScores && p.score === maxScore;
         return `
-          <div class="score-chip ${gameState.phase === 'smart10' && i === gameState.currentPlayerIdx ? 'active' : ''}" style="background:${p.color};position:relative;">
+          <div class="score-chip ${p.id === s10ActiveId ? 'active' : ''}" style="background:${p.color};position:relative;">
            ${!gameState.deckelMode && isLeader ? '👑 ' : ''}${gameState.deckelMode && (gameState.halbzeitLosers || []).includes(p.id) ? '🥊 ' : ''}${p.name.slice(0, 8)}${gameState.deckelMode ? '' : ` <span class="pts">${p.score}</span>`}${gameState.deckelMode && gameState.phase !== 'lobby' ? ` <span style="opacity:0.9;">❌${gameState.deckel[p.id] || 0}</span>` : ''}${role === 'host' && p.id !== myId ? `<span onclick="if(confirm('${p.name} entfernen?'))kickPlayer('${p.id}')" style="position:absolute;top:-6px;right:-6px;background:rgba(0,0,0,0.55);color:#fff;border-radius:50%;width:16px;height:16px;font-size:10px;line-height:16px;text-align:center;cursor:pointer;">✕</span>` : ''}
           </div>
         `;
