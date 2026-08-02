@@ -23,7 +23,7 @@
       --ms-red: #e63946;
       --ms-bg: #f1faee;
       --ms-card: #ffffff;
-      --ms-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+      --ms-shadow: 0 4px 20px rgba(0, 0, 0, 0.14);
       --ms-radius: 16px;
     }
 
@@ -35,27 +35,14 @@
 
     body {
       font-family: 'Nunito', sans-serif;
-      background: #1d3557;
+      background: linear-gradient(165deg, #1d3557 0%, #24555e 55%, #2d6a4f 100%);
+      background-attachment: fixed;
       min-height: 100vh;
       min-height: 100dvh;
       color: #1d1d1d;
       overflow-x: hidden;
       -webkit-tap-highlight-color: transparent;
       position: relative;
-    }
-
-    body::before {
-      content: '';
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/M%C3%BCnster%2C_Prinzipalmarkt_--_2019_--_3558.jpg/1920px-M%C3%BCnster%2C_Prinzipalmarkt_--_2019_--_3558.jpg');
-      background-size: cover;
-      background-position: center;
-      filter: blur(8px) brightness(0.4);
-      z-index: -1;
     }
 
     .container {
@@ -71,10 +58,10 @@
     }
 
     .card {
-      background: rgba(255, 255, 255, 0.8);
+      background: #ffffff;
       border-radius: var(--ms-radius);
       box-shadow: var(--ms-shadow);
-      padding: 28px 20px;
+      padding: 24px 20px;
       width: 100%;
       animation: fadeIn 0.35s ease;
     }
@@ -319,11 +306,10 @@
       display: flex;
       align-items: center;
       gap: 5px;
-      padding: 5px 10px;
+      padding: 4px 10px;
       border-radius: 20px;
-      font-weight: 400;
+      font-weight: 800;
       font-size: 0.75rem;
-      color: white;
       transition: all 0.3s;
     }
 
@@ -662,17 +648,20 @@
     }
 
     .result-box.success {
-      background: #d4edda;
+      background: #f0faf4;
+      border: 1px solid #b7e4c7;
       color: var(--ms-green);
     }
 
     .result-box.fail {
-      background: #f8d7da;
+      background: #fdf1f2;
+      border: 1px solid #f2c6cb;
       color: var(--ms-red);
     }
 
     .result-box.info {
-      background: #e8f4f8;
+      background: #eef6fb;
+      border: 1px solid #cfe2f0;
       color: var(--ms-blue);
     }
 
@@ -863,8 +852,8 @@
       text-align: center;
       margin-bottom: 12px;
       font-weight: 600;
-      color: #666;
-      font-size: 0.9rem;
+      color: #8a94a1;
+      font-size: 0.8rem;
     }
 
     .answer-count {
@@ -3337,7 +3326,7 @@
 
       app.innerHTML = `
     <div class="category-badge-wrapper"><div class="category-badge" style="background:${cat.color}">${cat.icon} ${cat.name}</div></div>
-    <div class="card" style="border:3px solid ${cat.color}">
+    <div class="card" style="border-top:5px solid ${cat.color};border-radius:0 0 var(--ms-radius) var(--ms-radius);">
       ${renderScoreboard()}
       ${renderRoundInfo()}
       ${inFinale ? `<div style="text-align:center;background:#1d3557;color:#fff;border-radius:8px;padding:8px;margin-bottom:10px;font-weight:700;font-size:.9rem;">🥊 FINALE: ${finalists.map(p => `<span style="color:#ffd166">${p.name}</span>`).join(' vs ')}${isSpectator ? ' – du schaust zu!' : ''}</div>` : ''}
@@ -3398,7 +3387,7 @@
 
       app.innerHTML = `
     <div class="category-badge-wrapper"><div class="category-badge" style="background:${cat.color}">${cat.icon} ${cat.name}</div></div>
-    <div class="card" style="border:3px solid ${cat.color}">
+    <div class="card" style="border-top:5px solid ${cat.color};border-radius:0 0 var(--ms-radius) var(--ms-radius);">
       ${renderScoreboard()}
       ${renderRoundInfo()}
       <div class="question-type-label">🧩 Wahr oder Falsch – Reihum rätseln!</div>
@@ -3676,7 +3665,7 @@
 
       app.innerHTML = `
     <div class="category-badge-wrapper"><div class="category-badge" style="background:${cat.color}">${cat.icon} ${cat.name}</div></div>
-    <div class="card" style="border:3px solid ${cat.color}">
+    <div class="card" style="border-top:5px solid ${cat.color};border-radius:0 0 var(--ms-radius) var(--ms-radius);">
       ${renderScoreboard()}
       <div class="question-text">${q.q}</div>
       ${resultContent}
@@ -3952,8 +3941,8 @@
         ${gameState.players.map((p, i) => {
         const isLeader = hasScores && p.score === maxScore;
         return `
-          <div class="score-chip ${gameState.phase === 'smart10' && i === gameState.currentPlayerIdx ? 'active' : ''}" style="background:${p.color};position:relative;">
-           ${!gameState.deckelMode && isLeader ? '👑 ' : ''}${gameState.deckelMode && (gameState.halbzeitLosers || []).includes(p.id) ? '🥊 ' : ''}${p.name.slice(0, 8)}${gameState.deckelMode ? '' : ` <span class="pts">${p.score}</span>`}${gameState.deckelMode && gameState.phase !== 'lobby' ? ` <span style="opacity:0.9;">❌${gameState.deckel[p.id] || 0}</span>` : ''}${role === 'host' && p.id !== myId ? `<span onclick="if(confirm('${p.name} entfernen?'))kickPlayer('${p.id}')" style="position:absolute;top:-6px;right:-6px;background:rgba(0,0,0,0.55);color:#fff;border-radius:50%;width:16px;height:16px;font-size:10px;line-height:16px;text-align:center;cursor:pointer;">✕</span>` : ''}
+          <div class="score-chip ${gameState.phase === 'smart10' && i === gameState.currentPlayerIdx ? 'active' : ''}" style="background:${p.color}1a;border:1.5px solid ${p.color}55;color:#2b3a4d;position:relative;">
+           <span style="width:8px;height:8px;border-radius:50%;background:${p.color};flex-shrink:0;"></span>${!gameState.deckelMode && isLeader ? '👑 ' : ''}${gameState.deckelMode && (gameState.halbzeitLosers || []).includes(p.id) ? '🥊 ' : ''}${p.name.slice(0, 8)}${gameState.deckelMode ? '' : ` <span class="pts">${p.score}</span>`}${gameState.deckelMode && gameState.phase !== 'lobby' ? ` <span style="opacity:0.9;">❌${gameState.deckel[p.id] || 0}</span>` : ''}${role === 'host' && p.id !== myId ? `<span onclick="if(confirm('${p.name} entfernen?'))kickPlayer('${p.id}')" style="position:absolute;top:-6px;right:-6px;background:rgba(0,0,0,0.55);color:#fff;border-radius:50%;width:16px;height:16px;font-size:10px;line-height:16px;text-align:center;cursor:pointer;">✕</span>` : ''}
           </div>
         `;
       }).join('')}
@@ -4318,7 +4307,7 @@
     function renderFeedbackRow() {
       const q = gameState.currentQuestion;
       if (!q || myId === 'test-host') return '';
-      return `<div id="fb-row" style="text-align:center;margin-top:12px;">${renderFeedbackRowContent()}</div>`;
+      return `<div id="fb-row" style="text-align:center;margin-top:14px;padding-top:10px;border-top:1px solid #eef1f4;">${renderFeedbackRowContent()}</div>`;
     }
     function renderFeedbackRowContent() {
       const q = gameState.currentQuestion;
