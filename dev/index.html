@@ -1010,6 +1010,20 @@
     </div>
   </div>
 
+  <div id="qrscan-overlay" style="display:none;position:fixed;inset:0;background:#000;z-index:99990;">
+    <video id="qrscan-video" autoplay playsinline muted
+      style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;"></video>
+    <div
+      style="position:absolute;top:0;left:0;right:0;padding:16px;text-align:center;color:#fff;font-weight:700;font-size:1rem;background:linear-gradient(rgba(0,0,0,0.65),transparent);pointer-events:none;">
+      QR-Code des Raums scannen</div>
+    <div
+      style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:min(62vw,260px);height:min(62vw,260px);border:3px solid rgba(255,255,255,0.9);border-radius:18px;box-shadow:0 0 0 100vmax rgba(0,0,0,0.35);pointer-events:none;">
+    </div>
+    <button onclick="stopQrScan()"
+      style="position:absolute;bottom:28px;left:50%;transform:translateX(-50%);background:rgba(255,255,255,0.92);color:#1d3557;border:none;border-radius:12px;padding:12px 28px;font-weight:700;font-size:1rem;font-family:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent;">✕
+      Abbrechen</button>
+  </div>
+
   <script>
     // ============================================================
     // MÜNSTER GAME – MULTIPLAYER (PeerJS WebRTC)
@@ -2870,7 +2884,10 @@
       <div id="joinSection" class="${joinLinkCode ? '' : 'hidden'}" style="margin-top:20px;">
         ${joinLinkCode ? `<div style="text-align:center;background:#e8f4ea;border:2px solid var(--ms-green);border-radius:8px;padding:8px;margin-bottom:10px;font-size:0.85rem;font-weight:600;color:#2d6a4f;">🔗 Einladung für Raum ${joinLinkCode} – nur noch Name eingeben!</div>` : ''}
         <label style="font-weight:700;display:block;margin-bottom:6px;">Raum-Code:</label>
-        <input class="input-field code-input" id="codeInput" placeholder="ABCD" maxlength="4" value="${joinLinkCode}" />
+        <div style="display:flex;gap:8px;align-items:stretch;">
+          <input class="input-field code-input" id="codeInput" placeholder="ABCD" maxlength="4" value="${joinLinkCode}" style="flex:1;min-width:0;margin-bottom:0;" />
+          ${canScanQr() ? `<button onclick="startQrScan()" title="QR-Code scannen" style="flex-shrink:0;width:58px;border:2px solid var(--ms-gold);background:#fff8e6;border-radius:10px;font-size:1.5rem;cursor:pointer;-webkit-tap-highlight-color:transparent;">📷</button>` : ''}
+        </div>
         <div class="btn-row">
           <button class="btn btn-gold" onclick="onJoinRoom()">Beitreten!</button>
         </div>
@@ -3974,6 +3991,115 @@
       const show = gameState.phase !== 'home';
       btn.style.display = show ? 'flex' : 'none';
       btn.textContent = soundOn ? '🔊' : '🔇';
+    }
+
+    // ============================================================
+    // QR-SCANNER (join via camera; BarcodeDetector, jsQR fallback)
+    // ============================================================
+    let _qrStream = null, _qrScanActive = false, _qrDetector = null, _qrTimer = null;
+    function canScanQr() {
+      try {
+        return typeof navigator !== 'undefined' && !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia) &&
+          (typeof isSecureContext === 'undefined' || isSecureContext);
+      } catch (e) { return false; }
+    }
+    function extractRoomCode(text) {
+      const t = String(text || '').trim();
+      if (/^[A-Za-z0-9]{4}$/.test(t)) return t.toUpperCase();
+      try {
+        const u = new URL(t);
+        const jc = (u.searchParams.get('join') || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+        if (jc.length === 4) return jc;
+      } catch (e) { }
+      return null;
+    }
+    function loadJsQR() {
+      return new Promise(resolve => {
+        if (typeof window === 'undefined' || window.jsQR) return resolve(!!(typeof window !== 'undefined' && window.jsQR));
+        const s = document.createElement('script');
+        s.src = 'https://unpkg.com/jsqr@1.4.0/dist/jsQR.js';
+        s.onload = () => resolve(!!window.jsQR);
+        s.onerror = () => resolve(false);
+        document.body.appendChild(s);
+        setTimeout(() => resolve(!!window.jsQR), 6000);
+      });
+    }
+    async function startQrScan() {
+      if (!canScanQr() || _qrScanActive) return;
+      _qrDetector = null;
+      try {
+        if ('BarcodeDetector' in window) _qrDetector = new BarcodeDetector({ formats: ['qr_code'] });
+      } catch (e) { _qrDetector = null; }
+      if (!_qrDetector) {
+        const ok = await loadJsQR();
+        if (!ok) { alert('QR-Scanner konnte nicht geladen werden – bitte Code eintippen.'); return; }
+      }
+      try {
+        _qrStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' }, audio: false });
+      } catch (e) {
+        alert('Kein Kamera-Zugriff – bitte Code eintippen oder Kamera-Berechtigung erlauben.');
+        return;
+      }
+      const overlay = document.getElementById('qrscan-overlay');
+      const video = document.getElementById('qrscan-video');
+      if (!overlay || !video) { stopQrScan(); return; }
+      video.srcObject = _qrStream;
+      try { await video.play(); } catch (e) { }
+      overlay.style.display = 'block';
+      _qrScanActive = true;
+      qrScanTick();
+    }
+    function stopQrScan() {
+      _qrScanActive = false;
+      clearTimeout(_qrTimer);
+      const overlay = document.getElementById('qrscan-overlay');
+      const video = document.getElementById('qrscan-video');
+      if (overlay) overlay.style.display = 'none';
+      if (video) video.srcObject = null;
+      if (_qrStream) {
+        try { _qrStream.getTracks().forEach(tr => tr.stop()); } catch (e) { }
+        _qrStream = null;
+      }
+    }
+    async function qrScanTick() {
+      if (!_qrScanActive) return;
+      const video = document.getElementById('qrscan-video');
+      let raw = null;
+      if (video && video.readyState >= 2 && video.videoWidth > 0) {
+        if (_qrDetector) {
+          try {
+            const codes = await _qrDetector.detect(video);
+            if (codes && codes.length) raw = codes[0].rawValue;
+          } catch (e) { }
+        } else if (window.jsQR) {
+          try {
+            const w = Math.min(video.videoWidth, 640);
+            const h = Math.round(video.videoHeight * (w / video.videoWidth));
+            const cv = document.createElement('canvas');
+            cv.width = w; cv.height = h;
+            const ctx = cv.getContext('2d', { willReadFrequently: true });
+            ctx.drawImage(video, 0, 0, w, h);
+            const img = ctx.getImageData(0, 0, w, h);
+            const res = window.jsQR(img.data, w, h, { inversionAttempts: 'dontInvert' });
+            if (res && res.data) raw = res.data;
+          } catch (e) { }
+        }
+      }
+      if (raw != null) {
+        const code = extractRoomCode(raw);
+        if (code) { onQrDetected(code); return; }
+      }
+      if (_qrScanActive) _qrTimer = setTimeout(qrScanTick, 140);
+    }
+    function onQrDetected(code) {
+      stopQrScan();
+      try { if (navigator.vibrate) navigator.vibrate(60); } catch (e) { }
+      const codeEl = document.getElementById('codeInput');
+      if (codeEl) codeEl.value = code;
+      const nameEl = document.getElementById('nameInput');
+      const name = nameEl ? nameEl.value.trim() : '';
+      if (name) { onJoinRoom(); }
+      else if (nameEl) { try { nameEl.focus(); } catch (e) { } }
     }
 
     // ============================================================
