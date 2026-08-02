@@ -1807,6 +1807,18 @@
           hostAddFeedback(conn._playerId || data.playerId, data.verdict, data.reason);
           break;
         }
+        case 'leave': {
+          // Player left deliberately (e.g. "Zurück zum Start") – remove completely
+          const pid = conn._playerId || data.playerId;
+          const idx = gameState.players.findIndex(p => p.id === pid);
+          if (idx !== -1) {
+            gameState.players.splice(idx, 1);
+            if (gameState.currentPlayerIdx >= gameState.players.length) gameState.currentPlayerIdx = 0;
+          }
+          connections = connections.filter(c => c._playerId !== pid);
+          broadcastState();
+          break;
+        }
       }
     }
 
@@ -3676,6 +3688,7 @@
     <div class="category-badge-wrapper"><div class="category-badge" style="background:${cat.color}">${cat.icon} ${cat.name}</div></div>
     <div class="card" style="border:3px solid ${cat.color}">
       ${renderScoreboard()}
+      ${renderRoundInfo()}
       <div class="question-text">${q.q}</div>
       ${resultContent}
       ${renderDeckelResultLine()}
@@ -3800,7 +3813,7 @@
         </div>
       ` : `
         <div class="btn-row">
-          <button class="btn btn-secondary" onclick="location.reload()">↩️ Zurück zum Start</button>
+          <button class="btn btn-secondary" onclick="leaveGame()">↩️ Zurück zum Start</button>
         </div>
       `}
     </div>
@@ -3808,6 +3821,10 @@
     }
 
     function restartGame() {
+      // Drop players who left or disconnected – no ghost players in the new game
+      gameState.players = gameState.players.filter(p => p.connected);
+      gameState.currentPlayerIdx = 0;
+      gameState.readyPlayers = [];
       gameState.phase = 'lobby';
       gameState.round = 0;
       gameState.players.forEach(p => p.score = 0);
@@ -3827,6 +3844,12 @@
       gameState._roundDeckel = [];
       gameState._deckelEvent = null;
       broadcastState();
+    }
+
+    // Player leaves deliberately: tell the host first, then reload
+    function leaveGame() {
+      try { sendToHost({ type: 'leave', playerId: myId }); } catch (e) { }
+      setTimeout(() => location.reload(), 250);
     }
 
     function onReady() {
@@ -3929,8 +3952,12 @@
           const [a, b] = gameState.finaleIds || [];
           const pa = gameState.players.find(p => p.id === a);
           const pb = gameState.players.find(p => p.id === b);
-          const vs = pa && pb ? ` · ${pa.name} vs ${pb.name}` : '';
-          return `<div class="round-info">🥊 FINALE · Frage ${gameState.finaleRound + 1}${vs}</div>`;
+          const qn = gameState.finaleRound + 1;
+          const stand = pa && pb ? `${pa.name} ${gameState.deckel[a] || 0}❌ · ${pb.name} ${gameState.deckel[b] || 0}❌` : '';
+          const hint = qn <= 3
+            ? `Frage ${qn}/3 – danach zahlt, wer mehr ❌ hat`
+            : `Frage ${qn} · Sudden Death – der nächste Unterschied entscheidet!`;
+          return `<div class="round-info">🥊 FINALE${stand ? ' · ' + stand : ''}<br><span style="font-size:0.9em;">${hint}</span></div>`;
         }
         const roundInHalf = gameState.round - gameState.halbzeitStartRound;
         const hz1Loser = gameState.halbzeit === 2 && gameState.halbzeitLosers[0]
