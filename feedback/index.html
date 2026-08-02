@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="robots" content="noindex, nofollow">
-  <title>Münster Game – Betreiber-Analyse</title>
+  <title>Münster Game – Feedback-Analyse</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
@@ -29,28 +29,27 @@
     .reasons { color: #b02a37; font-size: 0.7rem; font-style: italic; }
     .status { font-size: 0.72rem; color: #8a94a0; margin-bottom: 10px; }
     .status.err { color: #b02a37; }
+    .live-tag { background: #fdf3d7; color: #8a6d1a; font-size: 0.62rem; border-radius: 6px; padding: 1px 6px; margin-left: 6px; vertical-align: middle; }
     .btn-row { display: flex; gap: 8px; flex-wrap: wrap; }
     button {
       background: #fff; border: 1.5px solid #d5dbe1; border-radius: 10px; padding: 7px 14px;
       font-size: 0.75rem; color: #445; cursor: pointer; font-family: inherit;
     }
     button.primary { background: #1d3557; color: #fff; border-color: #1d3557; font-weight: 600; }
-    button.danger { color: #b02a37; border-color: #e8c5c9; }
     .back { display: inline-block; color: rgba(255,255,255,0.8); font-size: 0.75rem; text-decoration: none; margin-top: 6px; }
   </style>
 </head>
 <body>
   <div class="wrap">
-    <h1>Betreiber-Analyse</h1>
-    <div class="sub">Zieht alle Einsendungen vom zentralen Kanal (ntfy) und merkt sie sich dauerhaft auf diesem Gerät.
-      Der Kanal puffert ~12&nbsp;h – Seite gelegentlich öffnen (oder Topic in der ntfy-App abonnieren), dann geht nichts verloren.</div>
+    <h1>Feedback-Analyse</h1>
+    <div class="sub">Datenbank: <code>feedback/data.json</code> im Repo. Eine GitHub Action archiviert alle 4&nbsp;Stunden
+      automatisch neue Einsendungen vom Kanal dorthin. Diese Seite zeigt Archiv + noch nicht archivierte Live-Einträge.</div>
 
     <div class="card">
       <div class="status" id="status">Lade …</div>
       <div class="btn-row">
         <button class="primary" onclick="refresh()">Aktualisieren</button>
         <button onclick="copyAll()">JSON exportieren</button>
-        <button class="danger" onclick="clearAll()">Archiv löschen</button>
       </div>
     </div>
 
@@ -70,90 +69,74 @@
   <script>
     'use strict';
     const TOPIC_URL = 'https://ntfy.sh/msgame-fb-ziyqckpnpsfu';
-    const STORE_KEY = 'mk-operator-feedback';
     const REASON_LABELS = { zu_einfach: 'zu einfach', zu_schwer: 'zu schwer', unwahr: 'stimmt nicht', kein_muenster: 'kein Münster-Bezug' };
 
     function esc(s) {
       return String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
     }
-    function loadStore() {
-      try {
-        const v = JSON.parse(localStorage.getItem(STORE_KEY));
-        if (v && typeof v === 'object') return { app: Array.isArray(v.app) ? v.app : [], sessions: v.sessions && typeof v.sessions === 'object' ? v.sessions : {}, seen: Array.isArray(v.seen) ? v.seen : [] };
-      } catch (e) { }
-      return { app: [], sessions: {}, seen: [] };
-    }
-    function saveStore(s) {
-      try { localStorage.setItem(STORE_KEY, JSON.stringify(s)); } catch (e) { }
-    }
     function fmtTs(ts) {
       try { return new Date(ts).toLocaleString('de-DE', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }); } catch (e) { return ''; }
     }
 
-    async function refresh() {
-      const st = document.getElementById('status');
-      st.className = 'status'; st.textContent = 'Hole neue Einsendungen …';
-      const store = loadStore();
-      let added = 0;
+    let _entries = [];
+
+    async function loadArchive() {
+      try {
+        const res = await fetch('data.json?ts=' + Date.now(), { cache: 'no-store' });
+        if (!res.ok) return [];
+        const v = await res.json();
+        return Array.isArray(v) ? v : [];
+      } catch (e) { return []; }
+    }
+    async function loadLive(knownIds) {
+      const out = [];
       try {
         const res = await fetch(TOPIC_URL + '/json?poll=1&since=all', { cache: 'no-store' });
-        if (!res.ok) throw new Error('HTTP ' + res.status);
+        if (!res.ok) return out;
         const text = await res.text();
-        const seen = new Set(store.seen);
         for (const line of text.split('\n')) {
           if (!line.trim()) continue;
           let ev; try { ev = JSON.parse(line); } catch (e) { continue; }
-          if (!ev || ev.event !== 'message' || !ev.id || seen.has(ev.id)) continue;
-          seen.add(ev.id);
+          if (!ev || ev.event !== 'message' || !ev.id || knownIds.has(ev.id)) continue;
           let payload; try { payload = JSON.parse(ev.message); } catch (e) { continue; }
-          if (!payload || payload.v !== 1 || !payload.data) continue;
-          if (payload.kind === 'app') {
-            const d = payload.data;
-            if (typeof d.text !== 'string' || !d.text.trim()) continue;
-            store.app.push({
-              name: String(d.name || 'Anonym').slice(0, 30),
-              text: String(d.text).slice(0, 500),
-              room: typeof d.room === 'string' ? d.room.slice(0, 12) : null,
-              ts: Number(payload.ts) || Date.now()
-            });
-            added++;
-          } else if (payload.kind === 'questions') {
-            const d = payload.data;
-            if (!d.sid || !Array.isArray(d.items)) continue;
-            const prev = store.sessions[d.sid];
-            // kumulativ: neuester Push pro Session gewinnt
-            if (!prev || (Number(payload.ts) || 0) >= (prev.ts || 0)) {
-              store.sessions[d.sid] = { ts: Number(payload.ts) || Date.now(), players: Number(d.players) || 0, items: d.items.slice(0, 30) };
-            }
-            added++;
-          }
+          if (!payload || payload.v !== 1 || typeof payload.kind !== 'string' || !payload.data) continue;
+          out.push({ id: ev.id, kind: payload.kind, ts: Number(payload.ts) || (ev.time * 1000), data: payload.data, live: true });
         }
-        store.seen = [...seen].slice(-2000);
-        store.app = store.app.slice(-500);
-        saveStore(store);
-        st.textContent = 'Stand ' + fmtTs(Date.now()) + ' – ' + added + ' neue Einsendung' + (added === 1 ? '' : 'en') + '.';
-      } catch (e) {
-        st.className = 'status err';
-        st.textContent = 'Abruf fehlgeschlagen (' + esc(e && e.message || '?') + ') – zeige Archiv.';
-      }
-      render(store);
+      } catch (e) { }
+      return out;
     }
 
-    function render(store) {
-      const app = store.app.slice().sort((a, b) => b.ts - a.ts);
+    async function refresh() {
+      const st = document.getElementById('status');
+      st.className = 'status'; st.textContent = 'Lade …';
+      const archive = await loadArchive();
+      const live = await loadLive(new Set(archive.map(e => e && e.id)));
+      _entries = archive.concat(live);
+      st.textContent = 'Stand ' + fmtTs(Date.now()) + ' – ' + archive.length + ' archiviert, ' + live.length + ' neu (Auto-Archiv alle 4 h).';
+      render();
+    }
+
+    function render() {
+      const app = _entries.filter(e => e.kind === 'app' && e.data && typeof e.data.text === 'string')
+        .sort((a, b) => (b.ts || 0) - (a.ts || 0));
       document.getElementById('app-count').textContent = app.length;
       if (app.length) {
         document.getElementById('app-fb').innerHTML = app.map(f => `
-          <div class="fb-item"><strong>${esc(f.name)}:</strong> ${esc(f.text)}
-            <div class="meta">${esc(fmtTs(f.ts))}${f.room ? ' · Raum ' + esc(f.room) : ''}</div>
+          <div class="fb-item"><strong>${esc(String(f.data.name || 'Anonym').slice(0, 30))}:</strong> ${esc(String(f.data.text).slice(0, 500))}${f.live ? '<span class="live-tag">neu</span>' : ''}
+            <div class="meta">${esc(fmtTs(f.ts))}${f.data.room ? ' · Raum ' + esc(String(f.data.room).slice(0, 12)) : ''}</div>
           </div>`).join('');
       }
-      // Fragen über alle Sessions aggregieren
+      // Fragen: pro Session neuester Push, dann über Sessions aggregieren
+      const sessions = {};
+      _entries.filter(e => e.kind === 'questions' && e.data && e.data.sid && Array.isArray(e.data.items)).forEach(e => {
+        const prev = sessions[e.data.sid];
+        if (!prev || (e.ts || 0) >= (prev.ts || 0)) sessions[e.data.sid] = { ts: e.ts, items: e.data.items };
+      });
       const agg = {};
-      Object.values(store.sessions).forEach(sess => {
-        (sess.items || []).forEach(it => {
+      Object.values(sessions).forEach(sess => {
+        sess.items.forEach(it => {
           if (!it || typeof it.q !== 'string') return;
-          const a = agg[it.q] || (agg[it.q] = { q: it.q, cat: it.cat, up: 0, down: 0, reasons: {} });
+          const a = agg[it.q] || (agg[it.q] = { q: it.q, up: 0, down: 0, reasons: {} });
           a.up += Number(it.up) || 0;
           a.down += Number(it.down) || 0;
           Object.entries(it.reasons || {}).forEach(([r, n]) => a.reasons[r] = (a.reasons[r] || 0) + (Number(n) || 0));
@@ -166,23 +149,17 @@
           const reasonTxt = Object.entries(e.reasons).map(([r, n]) => `${REASON_LABELS[r] || r}${n > 1 ? ' ×' + n : ''}`).join(', ');
           return `<div class="q-row">
             <span class="votes"><span class="up">👍${e.up}</span> <span class="down">👎${e.down}</span></span>
-            <span>${esc(e.q)}${reasonTxt ? ` <span class="reasons">– ${esc(reasonTxt)}</span>` : ''}</span>
+            <span>${esc(e.q.slice(0, 120))}${reasonTxt ? ` <span class="reasons">– ${esc(reasonTxt)}</span>` : ''}</span>
           </div>`;
         }).join('');
       }
     }
 
     function copyAll() {
-      const s = loadStore();
-      const data = JSON.stringify({ allgemein: s.app, sessions: s.sessions }, null, 2);
+      const data = JSON.stringify(_entries, null, 2);
       try {
         navigator.clipboard.writeText(data).then(() => alert('JSON kopiert'), () => prompt('JSON:', data));
       } catch (e) { prompt('JSON:', data); }
-    }
-    function clearAll() {
-      if (!confirm('Lokales Archiv wirklich löschen? (Bereits gepufferte Kanal-Nachrichten werden beim nächsten Abruf erneut geladen)')) return;
-      try { localStorage.removeItem(STORE_KEY); } catch (e) { }
-      location.reload();
     }
     refresh();
   </script>

@@ -1,0 +1,30 @@
+name: Feedback archivieren
+
+on:
+  schedule:
+    - cron: '17 */4 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: archive-feedback
+
+jobs:
+  archive:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: node scripts/archive-feedback.mjs
+      - name: Commit bei Änderungen
+        run: |
+          if ! git diff --quiet feedback/data.json; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add feedback/data.json
+            git commit -m "Feedback-Archiv aktualisieren"
+            git push
+          else
+            echo "Keine neuen Einträge."
+          fi
