@@ -3681,7 +3681,9 @@
       <div class="question-text">${q.q}</div>
       ${resultContent}
       ${renderDeckelResultLine()}
-      ${q.fact ? `<div class="fun-fact"><strong>💡 Wusstest du?</strong> ${q.fact}</div>` : ''}
+      ${q.fact ? (_factOpen && _factQIdx === q.idx
+        ? `<div class="fun-fact" onclick="toggleFunFact()" style="cursor:pointer;"><strong>💡 Wusstest du?</strong> ${q.fact}</div>`
+        : `<div onclick="toggleFunFact()" style="margin-top:12px;text-align:center;cursor:pointer;font-size:0.8rem;color:#a58a3d;-webkit-tap-highlight-color:transparent;">💡 Wusstest du? <span style="opacity:0.55;">▸</span></div>`) : ''}
       ${renderFeedbackRow()}
       ${renderReadySection()}
     </div>
@@ -3912,14 +3914,30 @@
       return '';
     }
 
+    // Fun-Fact collapse (default closed, per question)
+    let _factOpen = false, _factQIdx = -1;
+    function toggleFunFact() {
+      const q = gameState.currentQuestion;
+      if (!q) return;
+      if (_factQIdx !== q.idx) { _factQIdx = q.idx; _factOpen = true; }
+      else _factOpen = !_factOpen;
+      render();
+    }
+
     // Round info line – shows Halbzeit/Finale in Deckel-Modus
     function renderRoundInfo() {
       if (gameState.deckelMode) {
         if (gameState.halbzeit === 3) {
-          return `<div class="round-info">🥊 FINALE · Frage ${gameState.finaleRound + 1}</div>`;
+          const [a, b] = gameState.finaleIds || [];
+          const pa = gameState.players.find(p => p.id === a);
+          const pb = gameState.players.find(p => p.id === b);
+          const vs = pa && pb ? ` · ${pa.name} vs ${pb.name}` : '';
+          return `<div class="round-info">🥊 FINALE · Frage ${gameState.finaleRound + 1}${vs}</div>`;
         }
         const roundInHalf = gameState.round - gameState.halbzeitStartRound;
-        return `<div class="round-info">${gameState.halbzeit}. Halbzeit · Runde ${roundInHalf + 1} · Noch <strong>${gameState.deckelPot}</strong> Deckel im Pott</div>`;
+        const hz1Loser = gameState.halbzeit === 2 && gameState.halbzeitLosers[0]
+          ? gameState.players.find(p => p.id === gameState.halbzeitLosers[0]) : null;
+        return `<div class="round-info">${gameState.halbzeit}. Halbzeit · Runde ${roundInHalf + 1} · Noch <strong>${gameState.deckelPot}</strong> Deckel im Pott${hz1Loser ? `<br><span style="font-size:0.85em;">🥊 Im Finale gesetzt: <strong>${hz1Loser.name}</strong></span>` : ''}</div>`;
       }
       return `<div class="round-info">Runde ${gameState.round + 1}${gameState.totalRounds === 0 ? '' : ' / ' + gameState.totalRounds}</div>`;
     }
@@ -3935,7 +3953,7 @@
         const isLeader = hasScores && p.score === maxScore;
         return `
           <div class="score-chip ${gameState.phase === 'smart10' && i === gameState.currentPlayerIdx ? 'active' : ''}" style="background:${p.color};position:relative;">
-           ${!gameState.deckelMode && isLeader ? '👑 ' : ''}${p.name.slice(0, 8)}${gameState.deckelMode ? '' : ` <span class="pts">${p.score}</span>`}${gameState.deckelMode && gameState.phase !== 'lobby' ? ` <span style="opacity:0.9;">❌${gameState.deckel[p.id] || 0}</span>` : ''}${role === 'host' && p.id !== myId ? `<span onclick="if(confirm('${p.name} entfernen?'))kickPlayer('${p.id}')" style="position:absolute;top:-6px;right:-6px;background:rgba(0,0,0,0.55);color:#fff;border-radius:50%;width:16px;height:16px;font-size:10px;line-height:16px;text-align:center;cursor:pointer;">✕</span>` : ''}
+           ${!gameState.deckelMode && isLeader ? '👑 ' : ''}${gameState.deckelMode && (gameState.halbzeitLosers || []).includes(p.id) ? '🥊 ' : ''}${p.name.slice(0, 8)}${gameState.deckelMode ? '' : ` <span class="pts">${p.score}</span>`}${gameState.deckelMode && gameState.phase !== 'lobby' ? ` <span style="opacity:0.9;">❌${gameState.deckel[p.id] || 0}</span>` : ''}${role === 'host' && p.id !== myId ? `<span onclick="if(confirm('${p.name} entfernen?'))kickPlayer('${p.id}')" style="position:absolute;top:-6px;right:-6px;background:rgba(0,0,0,0.55);color:#fff;border-radius:50%;width:16px;height:16px;font-size:10px;line-height:16px;text-align:center;cursor:pointer;">✕</span>` : ''}
           </div>
         `;
       }).join('')}
@@ -4307,7 +4325,7 @@
       if (!q) return '';
       const voted = _fbVotedFor === q.q ? _fbVote : null;
       if (!voted) {
-        return `<span style="font-size:0.75rem;color:#999;margin-right:8px;">Feedback:</span>
+        return `<span style="font-size:0.75rem;color:#999;margin-right:8px;">Feedback zur Frage:</span>
           <button onclick="voteFeedback('up')" style="background:#fff;border:1.5px solid #ddd;border-radius:8px;padding:4px 14px;font-size:1rem;cursor:pointer;">👍</button>
           <button onclick="voteFeedback('down')" style="background:#fff;border:1.5px solid #ddd;border-radius:8px;padding:4px 14px;font-size:1rem;cursor:pointer;margin-left:6px;">👎</button>`;
       }
