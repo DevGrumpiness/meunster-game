@@ -68,6 +68,11 @@
     </div>
 
     <div class="card">
+      <h2>📣 Werbeanfragen (<span id="ad-count">0</span>)</h2>
+      <div id="ad-fb"><div class="empty">Noch nichts eingegangen.</div></div>
+    </div>
+
+    <div class="card">
       <h2>Allgemeines Feedback (<span id="app-count">0</span>)</h2>
       <div id="app-fb"><div class="empty">Noch nichts eingegangen.</div></div>
     </div>
@@ -181,6 +186,22 @@
     }
 
     function render() {
+      // Werbeanfragen: nach Tag gruppiert, neueste zuerst
+      const ads = _entries.filter(e => e.kind === 'werbung' && e.data && typeof e.data.firma === 'string')
+        .sort((a, b) => (b.ts || 0) - (a.ts || 0));
+      document.getElementById('ad-count').textContent = ads.length;
+      if (ads.length) {
+        const adByDay = {};
+        ads.forEach(f => { const k = dayKey(f.ts); (adByDay[k] = adByDay[k] || []).push(f); });
+        document.getElementById('ad-fb').innerHTML = Object.keys(adByDay).sort().reverse().map(k => `
+          <div class="day-head">${esc(dayLabel(k))}</div>` + adByDay[k].map(f => `
+          <div class="fb-item"><strong>${esc(String(f.data.firma).slice(0, 60))}</strong> · <a href="mailto:${esc(String(f.data.email || '').slice(0, 80))}">${esc(String(f.data.email || '').slice(0, 80))}</a>${f.data.tel ? ' · 📞 ' + esc(String(f.data.tel).slice(0, 40)) : ''}
+            <div style="margin-top:3px;">${esc(String(f.data.text || '').slice(0, 500))}</div>
+            <div class="meta">${esc(fmtTs(f.ts))}</div>
+          </div>`).join('')).join('');
+      } else {
+        document.getElementById('ad-fb').innerHTML = '<div class="empty">Noch nichts eingegangen.</div>';
+      }
       // Allgemeines Feedback: nach Tag gruppiert, neuester Tag zuerst
       const app = _entries.filter(e => e.kind === 'app' && e.data && typeof e.data.text === 'string')
         .sort((a, b) => (b.ts || 0) - (a.ts || 0));
