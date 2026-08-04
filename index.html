@@ -2928,16 +2928,16 @@
         case 'error': renderError(); break;
         default: renderHome(); break;
       }
+      injectAdBanner();
       updateChatDock();
       updateTabBox();
       updateSoundToggle();
     }
 
-    function adBanner() { return ''; }
+    function injectAdBanner() { }
 
     function renderHome() {
       app.innerHTML = `
-    ${adBanner()}
     <div class="card">
       <h1><span class="bike">🚲</span> Münster Game</h1>
       <p class="subtitle">Das Multiplayer-Partyspiel für echte Münsteraner!</p>
@@ -3058,7 +3058,6 @@
       const canStart = gameState.players.length >= 2;
 
       app.innerHTML = `
-    ${adBanner()}
     <div class="card">
       <h1><span class="bike">🚲</span> Münster Game</h1>
       <p class="subtitle">Warteraum</p>

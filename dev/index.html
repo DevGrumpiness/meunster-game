@@ -2931,24 +2931,24 @@
         case 'error': renderError(); break;
         default: renderHome(); break;
       }
+      injectAdBanner();
       updateChatDock();
       updateTabBox();
       updateSoundToggle();
     }
 
     // AD-BANNER-START (nur DEV/Staging – wird beim Merge nach Prod entfernt)
-    function adBanner() {
-      return `<div style="background:#fff;border:2px dashed var(--ms-gold);border-radius:12px;padding:8px 12px;margin-bottom:10px;display:flex;align-items:center;gap:10px;">
+    function injectAdBanner() {
+      app.insertAdjacentHTML('afterbegin', `<div style="width:100%;background:#fff;border:2px dashed var(--ms-gold);border-radius:12px;padding:8px 12px;margin-bottom:10px;display:flex;align-items:center;gap:10px;box-sizing:border-box;">
         <span style="flex-shrink:0;font-size:0.55rem;font-weight:700;color:#aaa;border:1px solid #ddd;border-radius:4px;padding:1px 4px;letter-spacing:0.5px;">ANZEIGE</span>
         <span style="flex:1;font-size:0.85rem;font-weight:700;color:var(--ms-blue);">📣 Deine Werbung hier</span>
         <a href="mailto:werbung@ms-game.de?subject=Werbung%20auf%20ms-game.de" style="flex-shrink:0;background:var(--ms-gold);color:#5b4a00;border-radius:8px;padding:6px 12px;font-size:0.8rem;font-weight:700;text-decoration:none;">Buchen</a>
-      </div>`;
+      </div>`);
     }
     // AD-BANNER-END
 
     function renderHome() {
       app.innerHTML = `
-    ${adBanner()}
     <div class="card">
       <h1><span class="bike">🚲</span> Münster Game</h1>
       <p class="subtitle">Das Multiplayer-Partyspiel für echte Münsteraner!</p>
@@ -3069,7 +3069,6 @@
       const canStart = gameState.players.length >= 2;
 
       app.innerHTML = `
-    ${adBanner()}
     <div class="card">
       <h1><span class="bike">🚲</span> Münster Game</h1>
       <p class="subtitle">Warteraum</p>
