@@ -1635,6 +1635,7 @@
         myId = id;
         gameState.phase = 'lobby';
         gameState.players = [{ id: myId, name: myName, color: PLAYER_COLORS[0], score: 0, connected: true, isHost: true }];
+        trackEvent('room');
         render();
       });
 
@@ -1862,6 +1863,11 @@
       connections.forEach(c => {
         try { c.send(stateMsg); } catch (e) { }
       });
+      // Spielende einmalig anonym zählen (alle 5 Stellen, die phase='final' setzen)
+      if (gameState.phase === 'final' && !_statFinalPushed) {
+        _statFinalPushed = true;
+        trackEvent('game_end', { rounds: gameState.round, players: gameState.players.filter(p => p.connected).length, mins: _statGameStartTs ? Math.max(1, Math.round((Date.now() - _statGameStartTs) / 60000)) : null });
+      }
       render();
     }
 
@@ -2437,6 +2443,9 @@
       console.log(`📊 Verteilung:`, deckCatsMP);
       console.log(`🔢 Erste 20:`, gameState._globalDeck.slice(0, 20).map(i => `#${i} [${QUESTIONS[i].cat}] ${QUESTIONS[i].q.substring(0, 40)}`));
       gameState.phase = 'categorySelect';
+      _statGameStartTs = Date.now();
+      _statFinalPushed = false;
+      trackEvent('game_start', { players: gameState.players.filter(p => p.connected).length, deckel: !!gameState.deckelMode, allg: !!gameState.includeAllgemein, rounds: gameState.totalRounds });
       broadcastState();
     }
 
@@ -2944,6 +2953,7 @@
     }
     function openAdForm() {
       if (document.getElementById('ad-form-overlay')) return;
+      trackEvent('ad_click');
       const inp = 'width:100%;box-sizing:border-box;border:1.5px solid #d5dbe1;border-radius:10px;padding:9px 10px;font-size:0.9rem;font-family:inherit;margin-bottom:8px;';
       document.body.insertAdjacentHTML('beforeend', `<div id="ad-form-overlay" style="position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:8000;display:flex;align-items:center;justify-content:center;padding:16px;overflow:auto;">
         <div id="ad-form-card" style="background:#fff;border-radius:14px;padding:20px;max-width:400px;width:100%;box-shadow:0 10px 40px rgba(0,0,0,0.25);">
@@ -4509,6 +4519,17 @@
       } catch (e) { }
     }
     let _qfbTimer = null, _qfbLastBody = '';
+    // ============================================================
+    // NUTZUNGSSTATISTIK (anonym): reine Zähler-Events ohne Personen-
+    // bezug – keine Cookies, keine IDs, keine IPs. Läuft über den-
+    // selben ntfy-Kanal wie das Feedback (kind "stats").
+    // ============================================================
+    const IS_DEV_BUILD = String((typeof document !== 'undefined' && document.title) || '').indexOf('DEV') !== -1;
+    let _statGameStartTs = 0, _statFinalPushed = false;
+    function trackEvent(ev, data) {
+      pushFeedbackRemote('stats', Object.assign({ ev, src: IS_DEV_BUILD ? 'dev' : 'prod' }, data || {}));
+    }
+    setTimeout(() => trackEvent('open'), 1200);
     function compactQfb(feedback) {
       return Object.values(feedback || {}).map(e => {
         const counts = {};
@@ -4777,7 +4798,8 @@
       <ul style="font-size:0.85rem;line-height:1.8;padding-left:20px;">
         <li>🍪 <strong>Keine Cookies</strong> – wir setzen keine Tracking-Cookies.</li>
         <li>👤 <strong>Keine persönlichen Daten</strong> – wir speichern weder Namen, IP-Adressen noch Geräte-IDs.</li>
-        <li>📊 <strong>Anonyme Nutzungsstatistik</strong> – wir zählen anonym, wie oft das Spiel aufgerufen wird (ohne
+        <li>📊 <strong>Anonyme Nutzungsstatistik</strong> – wir zählen anonym, wie oft das Spiel aufgerufen und
+          gespielt wird (z.B. Anzahl Spiele und Spieler pro Runde, ohne
           Rückschluss auf einzelne Personen). Rechtsgrundlage: Berechtigtes Interesse (Art. 6 Abs. 1 lit. f DSGVO).</li>
         <li>🔗 <strong>WebRTC-Verbindung</strong> – die Multiplayer-Verbindung läuft direkt zwischen den Geräten
           (Peer-to-Peer). Der PeerJS-Server vermittelt nur den Verbindungsaufbau.</li>

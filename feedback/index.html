@@ -68,6 +68,11 @@
     </div>
 
     <div class="card">
+      <h2>📊 Nutzung (<span id="stat-days">0</span> Tage)</h2>
+      <div id="stat-fb"><div class="empty">Noch nichts eingegangen.</div></div>
+    </div>
+
+    <div class="card">
       <h2>📣 Werbeanfragen (<span id="ad-count">0</span>)</h2>
       <div id="ad-fb"><div class="empty">Noch nichts eingegangen.</div></div>
     </div>
@@ -186,6 +191,37 @@
     }
 
     function render() {
+      // Nutzungsstatistik: anonyme Zähler-Events (kind "stats"), nach Tag
+      const stats = _entries.filter(e => e.kind === 'stats' && e.data && typeof e.data.ev === 'string');
+      const stDays = {};
+      stats.forEach(s => { const k = dayKey(s.ts); (stDays[k] = stDays[k] || []).push(s); });
+      const stKeys = Object.keys(stDays).sort().reverse();
+      document.getElementById('stat-days').textContent = stKeys.length;
+      if (stKeys.length) {
+        document.getElementById('stat-fb').innerHTML = stKeys.map(k => {
+          const evs = stDays[k];
+          const prod = evs.filter(e => e.data.src !== 'dev');
+          const devN = evs.length - prod.length;
+          const of = ev => prod.filter(e => e.data.ev === ev);
+          const avg = (arr, f) => { const v = arr.map(f).filter(x => typeof x === 'number' && isFinite(x) && x > 0); return v.length ? Math.round(v.reduce((s, x) => s + x, 0) / v.length * 10) / 10 : 0; };
+          const starts = of('game_start'), ends = of('game_end');
+          const avgP = avg(starts, e => Number(e.data.players));
+          const deckelN = starts.filter(e => e.data.deckel).length;
+          const allgN = starts.filter(e => e.data.allg).length;
+          const avgR = avg(ends, e => Number(e.data.rounds));
+          const avgM = avg(ends, e => Number(e.data.mins));
+          const parts = [
+            of('open').length + ' Aufrufe',
+            of('room').length + ' Räume',
+            starts.length + ' Spiele' + (starts.length ? ' (Ø ' + avgP + ' Sp.' + (deckelN ? ' · 🍻 ' + deckelN : '') + (allgN ? ' · 🌍 ' + allgN : '') + ')' : ''),
+            ends.length + ' beendet' + (ends.length && avgR ? ' (Ø ' + avgR + ' Rd.' + (avgM ? ', ' + avgM + ' Min' : '') + ')' : ''),
+            of('ad_click').length + ' Banner-Klicks'
+          ];
+          return `<div class="day-head">${esc(dayLabel(k))}</div><div class="fb-item">${esc(parts.join(' · '))}${devN ? `<div class="meta">+ ${devN} dev-Events</div>` : ''}</div>`;
+        }).join('');
+      } else {
+        document.getElementById('stat-fb').innerHTML = '<div class="empty">Noch nichts eingegangen.</div>';
+      }
       // Werbeanfragen: nach Tag gruppiert, neueste zuerst
       const ads = _entries.filter(e => e.kind === 'werbung' && e.data && typeof e.data.firma === 'string')
         .sort((a, b) => (b.ts || 0) - (a.ts || 0));
