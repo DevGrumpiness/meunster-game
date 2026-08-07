@@ -1177,7 +1177,7 @@
       // --- Fahrrad & Mobilität ---
       { cat: 'fahrrad', type: 'quiz', q: 'Was passiert in Münster mit falsch geparkten Fahrrädern?', answers: ['Ordnungsamt entfernt sie', 'Polizei gibt Strafzettel', 'Nichts', 'Sie werden verschenkt'], correct: 0, fact: 'Das Ordnungsamt markiert "Fahrradleichen" mit einem Zettel und entfernt sie nach 4 Wochen – über 1.000 pro Jahr!' },
       { cat: 'fahrrad', type: 'quiz', q: 'Wie heißt der Fahrrad-Schnellweg, der Münster mit dem Umland verbinden soll?', answers: ['Veloroute', 'Radschnellweg RS1', 'Leeze-Express', 'Fahrradautobahn'], correct: 0, fact: 'Münster plant mehrere Velorouten als Fahrrad-Schnellverbindungen ins Umland – breit, kreuzungsfrei, beleuchtet.' },
-      { cat: 'fahrrad', type: 'quiz', q: 'Warum stehen tausende Räder am Hauptbahnhof?', answers: ['Pendler & Studenten nutzen das Rad als Zubringer', 'Es ist verboten, woanders zu parken', 'Fahrrad-Flohmarkt', 'Kunstinstallation'], correct: 0, fact: 'In Münster ist die Kombination Zug+Rad extrem beliebt – das Chaos am Bahnhof ist legendär und geht regelmäßig viral.' },
+      { cat: 'fahrrad', type: 'quiz', q: 'Warum stehen tausende Räder am Hauptbahnhof?', answers: ['Pendler & Studenten nutzen das Rad als Zubringer', 'Die meisten sind herrenlose Schrotträder', 'Die Stadt lagert dort ihre Leihräder', 'Autos dürfen nicht in die Altstadt'], correct: 0, fact: 'In Münster ist die Kombination Zug+Rad extrem beliebt – das Chaos am Bahnhof ist legendär und geht regelmäßig viral.' },
       { cat: 'fahrrad', type: 'estimate', q: 'Wie viele Fahrrad-Unfälle passieren jährlich in Münster?', answer: 1800, unit: '', tolerance: 500, fact: 'Rund 1.800 Fahrrad-Unfälle pro Jahr – die Kehrseite der Fahrradstadt. Kreuzungen sind besonders gefährlich.' },
       { cat: 'fahrrad', type: 'quiz', q: 'Wie lang ist die Promenade in Münster ungefähr?', answers: ['Ca. 4,5 km', 'Ca. 2 km', 'Ca. 8 km', 'Ca. 12 km'], correct: 0, fact: 'Die Promenade folgt dem Verlauf der ehemaligen Stadtmauer – 4,5 km, komplett autofrei, gesäumt von Linden.' },
       { cat: 'fahrrad', type: 'höher_tiefer', q: 'Wie viele Fahrradleichen entfernt das Ordnungsamt pro Jahr?', reference: 500, answer: 1000, unit: 'Räder', fact: 'Über 1.000 "Fahrradleichen" werden jährlich am Bahnhof und in der Innenstadt entfernt – manche stehen seit Jahren.' },
@@ -1423,7 +1423,7 @@
       { cat: 'allgemein', type: 'quiz', q: 'Welcher Stoff macht Chilischoten scharf?', answers: ['Capsaicin', 'Menthol', 'Piperin', 'Allicin'], correct: 0, fact: 'Capsaicin reizt Schmerzrezeptoren im Mund – die Schärfe wird in Scoville-Einheiten gemessen. Carolina Reaper: über 2 Mio. Scoville!' },
       { cat: 'allgemein', type: 'quiz', q: 'Was ist die Hauptstadt von Brasilien?', answers: ['Brasília', 'Rio de Janeiro', 'São Paulo', 'Salvador'], correct: 0, fact: 'Brasília wurde 1960 als Planstadt im Landesinneren als neue Hauptstadt eingeweiht – entworfen von Oscar Niemeyer.' },
       { cat: 'allgemein', type: 'quiz', q: 'Welches Metall ist bei Raumtemperatur flüssig?', answers: ['Quecksilber', 'Gallium', 'Blei', 'Zinn'], correct: 0, fact: 'Quecksilber (Hg) ist das einzige Metall, das bei Raumtemperatur flüssig ist – der Schmelzpunkt liegt bei -39°C.' },
-      { cat: 'allgemein', type: 'quiz', q: 'Welche Farbe hat der Nil aus dem Weltall betrachtet?', answers: ['Grün (Vegetation) in einem braunen Wüstenband', 'Blau', 'Rot', 'Schwarz'], correct: 0, fact: 'Aus dem All sieht man den Nil als grünes Vegetationsband, das sich durch die braune Sahara schlängelt.' },
+      { cat: 'allgemein', type: 'quiz', q: 'Welche Farbe hat der Nil aus dem Weltall betrachtet?', answers: ['Grün', 'Blau', 'Rot', 'Schwarz'], correct: 0, fact: 'Aus dem All sieht man den Nil als grünes Vegetationsband, das sich durch die braune Sahara schlängelt.' },
       { cat: 'allgemein', type: 'quiz', q: 'Was ist der Unterschied zwischen einem Asteroid und einem Kometen?', answers: ['Kometen haben einen Schweif aus Gas und Staub', 'Asteroiden sind größer', 'Kometen bestehen aus Metall', 'Es gibt keinen Unterschied'], correct: 0, fact: 'Kometen bestehen aus Eis und Gestein – wenn sie sich der Sonne nähern, verdampft das Eis und bildet den typischen Schweif.' },
       { cat: 'allgemein', type: 'quiz', q: 'Welches Tier hat das größte Gehirn?', answers: ['Pottwal', 'Blauwal', 'Elefant', 'Mensch'], correct: 0, fact: 'Das Gehirn eines Pottwals wiegt ca. 8 kg – das schwerste aller Lebewesen. Das menschliche Gehirn wiegt nur ca. 1,4 kg.' },
       { cat: 'allgemein', type: 'quiz', q: 'Wer war der erste Mensch im Weltraum?', answers: ['Juri Gagarin', 'Neil Armstrong', 'Buzz Aldrin', 'John Glenn'], correct: 0, fact: 'Der sowjetische Kosmonaut Juri Gagarin umrundete am 12. April 1961 als erster Mensch die Erde im Weltraum.' },
@@ -1568,34 +1568,63 @@
       showResult: false,
     };
 
-    const RECENT_QUESTIONS_KEY = 'mk-recent-questions-v1';
+    const RECENT_QUESTIONS_KEY = 'mk-recent-questions-v2';
     const RECENT_QUESTIONS_LIMIT = 300;
 
     // ============================================================
-    // NETWORKING
+    // RANDOMNESS & QUESTION IDENTITY
     // ============================================================
-    function generateRoomCode() {
-      const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-      let code = '';
-      for (let i = 0; i < 4; i++) code += chars[Math.floor(Math.random() * chars.length)];
-      return code;
+    // Crypto-strong random float [0,1) with Math.random fallback (test mocks)
+    function rand01() {
+      try {
+        if (typeof crypto !== 'undefined' && crypto.getRandomValues) {
+          const buf = new Uint32Array(1);
+          crypto.getRandomValues(buf);
+          return buf[0] / 4294967296;
+        }
+      } catch (e) { }
+      return Math.random();
     }
 
-    function getRecentQuestionIdxs() {
+    // Stable question identity: FNV-1a hash of the question text.
+    // Survives inserting/removing questions (array indices do NOT).
+    function questionKey(q) {
+      const s = String(q.q || '');
+      let h = 0x811c9dc5;
+      for (let i = 0; i < s.length; i++) {
+        h ^= s.charCodeAt(i);
+        h = (h * 0x01000193) >>> 0;
+      }
+      return h.toString(36);
+    }
+    const QUESTION_KEYS = QUESTIONS.map(questionKey);
+    const KEY_TO_IDX = {};
+    QUESTION_KEYS.forEach((k, i) => { if (!(k in KEY_TO_IDX)) KEY_TO_IDX[k] = i; });
+
+    function getRecentQuestionKeys() {
       try {
         const raw = localStorage.getItem(RECENT_QUESTIONS_KEY);
         if (!raw) return [];
         const parsed = JSON.parse(raw);
         if (!Array.isArray(parsed)) return [];
-        return parsed.filter(n => Number.isInteger(n) && n >= 0 && n < QUESTIONS.length);
+        return parsed.filter(k => typeof k === 'string');
       } catch (e) {
         return [];
       }
     }
 
+    // Position-ordered (oldest first) indices into the CURRENT questions array
+    function getRecentQuestionIdxs() {
+      return getRecentQuestionKeys()
+        .map(k => KEY_TO_IDX[k])
+        .filter(i => i !== undefined);
+    }
+
     function rememberQuestionIdx(qIdx) {
-      const recent = getRecentQuestionIdxs().filter(idx => idx !== qIdx);
-      recent.push(qIdx);
+      const key = QUESTION_KEYS[qIdx];
+      if (!key) return;
+      const recent = getRecentQuestionKeys().filter(k => k !== key);
+      recent.push(key);
       while (recent.length > RECENT_QUESTIONS_LIMIT) recent.shift();
       try {
         localStorage.setItem(RECENT_QUESTIONS_KEY, JSON.stringify(recent));
@@ -1604,10 +1633,20 @@
 
     function shuffleArray(items) {
       for (let i = items.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
+        const j = Math.floor(rand01() * (i + 1));
         [items[i], items[j]] = [items[j], items[i]];
       }
       return items;
+    }
+
+    // ============================================================
+    // NETWORKING
+    // ============================================================
+    function generateRoomCode() {
+      const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+      let code = '';
+      for (let i = 0; i < 4; i++) code += chars[Math.floor(rand01() * chars.length)];
+      return code;
     }
 
     const PEER_CONFIG = {
@@ -1672,7 +1711,7 @@
 
         hostConn.on('open', () => {
           clearTimeout(window._joinTimeout);
-          hostConn.send({ type: 'join', name: myName, id: myId, recentIdxs: getRecentQuestionIdxs() });
+          hostConn.send({ type: 'join', name: myName, id: myId, recentKeys: getRecentQuestionKeys() });
         });
 
         hostConn.on('data', (data) => handlePlayerMessage(data));
@@ -1717,7 +1756,7 @@
           const player = { id: data.id, name: data.name, color, score: startScore, connected: true, connId: conn.peer };
           gameState.players.push(player);
           conn._playerId = data.id;
-          storePlayerRecent(data.id, data.recentIdxs);
+          storePlayerRecent(data.id, data.recentKeys || data.recentIdxs);
           // Send current state to new player
           broadcastState();
           break;
@@ -1790,7 +1829,7 @@
             gameState.players.push(player);
             conn._playerId = data.id;
           }
-          storePlayerRecent(data.id, data.recentIdxs);
+          storePlayerRecent(data.id, data.recentKeys || data.recentIdxs);
           broadcastState();
           break;
         }
@@ -2214,7 +2253,7 @@
         hostConn = peer.connect(hostPeerId, { reliable: true });
 
         hostConn.on('open', () => {
-          hostConn.send({ type: 'rejoin', name: myName, id: myId, oldId: savedGameId, recentIdxs: getRecentQuestionIdxs() });
+          hostConn.send({ type: 'rejoin', name: myName, id: myId, oldId: savedGameId, recentKeys: getRecentQuestionKeys() });
         });
 
         hostConn.on('data', (data) => handlePlayerMessage(data));
@@ -2486,9 +2525,11 @@
       return fresh.concat(recent);
     }
 
-    function storePlayerRecent(playerId, recentIdxs) {
-      if (!playerId || !Array.isArray(recentIdxs)) return;
-      playerRecentMap[playerId] = recentIdxs
+    function storePlayerRecent(playerId, recentList) {
+      if (!playerId || !Array.isArray(recentList)) return;
+      // Accept stable keys (strings) or legacy indices (numbers)
+      playerRecentMap[playerId] = recentList
+        .map(v => typeof v === 'string' ? KEY_TO_IDX[v] : v)
         .filter(n => Number.isInteger(n) && n >= 0 && n < QUESTIONS.length)
         .slice(-RECENT_QUESTIONS_LIMIT);
       // Deck already built? Rebuild so the new player's known questions sink to the back.
@@ -2542,7 +2583,7 @@
         const available = QUESTIONS.map((q, i) => ({ ...q, idx: i }))
           .filter(q => q.cat === catId && isQuestionPlayable(q, q.idx));
         if (available.length === 0) return;
-        qIdx = available[Math.floor(Math.random() * available.length)].idx;
+        qIdx = available[Math.floor(rand01() * available.length)].idx;
       }
 
       const q = { ...QUESTIONS[qIdx], idx: qIdx };
@@ -2553,7 +2594,7 @@
         const shuffled = [...q.answers];
         // Fisher-Yates shuffle
         for (let i = shuffled.length - 1; i > 0; i--) {
-          const j = Math.floor(Math.random() * (i + 1));
+          const j = Math.floor(rand01() * (i + 1));
           [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
         }
         q.answers = shuffled;
@@ -2799,7 +2840,7 @@
       }
       if (losers.length > 1) {
         // Final tiebreak: random
-        return losers[Math.floor(Math.random() * losers.length)].id;
+        return losers[Math.floor(rand01() * losers.length)].id;
       }
       return losers[0] ? losers[0].id : null;
     }
