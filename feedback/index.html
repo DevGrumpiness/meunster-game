@@ -83,6 +83,11 @@
     </div>
 
     <div class="card">
+      <h2>💡 Eingereichte Fragen (<span id="qs-count">0</span>)</h2>
+      <div id="qs-fb"><div class="empty">Noch nichts eingegangen.</div></div>
+    </div>
+
+    <div class="card">
       <h2>Fragen-Feedback – aggregiert (<span id="q-count">0</span> Fragen)</h2>
       <div id="q-fb"><div class="empty">Noch nichts eingegangen.</div></div>
     </div>
@@ -252,6 +257,22 @@
           </div>`).join('')).join('');
       } else {
         document.getElementById('app-fb').innerHTML = '<div class="empty">Noch nichts eingegangen.</div>';
+      }
+      // Eingereichte Fragen (Community): nach Tag gruppiert, neuester Tag zuerst
+      const qsub = _entries.filter(e => e.kind === 'qsubmit' && e.data && typeof e.data.q === 'string' && typeof e.data.a === 'string')
+        .sort((a, b) => (b.ts || 0) - (a.ts || 0));
+      document.getElementById('qs-count').textContent = qsub.length;
+      if (qsub.length) {
+        const qsByDay = {};
+        qsub.forEach(f => { const k = dayKey(f.ts); (qsByDay[k] = qsByDay[k] || []).push(f); });
+        document.getElementById('qs-fb').innerHTML = Object.keys(qsByDay).sort().reverse().map(k => `
+          <div class="day-head">${esc(dayLabel(k))}</div>` + qsByDay[k].map(f => `
+          <div class="fb-item"><strong>${esc(String(f.data.name || 'Anonym').slice(0, 30))}:</strong> ${esc(String(f.data.q).slice(0, 200))}
+            <div style="margin-top:3px;">→ <strong style="color:#2d6a4f;">${esc(String(f.data.a).slice(0, 100))}</strong>${f.data.src ? ' <span style="color:#8a94a0;">(' + esc(String(f.data.src).slice(0, 150)) + ')</span>' : ''}</div>
+            <div class="meta">${esc(fmtTs(f.ts))}</div>
+          </div>`).join('')).join('');
+      } else {
+        document.getElementById('qs-fb').innerHTML = '<div class="empty">Noch nichts eingegangen.</div>';
       }
       // Fragen: pro Session neuester Push, dann pro Tag aggregieren
       const sessions = {};

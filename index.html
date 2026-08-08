@@ -10,6 +10,13 @@
   <title>Münster Game – Multiplayer</title>
   <link rel="icon"
     href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🚲</text></svg>">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <meta name="theme-color" content="#2d6a4f">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="MS Game">
+  <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
   <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
   <script src="https://unpkg.com/qrcode-generator@1.4.4/qrcode.js"></script>
   <style>
@@ -944,11 +951,26 @@
 <body>  <button id="fb-open-btn" onclick="openAppFeedback()" style="position:fixed;top:8px;left:8px;z-index:99998;background:rgba(255,255,255,0.92);border:1px solid #d5dbe1;border-radius:20px;padding:4px 12px;font-size:0.72rem;color:#5a6572;cursor:pointer;font-family:inherit;box-shadow:0 1px 4px rgba(0,0,0,0.08);">Feedback</button>
   <div id="fb-modal" style="display:none;position:fixed;inset:0;z-index:100000;background:rgba(29,53,87,0.45);align-items:center;justify-content:center;padding:20px;" onclick="if(event.target===this)closeAppFeedback()">
     <div style="background:#fff;border-radius:14px;padding:18px;max-width:340px;width:100%;box-shadow:0 10px 40px rgba(0,0,0,0.25);">
-      <div style="font-weight:700;color:#1d3557;font-size:0.95rem;margin-bottom:8px;">Feedback</div>
-      <textarea id="fb-text" maxlength="500" rows="4" placeholder="Was gefällt dir, was fehlt, was nervt?" style="width:100%;box-sizing:border-box;border:1.5px solid #d5dbe1;border-radius:10px;padding:10px;font-size:0.85rem;font-family:inherit;resize:vertical;"></textarea>
-      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:10px;">
-        <button onclick="closeAppFeedback()" style="background:none;border:none;color:#8a94a0;font-size:0.8rem;cursor:pointer;padding:6px 10px;font-family:inherit;">Abbrechen</button>
-        <button onclick="submitAppFeedback()" style="background:#1d3557;color:#fff;border:none;border-radius:10px;padding:7px 16px;font-size:0.8rem;font-weight:600;cursor:pointer;font-family:inherit;">Senden</button>
+      <div style="display:flex;gap:6px;margin-bottom:12px;">
+        <button id="fb-tab-fb" onclick="switchFbTab('fb')" style="flex:1;border:1.5px solid #1d3557;background:#1d3557;color:#fff;border-radius:10px;padding:6px 4px;font-size:0.78rem;font-weight:700;cursor:pointer;font-family:inherit;">💬 Feedback</button>
+        <button id="fb-tab-q" onclick="switchFbTab('q')" style="flex:1;border:1.5px solid #d5dbe1;background:#fff;color:#5a6572;border-radius:10px;padding:6px 4px;font-size:0.78rem;font-weight:700;cursor:pointer;font-family:inherit;">💡 Frage einreichen</button>
+      </div>
+      <div id="fb-pane-fb">
+        <textarea id="fb-text" maxlength="500" rows="4" placeholder="Was gefällt dir, was fehlt, was nervt?" style="width:100%;box-sizing:border-box;border:1.5px solid #d5dbe1;border-radius:10px;padding:10px;font-size:0.85rem;font-family:inherit;resize:vertical;"></textarea>
+        <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:10px;">
+          <button onclick="closeAppFeedback()" style="background:none;border:none;color:#8a94a0;font-size:0.8rem;cursor:pointer;padding:6px 10px;font-family:inherit;">Abbrechen</button>
+          <button onclick="submitAppFeedback()" style="background:#1d3557;color:#fff;border:none;border-radius:10px;padding:7px 16px;font-size:0.8rem;font-weight:600;cursor:pointer;font-family:inherit;">Senden</button>
+        </div>
+      </div>
+      <div id="fb-pane-q" style="display:none;">
+        <div style="font-size:0.72rem;color:#8a94a0;margin-bottom:8px;line-height:1.4;">Du kennst einen guten Münster-Fakt? Die besten Fragen schaffen es ins Spiel!</div>
+        <textarea id="fbq-q" maxlength="200" rows="2" placeholder="Deine Frage (z.B. Wie heißt …?)" style="width:100%;box-sizing:border-box;border:1.5px solid #d5dbe1;border-radius:10px;padding:10px;font-size:0.85rem;font-family:inherit;resize:vertical;margin-bottom:8px;"></textarea>
+        <input id="fbq-a" maxlength="100" placeholder="Richtige Antwort" style="width:100%;box-sizing:border-box;border:1.5px solid #d5dbe1;border-radius:10px;padding:10px;font-size:0.85rem;font-family:inherit;margin-bottom:8px;">
+        <input id="fbq-src" maxlength="150" placeholder="Optional: Woher weißt du das?" style="width:100%;box-sizing:border-box;border:1.5px solid #d5dbe1;border-radius:10px;padding:10px;font-size:0.85rem;font-family:inherit;">
+        <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:10px;">
+          <button onclick="closeAppFeedback()" style="background:none;border:none;color:#8a94a0;font-size:0.8rem;cursor:pointer;padding:6px 10px;font-family:inherit;">Abbrechen</button>
+          <button onclick="submitQuestionSuggestion()" style="background:#2d6a4f;color:#fff;border:none;border-radius:10px;padding:7px 16px;font-size:0.8rem;font-weight:600;cursor:pointer;font-family:inherit;">Einreichen</button>
+        </div>
       </div>
     </div>
   </div>
@@ -4731,11 +4753,17 @@
     // selben ntfy-Kanal wie das Feedback (kind "stats").
     // ============================================================
     const IS_DEV_BUILD = String((typeof document !== 'undefined' && document.title) || '').indexOf('DEV') !== -1;
+    const IS_PWA = (typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) || false;
     let _statGameStartTs = 0, _statFinalPushed = false;
     function trackEvent(ev, data) {
-      pushFeedbackRemote('stats', Object.assign({ ev, src: IS_DEV_BUILD ? 'dev' : 'prod' }, data || {}));
+      pushFeedbackRemote('stats', Object.assign({ ev, src: IS_DEV_BUILD ? 'dev' : 'prod' }, IS_PWA ? { pwa: 1 } : {}, data || {}));
     }
     setTimeout(() => trackEvent('open'), 1200);
+    // PWA: Service Worker (nur https; scope / deckt auch /dev/ ab)
+    if (typeof navigator !== 'undefined' && 'serviceWorker' in navigator &&
+      typeof location !== 'undefined' && location.protocol === 'https:') {
+      try { navigator.serviceWorker.register('/sw.js').catch(() => { }); } catch (e) { }
+    }
     function compactQfb(feedback) {
       return Object.values(feedback || {}).map(e => {
         const counts = {};
@@ -4784,12 +4812,42 @@
       const m = document.getElementById('fb-modal');
       if (!m) return;
       m.style.display = 'flex';
+      switchFbTab('fb');
       const t = document.getElementById('fb-text');
       if (t) { t.value = ''; setTimeout(() => { try { t.focus(); } catch (e) { } }, 60); }
     }
     function closeAppFeedback() {
       const m = document.getElementById('fb-modal');
       if (m) m.style.display = 'none';
+    }
+    function switchFbTab(tab) {
+      const bFb = document.getElementById('fb-tab-fb'), bQ = document.getElementById('fb-tab-q');
+      const pFb = document.getElementById('fb-pane-fb'), pQ = document.getElementById('fb-pane-q');
+      if (!bFb || !bQ || !pFb || !pQ) return;
+      const on = 'flex:1;border:1.5px solid #1d3557;background:#1d3557;color:#fff;border-radius:10px;padding:6px 4px;font-size:0.78rem;font-weight:700;cursor:pointer;font-family:inherit;';
+      const off = 'flex:1;border:1.5px solid #d5dbe1;background:#fff;color:#5a6572;border-radius:10px;padding:6px 4px;font-size:0.78rem;font-weight:700;cursor:pointer;font-family:inherit;';
+      bFb.style.cssText = tab === 'fb' ? on : off;
+      bQ.style.cssText = tab === 'q' ? on.replace(/#1d3557/g, '#2d6a4f') : off;
+      pFb.style.display = tab === 'fb' ? '' : 'none';
+      pQ.style.display = tab === 'q' ? '' : 'none';
+      if (tab === 'q') { const q = document.getElementById('fbq-q'); if (q) setTimeout(() => { try { q.focus(); } catch (e) { } }, 60); }
+    }
+    let _qSubmitLastTs = 0;
+    function submitQuestionSuggestion() {
+      const qEl = document.getElementById('fbq-q'), aEl = document.getElementById('fbq-a'), sEl = document.getElementById('fbq-src');
+      const q = (qEl && typeof qEl.value === 'string' ? qEl.value : '').trim().slice(0, 200);
+      const a = (aEl && typeof aEl.value === 'string' ? aEl.value : '').trim().slice(0, 100);
+      const src = (sEl && typeof sEl.value === 'string' ? sEl.value : '').trim().slice(0, 150);
+      if (!q) { if (qEl) qEl.focus(); return; }
+      if (!a) { if (aEl) aEl.focus(); return; }
+      const now = Date.now();
+      if (now - _qSubmitLastTs < 5000) return;
+      _qSubmitLastTs = now;
+      pushFeedbackRemote('qsubmit', { name: (myName || 'Anonym').slice(0, 30), q, a, src: src || null });
+      if (qEl) qEl.value = ''; if (aEl) aEl.value = ''; if (sEl) sEl.value = '';
+      closeAppFeedback();
+      const btn = document.getElementById('fb-open-btn');
+      if (btn) { btn.textContent = '✓ Danke'; setTimeout(() => { btn.textContent = 'Feedback'; }, 2500); }
     }
     function submitAppFeedback() {
       const t = document.getElementById('fb-text');
@@ -5011,6 +5069,8 @@
           (Peer-to-Peer). Der PeerJS-Server vermittelt nur den Verbindungsaufbau.</li>
         <li>💾 <strong>Lokale Speicherung</strong> – dein Spielername wird nur in deinem Browser (localStorage)
           gespeichert.</li>
+        <li>💬 <strong>Freiwillige Eingaben</strong> – Feedback und eingereichte Fragen werden mit dem von dir
+          angegebenen Namen übertragen und zur Verbesserung des Spiels gespeichert.</li>
       </ul>
       <p style="font-size:0.85rem;margin-top:12px;">Kontakt: GitHub-Repository des Projekts</p>
       <button class="btn btn-secondary" style="margin-top:16px;"
