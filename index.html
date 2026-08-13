@@ -2275,7 +2275,7 @@
       const label = gameState.deckelMode
         ? `Passen – ${myPts} Richtige sichern`
         : `Passen – ${myPts} Punkt${myPts === 1 ? '' : 'e'} sichern`;
-      return `<button class="btn btn-small" style="background:#fff;color:#2b3440;border:1.5px solid #d9ba55;box-shadow:none;padding:8px 16px;font-size:0.85rem;" onclick="submitSmart10Pass()">${label}</button>
+      return `<button class="btn" style="background:linear-gradient(135deg,#e9c46a,#d9ba55);color:#2b3440;border:none;box-shadow:0 3px 10px rgba(217,186,85,0.4);padding:12px 24px;font-size:0.95rem;font-weight:700;border-radius:12px;" onclick="submitSmart10Pass()">🛡️ ${label}</button>
         <div style="font-size:0.72rem;color:#98a1ab;margin-top:5px;">${hint}</div>`;
     }
 
@@ -2308,8 +2308,8 @@
         if (passRow) {
           passRow.innerHTML = passHtml;
         } else {
-          const anchor = document.querySelector('.question-type-label');
-          if (anchor) anchor.insertAdjacentHTML('afterend', `<div id="smart10-pass-row" style="text-align:center;margin:8px 0;">${passHtml}</div>`);
+          const anchor = document.querySelector('.smart10-grid');
+          if (anchor) anchor.insertAdjacentHTML('beforebegin', `<div id="smart10-pass-row" style="text-align:center;margin:10px 0 12px;">${passHtml}</div>`);
         }
       } else if (passRow) {
         passRow.remove();
@@ -3735,10 +3735,6 @@
       ${renderScoreboard()}
       ${renderRoundInfo()}
       <div class="question-type-label">Wahr oder Falsch · reihum</div>
-      ${isMyTurn ? `
-      <div id="smart10-pass-row" style="text-align:center;margin:8px 0;">
-        ${smart10PassRowInnerHtml(smart10)}
-      </div>` : ''}
       <div class="question-text">${q.q}</div>
       <div class="smart10-status-row">
         ${participantPlayers.map(p => {
@@ -3756,6 +3752,10 @@
         `;
       }).join('')}
       </div>
+      ${isMyTurn ? `
+      <div id="smart10-pass-row" style="text-align:center;margin:10px 0 12px;">
+        ${smart10PassRowInnerHtml(smart10)}
+      </div>` : ''}
       <div class="smart10-grid">
         ${q.options.map((option, i) => {
         const isEliminated = !!smart10.eliminated[i];
