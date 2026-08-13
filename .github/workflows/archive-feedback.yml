@@ -1,8 +1,10 @@
 name: Feedback archivieren
-
-# Nur manuell (Actions-Tab -> Run workflow). Kein automatischer Zeitplan.
+# Läuft alle 6h automatisch (ntfy löscht Nachrichten nach ~12h!)
+# plus manuell über Actions-Tab -> Run workflow.
 on:
   workflow_dispatch:
+  schedule:
+    - cron: '23 */6 * * *'
 
 permissions:
   contents: write
