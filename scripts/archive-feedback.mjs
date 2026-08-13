@@ -9,7 +9,7 @@ if (!res.ok) { console.error('Kanal-Abruf fehlgeschlagen: HTTP ' + res.status); 
 const text = await res.text();
 
 let archive = [];
-try { archive = JSON.parse(fs.readFileSync(FILE, 'utf8')); } catch (e) { }
+try { archive = JSON.parse(fs.readFileSync(FILE, 'utf8').replace(/^\uFEFF/, '')); } catch (e) { }
 if (!Array.isArray(archive)) archive = [];
 
 const seen = new Set(archive.map(e => e && e.id));
@@ -22,6 +22,7 @@ for (const line of text.split('\n')) {
   if (!ev || ev.event !== 'message' || !ev.id || seen.has(ev.id)) continue;
   let payload; try { payload = JSON.parse(ev.message); } catch (e) { continue; }
   if (!payload || payload.v !== 1 || typeof payload.kind !== 'string' || !payload.data) continue;
+  if (payload.data.src === 'diag') continue; // Diagnose-Testevents nicht archivieren
   const ts = Number(payload.ts) || (ev.time * 1000) || Date.now();
   if (ts <= purgeTs) continue;
   archive.push({

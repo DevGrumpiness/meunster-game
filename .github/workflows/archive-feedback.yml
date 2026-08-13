@@ -8,6 +8,7 @@ on:
 
 permissions:
   contents: write
+  actions: write
 
 concurrency:
   group: archive-feedback
@@ -26,6 +27,10 @@ jobs:
             git add feedback/data.json
             git commit -m "Feedback-Archiv aktualisieren"
             git push
+            # Bot-Pushes triggern kein on:push -> Pages-Deploy explizit starten
+            gh workflow run deploy.yml --ref main
           else
             echo "Keine neuen Einträge."
           fi
+        env:
+          GH_TOKEN: ${{ github.token }}
