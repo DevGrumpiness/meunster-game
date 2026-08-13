@@ -1,7 +1,20 @@
-﻿[
+[
  {
-  "id": "purge-1785682786179",
-  "kind": "purge",
-  "ts": 1785682786179
+  "id": "jd419ex0L9Hb",
+  "kind": "stats",
+  "ts": 1786601748661,
+  "data": {
+   "ev": "diag-test",
+   "src": "diag"
+  }
+ },
+ {
+  "id": "iuerow8UbOXN",
+  "kind": "stats",
+  "ts": 1786601766579,
+  "data": {
+   "ev": "diag-test2",
+   "src": "diag"
+  }
  }
 ]
