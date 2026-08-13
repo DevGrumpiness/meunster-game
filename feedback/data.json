@@ -330,5 +330,72 @@
    "ev": "open",
    "src": "prod"
   }
+ },
+ {
+  "id": "gX1ByEMdyhmF",
+  "kind": "stats",
+  "ts": 1786624974206,
+  "data": {
+   "ev": "open",
+   "src": "prod"
+  }
+ },
+ {
+  "id": "kBZGj3jZJLiA",
+  "kind": "stats",
+  "ts": 1786630274513,
+  "data": {
+   "ev": "open",
+   "src": "prod"
+  }
+ },
+ {
+  "id": "dUHiS5nl5wP7",
+  "kind": "stats",
+  "ts": 1786644835111,
+  "data": {
+   "ev": "open",
+   "src": "prod"
+  }
+ },
+ {
+  "id": "CszYjk76hNJT",
+  "kind": "stats",
+  "ts": 1786644894091,
+  "data": {
+   "ev": "room",
+   "src": "prod"
+  }
+ },
+ {
+  "id": "0QyQkKL51FAD",
+  "kind": "stats",
+  "ts": 1786645008741,
+  "data": {
+   "ev": "open",
+   "src": "prod"
+  }
+ },
+ {
+  "id": "aYRsB6ssr7We",
+  "kind": "stats",
+  "ts": 1786645039182,
+  "data": {
+   "ev": "game_start",
+   "src": "prod",
+   "players": 2,
+   "deckel": false,
+   "allg": false,
+   "rounds": 0
+  }
+ },
+ {
+  "id": "zPwVweGbzVHL",
+  "kind": "stats",
+  "ts": 1786645943633,
+  "data": {
+   "ev": "open",
+   "src": "prod"
+  }
  }
 ]
