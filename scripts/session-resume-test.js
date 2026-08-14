@@ -6,9 +6,11 @@
 // ohne Session-Persistenz wuerde createHost() dabei einen NEUEN Zufalls-Code
 // erzeugen, wodurch der gerade geteilte Code/Link sofort ungueltig wird.
 //
-// Dieser Test prueft die sessionStorage-basierte Resume-Logik direkt an den
+// Dieser Test prueft die localStorage-basierte Resume-Logik direkt an den
 // Netzwerkfunktionen (createHost/joinRoom/handlePlayerMessage/leaveGame),
 // mit einem Fake-Peer, der Events manuell auslösen laesst.
+// (localStorage statt localStorage: uebersteht auch einen echten Prozess-
+// Kill/neue Tab-Instanz beim mobilen App-Wechsel, siehe Kommentar bei saveSession.)
 const fs = require('fs');
 const html = fs.readFileSync(__dirname + '/muenster-kenner-dev.html', 'utf8');
 const parts = html.split(/<script>|<\/script>/);
@@ -23,7 +25,7 @@ function makeStorage() {
     removeItem(k) { delete this._d[k]; },
   };
 }
-global.sessionStorage = makeStorage();
+global.localStorage = makeStorage();
 
 const stubEl = new Proxy({}, {
   get: (t, k) => {
@@ -38,7 +40,6 @@ const stubEl = new Proxy({}, {
 global.document = { getElementById: () => stubEl, querySelector: () => null, querySelectorAll: () => [], createElement: () => stubEl, body: { appendChild() { } } };
 global.window = { location: { reload() { } } };
 global.location = window.location;
-global.localStorage = { _d: {}, getItem(k) { return this._d[k] || null; }, setItem(k, v) { this._d[k] = v; }, removeItem(k) { delete this._d[k]; } };
 global.alert = () => { }; global.confirm = () => true;
 global.fetch = function () { return { catch: function () { return this; } }; };
 // setTimeout feuert hier SOFORT synchron - Retry-Ketten laufen deterministisch
@@ -97,17 +98,17 @@ let pass = 0, fail = 0;
 function check(name, cond) { if (cond) { pass++; realLog('OK  ' + name); } else { fail++; realLog('FAIL ' + name); } }
 
 // ===== TEST 1: Host-Resume mit erzwungenem Code behaelt den Code =====
-sessionStorage._d = {};
+localStorage._d = {};
 __peerInstances = [];
 G.createHost('HostTest', 0, 'ABCD');
 check('createHost(forcedCode) benutzt Code als Peer-ID', lastPeer().id === 'msk-dev-abcd');
 lastPeer()._trigger('open', 'msk-dev-abcd');
 check('roomCode bleibt ABCD nach Resume', G.roomCode === 'ABCD');
-let saved = JSON.parse(sessionStorage.getItem('mk-session'));
+let saved = JSON.parse(localStorage.getItem('mk-session'));
 check('Session nach Host-Open gespeichert (role host, code ABCD)', !!saved && saved.role === 'host' && saved.code === 'ABCD' && saved.name === 'HostTest');
 
 // ===== TEST 2: unavailable-id auf Resume-Code retried 2x denselben Code, dann Fallback =====
-sessionStorage._d = {};
+localStorage._d = {};
 __peerInstances = [];
 G.createHost('HostTest2', 0, 'WXYZ');
 check('Initialer Resume-Versuch mit WXYZ', lastPeer().id === 'msk-dev-wxyz');
@@ -119,7 +120,7 @@ lastPeer()._trigger('error', { type: 'unavailable-id' });
 check('Nach 2 gescheiterten Retries: Fallback auf neuen Code', __peerInstances.length === 4 && lastPeer().id !== 'msk-dev-wxyz');
 
 // ===== TEST 3: Player-Resume sendet rejoin (mit oldId) statt join =====
-sessionStorage._d = {};
+localStorage._d = {};
 __peerInstances = [];
 G.joinRoom('PlayerTest', 'ABCD', 0, 'old-id-123');
 lastPeer()._trigger('open', 'new-id-456');
@@ -127,11 +128,11 @@ let conn = lastPeer().lastConn;
 conn.open = true;
 conn._trigger('open');
 check('Resume-Join sendet rejoin mit oldId', conn.sent.length === 1 && conn.sent[0].type === 'rejoin' && conn.sent[0].oldId === 'old-id-123');
-saved = JSON.parse(sessionStorage.getItem('mk-session'));
+saved = JSON.parse(localStorage.getItem('mk-session'));
 check('Session nach Player-Rejoin gespeichert (role player)', !!saved && saved.role === 'player' && saved.code === 'ABCD' && saved.id === 'new-id-456');
 
 // ===== TEST 4: Normaler Join (kein Resume) sendet join, nicht rejoin =====
-sessionStorage._d = {};
+localStorage._d = {};
 __peerInstances = [];
 G.joinRoom('PlayerTest2', 'EFGH');
 lastPeer()._trigger('open', 'new-id-789');
@@ -141,27 +142,42 @@ conn2._trigger('open');
 check('Normaler Join (ohne resumeId) sendet join statt rejoin', conn2.sent.length === 1 && conn2.sent[0].type === 'join');
 
 // ===== TEST 5: Kicked-Nachricht loescht gespeicherte Session =====
-sessionStorage.setItem('mk-session', JSON.stringify({ role: 'player', code: 'ABCD', name: 'X', id: 'y' }));
+localStorage.setItem('mk-session', JSON.stringify({ role: 'player', code: 'ABCD', name: 'X', id: 'y' }));
 G.handlePlayerMessage({ type: 'kicked' });
-check('Kicked loescht gespeicherte Session (kein Auto-Rejoin nach Kick)', sessionStorage.getItem('mk-session') === null);
+check('Kicked loescht gespeicherte Session (kein Auto-Rejoin nach Kick)', localStorage.getItem('mk-session') === null);
 
 // ===== TEST 6: leaveGame() loescht gespeicherte Session =====
-sessionStorage.setItem('mk-session', JSON.stringify({ role: 'player', code: 'ABCD', name: 'X', id: 'y' }));
+localStorage.setItem('mk-session', JSON.stringify({ role: 'player', code: 'ABCD', name: 'X', id: 'y' }));
 G.role = 'player'; G.hostConn = { open: true, send() { } };
 G.leaveGame();
-check('leaveGame loescht gespeicherte Session (bewusstes Verlassen)', sessionStorage.getItem('mk-session') === null);
+check('leaveGame loescht gespeicherte Session (bewusstes Verlassen)', localStorage.getItem('mk-session') === null);
 
 // ===== TEST 7: Post-Connect-Fehler (mid-game) loescht Session statt Endlosschleife =====
-sessionStorage._d = {};
+localStorage._d = {};
 __peerInstances = [];
 G.joinRoom('PlayerTest3', 'IJKL');
 lastPeer()._trigger('open', 'new-id-999');
 let conn3 = lastPeer().lastConn;
 conn3.open = true;
 conn3._trigger('open');
-check('Session vor Fehler vorhanden', sessionStorage.getItem('mk-session') !== null);
+check('Session vor Fehler vorhanden', localStorage.getItem('mk-session') !== null);
 conn3._trigger('error', { type: 'network' });
-check('Post-Connect-Fehler loescht Session (kein Resume-Loop auf totem Raum)', sessionStorage.getItem('mk-session') === null);
+check('Post-Connect-Fehler loescht Session (kein Resume-Loop auf totem Raum)', localStorage.getItem('mk-session') === null);
+
+// ===== TEST 8: Gespeicherte Session enthaelt frischen Zeitstempel (Basis fuer Max-Age-Check) =====
+localStorage._d = {};
+__peerInstances = [];
+const tsBefore = Date.now();
+G.createHost('HostTest3', 0, 'MNOP');
+lastPeer()._trigger('open', 'msk-dev-mnop');
+const savedTs = JSON.parse(localStorage.getItem('mk-session'));
+check('saveSession() setzt einen aktuellen Zeitstempel (ts)', !!savedTs.ts && savedTs.ts >= tsBefore && savedTs.ts <= Date.now());
+
+// ===== TEST 9: Max-Age-Schutz fuer AUTO-RESUME ist im Quellcode vorhanden =====
+// (strukturelle Regressions-Sicherung: verhindert, dass die Alters-Pruefung
+// beim Auto-Resume-Init-Block versehentlich wieder entfernt wird)
+check('AUTO-RESUME prueft Session-Alter (MAX_AGE_MS) vor dem Wiederverbinden', /MAX_AGE_MS/.test(html) && /Date\.now\(\)\s*-\s*saved\.ts/.test(html));
+check('localStorage (nicht sessionStorage) wird fuer mk-session verwendet', /localStorage\.setItem\('mk-session'/.test(html) && !/sessionStorage\.(get|set|remove)Item\([`'"]mk-session/.test(html));
 
 realLog(`\n${pass} passed, ${fail} failed`);
 process.exit(fail ? 1 : 0);

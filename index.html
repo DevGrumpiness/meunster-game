@@ -1904,16 +1904,22 @@
     // Share-Sheet/App-Wechsel beim Teilen des Links den Tab im Hintergrund
     // killt - beim Zurueckkommen wuerde createHost() sonst einen NEUEN
     // Zufalls-Code erzeugen und der gerade geteilte Code waere ungueltig).
-    // sessionStorage uebersteht einen Reload im selben Tab, wird aber beim
-    // echten Schliessen des Tabs automatisch vom Browser geloescht.
+    // WICHTIG: localStorage statt sessionStorage! Bei echtem App-Wechsel auf
+    // Mobilgeraeten (Share-Sheet -> WhatsApp -> zurueck) kann das Betriebssystem
+    // den Tab/Prozess komplett beenden statt nur zu pausieren - manche mobilen
+    // Browser legen dabei eine neue Tab-Instanz an und sessionStorage (an die
+    // Tab-Instanz gebunden) ist dann WEG, obwohl es "derselbe Tab" aussieht.
+    // localStorage ist an den Origin gebunden, nicht an die Tab-Instanz, und
+    // uebersteht das garantiert. Ein Zeitstempel + Max-Alter (siehe unten beim
+    // Resume) verhindert, dass ein Tage altes/totes Session veraltet weiterlebt.
     // ============================================================
     function saveSession() {
       try {
-        sessionStorage.setItem('mk-session', JSON.stringify({ role, code: roomCode, name: myName, id: myId }));
+        localStorage.setItem('mk-session', JSON.stringify({ role, code: roomCode, name: myName, id: myId, ts: Date.now() }));
       } catch (e) { }
     }
     function clearSession() {
-      try { sessionStorage.removeItem('mk-session'); } catch (e) { }
+      try { localStorage.removeItem('mk-session'); } catch (e) { }
     }
 
     function createHost(name, attempt, forcedCode, codeRetries) {
@@ -5099,8 +5105,9 @@
     // bekommen und der gerade geteilte Code/Link waere sofort ungueltig.
     let _resumed = false;
     try {
-      const saved = JSON.parse(sessionStorage.getItem('mk-session') || 'null');
-      if (saved && saved.code && saved.name) {
+      const saved = JSON.parse(localStorage.getItem('mk-session') || 'null');
+      const MAX_AGE_MS = 3 * 60 * 60 * 1000; // 3h - danach gilt die Session als tot/veraltet
+      if (saved && saved.code && saved.name && saved.ts && (Date.now() - saved.ts) < MAX_AGE_MS) {
         app.innerHTML = '<div class="card"><div class="waiting">Stelle Verbindung wieder her<span class="waiting-dots"></span></div></div>';
         if (saved.role === 'host') {
           createHost(saved.name, 0, saved.code);
@@ -5110,6 +5117,8 @@
           joinRoom(saved.name, saved.code, 0, saved.id);
           _resumed = true;
         }
+      } else if (saved) {
+        localStorage.removeItem('mk-session');
       }
     } catch (e) { }
 
