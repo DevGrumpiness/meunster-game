@@ -4538,7 +4538,9 @@
       const link = roomLink();
       if (typeof navigator !== 'undefined' && navigator.share) {
         try {
-          await navigator.share({ title: 'Münster Game', text: `Komm in meine Münster-Game-Runde! Raum-Code: ${roomCode}`, url: link });
+          // iOS-Safari-Bug: "Kopieren" im Share-Sheet übernimmt nur text,
+          // nicht url – Link deshalb direkt in den Text packen.
+          await navigator.share({ title: 'Münster Game', text: `Komm in meine Münster-Game-Runde! Raum-Code: ${roomCode}\n${link}` });
           return;
         } catch (e) { if (e && e.name === 'AbortError') return; }
       }
