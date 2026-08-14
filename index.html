@@ -3432,8 +3432,7 @@
       <div class="room-code">${roomCode}</div>
       <p style="text-align:center;color:#888;font-size:0.85rem;">Teilt diesen Code, damit andere beitreten können.</p>
       <div style="display:flex;justify-content:center;gap:8px;margin:10px 0 4px;">
-        <button onclick="toggleQR()" style="background:#fff;border:2px solid var(--ms-blue);color:var(--ms-blue);border-radius:10px;padding:8px 16px;font-size:0.85rem;font-weight:700;cursor:pointer;font-family:inherit;">📱 QR-Code</button>
-        <button onclick="shareRoom()" style="background:var(--ms-blue);border:2px solid var(--ms-blue);color:#fff;border-radius:10px;padding:8px 16px;font-size:0.85rem;font-weight:700;cursor:pointer;font-family:inherit;">📤 Link teilen</button>
+        <button onclick="toggleQR()" style="background:var(--ms-blue);border:2px solid var(--ms-blue);color:#fff;border-radius:10px;padding:8px 16px;font-size:0.85rem;font-weight:700;cursor:pointer;font-family:inherit;">📱 QR-Code anzeigen</button>
       </div>
       <div id="qr-box" style="display:none;text-align:center;margin:8px 0;"></div>
 
@@ -4592,7 +4591,12 @@
     }
 
     // ============================================================
-    // ROOM SHARING (QR code + share link)
+    // ROOM SHARING (nur QR-Code + manueller Code - siehe Kommentar unten:
+    // "Link teilen" (Web Share API) wurde entfernt, weil sie auf manchen
+    // Mobilgeraeten beim Wechsel zu WhatsApp den Tab/Prozess killen konnte
+    // und der Host danach nicht zuverlässig in denselben Raum zurückfand.
+    // QR-Code und manueller Code-Eintritt lösen dasselbe Problem (Code an
+    // andere weitergeben) ohne die App zu verlassen - kein Absturzrisiko.
     // ============================================================
     function roomLink() {
       return location.origin + location.pathname + '?join=' + roomCode;
@@ -4616,23 +4620,6 @@
         <div style="font-size:0.75rem;color:#666;margin-top:6px;">Scannen → Name eingeben → drin!</div>
       </div>`;
       box.style.display = 'block';
-    }
-    async function shareRoom() {
-      const link = roomLink();
-      if (typeof navigator !== 'undefined' && navigator.share) {
-        try {
-          // iOS-Safari-Bug: "Kopieren" im Share-Sheet übernimmt nur text,
-          // nicht url – Link deshalb direkt in den Text packen.
-          await navigator.share({ title: 'Münster Game', text: `Komm in meine Münster-Game-Runde! Raum-Code: ${roomCode}\n${link}` });
-          return;
-        } catch (e) { if (e && e.name === 'AbortError') return; }
-      }
-      try {
-        await navigator.clipboard.writeText(link);
-        alert('Einladungs-Link kopiert! 📋\n\n' + link);
-      } catch (e) {
-        prompt('Link zum Teilen:', link);
-      }
     }
 
     // ============================================================
