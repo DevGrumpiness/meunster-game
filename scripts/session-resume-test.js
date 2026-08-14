@@ -82,6 +82,7 @@ console.error = () => { };
 const exposed = `
 ;globalThis.__G = { get gameState() { return gameState; },
   createHost, joinRoom, leaveGame, handlePlayerMessage, saveSession, clearSession,
+  getSavedSession, resumeSavedSession, discardSavedSession,
   get role() { return role; }, set role(v) { role = v; },
   get myId() { return myId; }, set myId(v) { myId = v; },
   get myName() { return myName; }, set myName(v) { myName = v; },
@@ -218,11 +219,12 @@ lastPeer()._trigger('open', 'msk-dev-mnop');
 const savedTs = JSON.parse(localStorage.getItem('mk-session'));
 check('saveSession() setzt einen aktuellen Zeitstempel (ts)', !!savedTs.ts && savedTs.ts >= tsBefore && savedTs.ts <= Date.now());
 
-// ===== TEST 9: Max-Age-Schutz fuer AUTO-RESUME ist im Quellcode vorhanden =====
-// (strukturelle Regressions-Sicherung: verhindert, dass die Alters-Pruefung
-// beim Auto-Resume-Init-Block versehentlich wieder entfernt wird)
-check('AUTO-RESUME prueft Session-Alter (MAX_AGE_MS) vor dem Wiederverbinden', /MAX_AGE_MS/.test(html) && /Date\.now\(\)\s*-\s*saved\.ts/.test(html));
-check('localStorage (nicht sessionStorage) wird fuer mk-session verwendet', /localStorage\.setItem\('mk-session'/.test(html) && !/sessionStorage\.(get|set|remove)Item\([`'"]mk-session/.test(html));
+// ===== TEST 9: Gespeicherte Sessions duerfen die Landingpage NICHT automatisch
+// in eine alte Lobby ziehen. Fortsetzen ist nur noch explizit per Button. =====
+localStorage.setItem('mk-session', JSON.stringify({ role: 'host', code: 'ABCD', name: 'Host', id: 'msk-dev-abcd', ts: Date.now() }));
+check('Gespeicherte Host-Session ist fuer explizites Fortsetzen lesbar', !!G.getSavedSession() && G.getSavedSession().code === 'ABCD');
+check('Landingpage startet alte Session nicht automatisch', !/AUTO-RESUME/.test(html) && !/let _resumed/.test(html) && /resumeSavedSession/.test(html) && /render\(\);\s*<\/script>/.test(html));
+check('localStorage (nicht sessionStorage) wird fuer mk-session verwendet', /const SESSION_KEY = 'mk-session'/.test(html) && /localStorage\.setItem\(SESSION_KEY/.test(html) && !/sessionStorage\.(get|set|remove)Item\([`'"]mk-session/.test(html));
 
 realLog(`\n${pass} passed, ${fail} failed`);
 process.exit(fail ? 1 : 0);

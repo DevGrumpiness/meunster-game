@@ -1910,16 +1910,56 @@
     // Browser legen dabei eine neue Tab-Instanz an und sessionStorage (an die
     // Tab-Instanz gebunden) ist dann WEG, obwohl es "derselbe Tab" aussieht.
     // localStorage ist an den Origin gebunden, nicht an die Tab-Instanz, und
-    // uebersteht das garantiert. Ein Zeitstempel + Max-Alter (siehe unten beim
-    // Resume) verhindert, dass ein Tage altes/totes Session veraltet weiterlebt.
+    // uebersteht das garantiert. Wichtig: Gespeicherte Sessions werden NICHT
+    // automatisch gestartet. Sonst haengt jeder spaetere normale Besuch auf der
+    // Landingpage in einer alten Lobby. Stattdessen zeigt die Startseite einen
+    // expliziten "Raum fortsetzen"-Button.
     // ============================================================
+    const SESSION_KEY = 'mk-session';
+    const SESSION_MAX_AGE_MS = 3 * 60 * 60 * 1000; // 3h - danach gilt die Session als tot/veraltet
+
     function saveSession() {
       try {
-        localStorage.setItem('mk-session', JSON.stringify({ role, code: roomCode, name: myName, id: myId, ts: Date.now() }));
+        localStorage.setItem(SESSION_KEY, JSON.stringify({ role, code: roomCode, name: myName, id: myId, ts: Date.now() }));
       } catch (e) { }
     }
     function clearSession() {
-      try { localStorage.removeItem('mk-session'); } catch (e) { }
+      try {
+        localStorage.removeItem(SESSION_KEY);
+      } catch (e) { }
+    }
+    function getSavedSession() {
+      try {
+        const saved = JSON.parse(localStorage.getItem(SESSION_KEY) || 'null');
+        if (!saved) return null;
+        const now = Date.now();
+        const code = String(saved.code || '').toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 4);
+        const name = String(saved.name || '').trim().slice(0, 14);
+        const roleSaved = saved.role === 'host' || saved.role === 'player' ? saved.role : '';
+        if (!roleSaved || code.length !== 4 || !name || !saved.ts || (now - saved.ts) >= SESSION_MAX_AGE_MS ||
+          (roleSaved === 'player' && !saved.id)) {
+          clearSession();
+          return null;
+        }
+        return { role: roleSaved, code, name, id: saved.id || '', ts: saved.ts };
+      } catch (e) {
+        return null;
+      }
+    }
+    function resumeSavedSession() {
+      const saved = getSavedSession();
+      if (!saved) { render(); return; }
+      app.innerHTML = '<div class="card"><div class="waiting">Stelle Raum ' + saved.code + ' wieder her<span class="waiting-dots"></span></div></div>';
+      if (saved.role === 'host') {
+        createHost(saved.name, 0, saved.code);
+      } else {
+        armJoinTimeout(saved.code);
+        joinRoom(saved.name, saved.code, 0, saved.id);
+      }
+    }
+    function discardSavedSession() {
+      clearSession();
+      render();
     }
 
     function createHost(name, attempt, forcedCode, codeRetries) {
@@ -3335,6 +3375,7 @@
     // AD-BANNER-END
 
     function renderHome() {
+      const savedSession = getSavedSession();
       app.innerHTML = `
     <div class="card">
       <h1><span class="bike">🚲</span> Münster Game</h1>
@@ -3349,6 +3390,13 @@
         <button class="btn btn-primary" onclick="onCreateRoom()">🎮 Raum erstellen</button>
         <button class="btn btn-secondary" onclick="onShowJoin()">🔗 Raum beitreten</button>
       </div>
+      ${savedSession ? `<div style="margin-top:14px;background:#f3f8ff;border:1.5px solid #c8dcf6;border-radius:12px;padding:10px;text-align:center;">
+        <div style="font-size:0.82rem;color:#46627f;margin-bottom:8px;">Letzten Raum <strong>${savedSession.code}</strong> fortsetzen?</div>
+        <div style="display:flex;gap:8px;">
+          <button class="btn btn-secondary" onclick="resumeSavedSession()" style="flex:1;margin:0;padding:10px 12px;font-size:0.85rem;">Fortsetzen</button>
+          <button onclick="discardSavedSession()" style="flex:0 0 auto;background:#fff;border:1.5px solid #cbd5e1;border-radius:10px;padding:10px 12px;font-size:0.8rem;font-weight:700;color:#64748b;cursor:pointer;font-family:inherit;">Verwerfen</button>
+        </div>
+      </div>` : ''}
 
       <div id="joinSection" class="${joinLinkCode ? '' : 'hidden'}" style="margin-top:20px;">
         ${joinLinkCode ? `<div style="text-align:center;background:#e8f4ea;border:2px solid var(--ms-green);border-radius:8px;padding:8px;margin-bottom:10px;font-size:0.85rem;font-weight:600;color:#2d6a4f;">🔗 Einladung für Raum ${joinLinkCode} – nur noch Name eingeben!</div>` : ''}
@@ -5106,31 +5154,8 @@
       if (jc.length === 4) joinLinkCode = jc;
     } catch (e) { }
 
-    // AUTO-RESUME nach ungewolltem Reload (z.B. killt das Share-Sheet beim
-    // "Link teilen" den Tab im Hintergrund - siehe SESSION-PERSISTENZ oben).
-    // Ohne das wuerde der Host beim Zurueckkommen einen NEUEN Zufalls-Code
-    // bekommen und der gerade geteilte Code/Link waere sofort ungueltig.
-    let _resumed = false;
-    try {
-      const saved = JSON.parse(localStorage.getItem('mk-session') || 'null');
-      const MAX_AGE_MS = 3 * 60 * 60 * 1000; // 3h - danach gilt die Session als tot/veraltet
-      if (saved && saved.code && saved.name && saved.ts && (Date.now() - saved.ts) < MAX_AGE_MS) {
-        app.innerHTML = '<div class="card"><div class="waiting">Stelle Verbindung wieder her<span class="waiting-dots"></span></div></div>';
-        if (saved.role === 'host') {
-          createHost(saved.name, 0, saved.code);
-          _resumed = true;
-        } else if (saved.role === 'player' && saved.id) {
-          armJoinTimeout(saved.code);
-          joinRoom(saved.name, saved.code, 0, saved.id);
-          _resumed = true;
-        }
-      } else if (saved) {
-        localStorage.removeItem('mk-session');
-      }
-    } catch (e) { }
-
     // INIT
-    if (!_resumed) render();
+    render();
   </script>
 
   <div id="howto-overlay"
