@@ -1,7 +1,12 @@
 // MS Game Service Worker: Navigation network-first (Updates landen sofort),
 // statische Assets cache-first. Nur same-origin GET; POSTs (ntfy) unberührt.
 'use strict';
-const CACHE = 'msgame-v1';
+// WICHTIG: Cache-Version bei Bedarf hochzaehlen (z.B. nach kritischen Fixes)!
+// Der Name ist der EINZIGE Trigger, der activate() dazu bringt, alte Caches
+// zu loeschen (siehe unten) - ohne Versionswechsel koennte auf manchen
+// Geraeten dauerhaft eine veraltete/kaputte gecachte Version als Offline-
+// Fallback ueberleben, selbst nach etlichen Deployments.
+const CACHE = 'msgame-v2';
 const PRECACHE = ['/', '/manifest.webmanifest', '/icons/icon-192.png', '/icons/icon-512.png'];
 
 self.addEventListener('install', e => {

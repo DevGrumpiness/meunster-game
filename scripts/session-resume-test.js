@@ -107,17 +107,21 @@ check('roomCode bleibt ABCD nach Resume', G.roomCode === 'ABCD');
 let saved = JSON.parse(localStorage.getItem('mk-session'));
 check('Session nach Host-Open gespeichert (role host, code ABCD)', !!saved && saved.role === 'host' && saved.code === 'ABCD' && saved.name === 'HostTest');
 
-// ===== TEST 2: unavailable-id auf Resume-Code retried 2x denselben Code, dann Fallback =====
+// ===== TEST 2: unavailable-id auf Resume-Code retried viele Male denselben Code,
+// dann erst Fallback (Kernfix dieser Runde: Budget von 2 auf 20 Retries erhoeht,
+// weil der echte PeerJS-Signaling-Server eine Peer-ID nach einem unsauberen
+// Verbindungsabbruch oft ERST NACH SEINEM EIGENEN HEARTBEAT-TIMEOUT freigibt -
+// das kann 30-60+ Sekunden dauern, nicht nur die alten ~2,7 Sekunden Gesamtfenster) =====
 localStorage._d = {};
 __peerInstances = [];
 G.createHost('HostTest2', 0, 'WXYZ');
 check('Initialer Resume-Versuch mit WXYZ', lastPeer().id === 'msk-dev-wxyz');
+for (let i = 0; i < 20; i++) {
+  lastPeer()._trigger('error', { type: 'unavailable-id' });
+}
+check('Nach 20 Retries (21 Versuche) noch immer WXYZ - nicht vorzeitig aufgegeben', __peerInstances.length === 21 && lastPeer().id === 'msk-dev-wxyz');
 lastPeer()._trigger('error', { type: 'unavailable-id' });
-check('1. Retry behaelt denselben Code', __peerInstances.length === 2 && lastPeer().id === 'msk-dev-wxyz');
-lastPeer()._trigger('error', { type: 'unavailable-id' });
-check('2. Retry behaelt denselben Code', __peerInstances.length === 3 && lastPeer().id === 'msk-dev-wxyz');
-lastPeer()._trigger('error', { type: 'unavailable-id' });
-check('Nach 2 gescheiterten Retries: Fallback auf neuen Code', __peerInstances.length === 4 && lastPeer().id !== 'msk-dev-wxyz');
+check('Erst nach 20 gescheiterten Retries: Fallback auf neuen Code', __peerInstances.length === 22 && lastPeer().id !== 'msk-dev-wxyz');
 
 // ===== TEST 3: Player-Resume sendet rejoin (mit oldId) statt join =====
 localStorage._d = {};
@@ -140,6 +144,31 @@ let conn2 = lastPeer().lastConn;
 conn2.open = true;
 conn2._trigger('open');
 check('Normaler Join (ohne resumeId) sendet join statt rejoin', conn2.sent.length === 1 && conn2.sent[0].type === 'join');
+
+// ===== TEST 4b: Player-Resume (resumeId gesetzt) bekommt dasselbe lange Retry-
+// Budget wie der Host (Kernfix, s.o.) - gibt NICHT nach 2 Fehlversuchen auf,
+// weil der Host in dieser Zeit selbst noch versuchen koennte, seine alte
+// Peer-ID zurueckzuholen. =====
+localStorage._d = {};
+__peerInstances = [];
+G.gameState.phase = 'home';
+G.joinRoom('ResumePlayer', 'QRST', 0, 'old-id-999');
+for (let i = 0; i < 20; i++) { lastPeer()._trigger('error', { type: 'network' }); }
+check('Player-Resume gibt nach 20 Fehlversuchen noch NICHT auf', G.gameState.phase === 'home');
+lastPeer()._trigger('error', { type: 'network' });
+check('Player-Resume gibt erst nach 20 Retries auf (lange Geduld bei Resume)', G.gameState.phase === 'error');
+
+// ===== TEST 4c: Frischer Join (kein resumeId) bleibt beim schnellen Fail
+// (2 Retries) - ein vertippter Code soll nicht eine Minute lang haengen. =====
+localStorage._d = {};
+__peerInstances = [];
+G.gameState.phase = 'home';
+G.joinRoom('FreshPlayer', 'UVWX');
+lastPeer()._trigger('error', { type: 'network' });
+lastPeer()._trigger('error', { type: 'network' });
+check('Frischer Join nach 2 Fehlversuchen noch nicht aufgegeben', G.gameState.phase === 'home');
+lastPeer()._trigger('error', { type: 'network' });
+check('Frischer Join gibt weiterhin schnell auf (2 Retries, unveraendert)', G.gameState.phase === 'error');
 
 // ===== TEST 5: Kicked-Nachricht loescht gespeicherte Session =====
 localStorage.setItem('mk-session', JSON.stringify({ role: 'player', code: 'ABCD', name: 'X', id: 'y' }));

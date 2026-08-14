@@ -1953,11 +1953,20 @@
         console.error('Peer error (host):', err && err.type);
         if (err && err.type === 'unavailable-id') {
           try { peer.destroy(); } catch (e) { }
-          if (forcedCode && codeRetries < 2) {
-            // Resume nach Reload: alte Peer-ID ist evtl. noch nicht vom
-            // Signaling-Server freigegeben - kurz nochmal mit demselben Code
-            // versuchen, bevor wir auf einen neuen Code ausweichen.
-            setTimeout(() => createHost(name, attempt, forcedCode, codeRetries + 1), 900 + codeRetries * 900);
+          // Resume nach Reload: der Signaling-Server (PeerJS-Broker) gibt eine
+          // Peer-ID nach einem UNSAUBEREN Verbindungsabbruch (z.B. OS killt den
+          // Tab beim App-Wechsel ohne jede Chance auf ein "beforeunload") oft
+          // ERST NACH SEINEM EIGENEN HEARTBEAT-TIMEOUT frei - das kann durchaus
+          // 30-60+ Sekunden dauern, nicht nur ein paar Millisekunden. Ein zu
+          // kurzes Retry-Fenster hier war der eigentliche Grund, warum Resume
+          // trotz korrekter localStorage-Logik fehlschlug: wir haben nach ~2,7s
+          // aufgegeben und einen KOMPLETT NEUEN Code erzeugt, obwohl der alte
+          // Code kurz danach laengst wieder verfuegbar gewesen waere.
+          // Deshalb: bis zu 20 Versuche, Backoff bis 4s gedeckelt (~70s gesamt),
+          // bevor wir wirklich auf einen neuen Code ausweichen.
+          if (forcedCode && codeRetries < 20) {
+            const delay = Math.min(900 + codeRetries * 700, 4000);
+            setTimeout(() => createHost(name, attempt, forcedCode, codeRetries + 1), delay);
           } else {
             createHost(name, attempt);
           }
@@ -2002,9 +2011,13 @@
       peer = new Peer(undefined, PEER_CONFIG);
 
       // Peer-/Signaling-Fehler koennen transient sein (kurzer Aussetzer beim
-      // Broker). Statt sofort eine Dauer-Fehlermeldung zu zeigen: 2x mit kurzer
-      // Pause neu versuchen, BEVOR wir aufgeben - aber nur, solange wir noch
-      // nicht erfolgreich verbunden waren (mid-game bleibt unveraendert).
+      // Broker). Bei einem RESUME (resumeId gesetzt, nach ungewolltem Reload)
+      // kann ausserdem der HOST selbst noch dabei sein, seine alte Peer-ID vom
+      // Signaling-Server zurueckzuholen (siehe createHost) - das dauert oft
+      // deutlich laenger als ein paar Sekunden. Deshalb bei Resume bis zu 20x
+      // mit Backoff bis 4s (~70s gesamt) retryen, bevor wir aufgeben. Bei einem
+      // FRISCHEN Beitritt (kein resumeId, z.B. vertippter Code) bleiben wir
+      // bei schnellem Fail (2 Versuche), damit Nutzer nicht unnoetig warten.
       const retryOrFail = (err) => {
         console.error('Peer error (join):', err && err.type);
         if (didOpen) {
@@ -2013,10 +2026,12 @@
           render();
           return;
         }
-        if (attempt < 2) {
+        const maxAttempts = resumeId ? 20 : 2;
+        if (attempt < maxAttempts) {
           try { peer.destroy(); } catch (e) { }
           armJoinTimeout(code);
-          setTimeout(() => joinRoom(name, code, attempt + 1, resumeId), 1200 + attempt * 1200);
+          const delay = resumeId ? Math.min(1200 + attempt * 700, 4000) : (1200 + attempt * 1200);
+          setTimeout(() => joinRoom(name, code, attempt + 1, resumeId), delay);
         } else {
           clearSession();
           gameState.phase = 'error';
