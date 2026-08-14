@@ -3502,7 +3502,8 @@
       <p style="text-align:center;font-weight:600;margin-bottom:6px;">Raum-Code:</p>
       <div class="room-code">${roomCode}</div>
       <p style="text-align:center;color:#888;font-size:0.85rem;">Teilt diesen Code, damit andere beitreten können.</p>
-      <div style="display:flex;justify-content:center;gap:8px;margin:10px 0 4px;">
+      <div style="display:flex;justify-content:center;gap:8px;margin:10px 0 4px;flex-wrap:wrap;">
+        <button onclick="shareRoom()" style="background:var(--ms-gold);border:2px solid var(--ms-gold);color:#5b4a00;border-radius:10px;padding:8px 16px;font-size:0.85rem;font-weight:700;cursor:pointer;font-family:inherit;">📤 Link teilen</button>
         <button onclick="toggleQR()" style="background:var(--ms-blue);border:2px solid var(--ms-blue);color:#fff;border-radius:10px;padding:8px 16px;font-size:0.85rem;font-weight:700;cursor:pointer;font-family:inherit;">📱 QR-Code anzeigen</button>
       </div>
       <div id="qr-box" style="display:none;text-align:center;margin:8px 0;"></div>
@@ -4662,15 +4663,33 @@
     }
 
     // ============================================================
-    // ROOM SHARING (nur QR-Code + manueller Code - siehe Kommentar unten:
-    // "Link teilen" (Web Share API) wurde entfernt, weil sie auf manchen
-    // Mobilgeraeten beim Wechsel zu WhatsApp den Tab/Prozess killen konnte
-    // und der Host danach nicht zuverlässig in denselben Raum zurückfand.
-    // QR-Code und manueller Code-Eintritt lösen dasselbe Problem (Code an
-    // andere weitergeben) ohne die App zu verlassen - kein Absturzrisiko.
+    // ROOM SHARING
+    // "Link teilen" darf nur den bestehenden Raumcode weitergeben. Es startet
+    // keinen neuen Raum und loest kein Auto-Resume aus; falls die Share-App den
+    // Tab killt, zeigt die Landingpage danach nur den expliziten Fortsetzen-
+    // Button fuer die gespeicherte Session.
     // ============================================================
     function roomLink() {
       return location.origin + location.pathname + '?join=' + roomCode;
+    }
+    async function shareRoom() {
+      const link = roomLink();
+      const text = 'Komm in meinen Münster-Game-Raum ' + roomCode + ': ' + link;
+      try { saveSession(); } catch (e) { }
+      if (navigator.share) {
+        try {
+          await navigator.share({ title: 'Münster Game', text: 'Raum-Code: ' + roomCode, url: link });
+          return;
+        } catch (e) {
+          if (e && e.name === 'AbortError') return;
+        }
+      }
+      try {
+        await navigator.clipboard.writeText(text);
+        alert('Link kopiert: ' + roomCode);
+      } catch (e) {
+        try { window.prompt('Link kopieren:', text); } catch (err) { alert(link); }
+      }
     }
     function toggleQR() {
       const box = document.getElementById('qr-box');

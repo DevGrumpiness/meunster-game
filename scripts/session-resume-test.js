@@ -224,6 +224,7 @@ check('saveSession() setzt einen aktuellen Zeitstempel (ts)', !!savedTs.ts && sa
 localStorage.setItem('mk-session', JSON.stringify({ role: 'host', code: 'ABCD', name: 'Host', id: 'msk-dev-abcd', ts: Date.now() }));
 check('Gespeicherte Host-Session ist fuer explizites Fortsetzen lesbar', !!G.getSavedSession() && G.getSavedSession().code === 'ABCD');
 check('Landingpage startet alte Session nicht automatisch', !/AUTO-RESUME/.test(html) && !/let _resumed/.test(html) && /resumeSavedSession/.test(html) && /render\(\);\s*<\/script>/.test(html));
+check('Link teilen ist wieder aktiv, aber ohne Auto-Resume-Magie', /onclick="shareRoom\(\)"/.test(html) && /async function shareRoom\(\)/.test(html) && /navigator\.share/.test(html) && !/markResumeIntent/.test(html) && !/mk-resume-intent/.test(html));
 check('localStorage (nicht sessionStorage) wird fuer mk-session verwendet', /const SESSION_KEY = 'mk-session'/.test(html) && /localStorage\.setItem\(SESSION_KEY/.test(html) && !/sessionStorage\.(get|set|remove)Item\([`'"]mk-session/.test(html));
 
 realLog(`\n${pass} passed, ${fail} failed`);
