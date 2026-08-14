@@ -568,5 +568,213 @@
    "ev": "open",
    "src": "prod"
   }
+ },
+ {
+  "id": "pUno6E3cNfmB",
+  "kind": "stats",
+  "ts": 1786714216552,
+  "data": {
+   "ev": "open",
+   "src": "prod"
+  }
+ },
+ {
+  "id": "nZQC1gg3mAaX",
+  "kind": "stats",
+  "ts": 1786714232002,
+  "data": {
+   "ev": "open",
+   "src": "prod"
+  }
+ },
+ {
+  "id": "vyMeFwYvfNlr",
+  "kind": "stats",
+  "ts": 1786714238974,
+  "data": {
+   "ev": "room",
+   "src": "prod"
+  }
+ },
+ {
+  "id": "S8YoTrPlosqR",
+  "kind": "stats",
+  "ts": 1786714399664,
+  "data": {
+   "ev": "room",
+   "src": "prod"
+  }
+ },
+ {
+  "id": "8aTBUiBS2bRE",
+  "kind": "app",
+  "ts": 1786714512408,
+  "data": {
+   "name": "Mo",
+   "text": "Beim „Link teilen“ Button fehlt der Link, wenn man danach „kopieren“ auswählt, statt direkt eine App.\niOS, Safari",
+   "room": "22Y2"
+  }
+ },
+ {
+  "id": "4W64vVwKBgMJ",
+  "kind": "stats",
+  "ts": 1786715377315,
+  "data": {
+   "ev": "open",
+   "src": "prod"
+  }
+ },
+ {
+  "id": "1OnYEuisZg3u",
+  "kind": "stats",
+  "ts": 1786715377318,
+  "data": {
+   "ev": "open",
+   "src": "prod"
+  }
+ },
+ {
+  "id": "EkY4a4fr0nvt",
+  "kind": "stats",
+  "ts": 1786715392642,
+  "data": {
+   "ev": "room",
+   "src": "prod"
+  }
+ },
+ {
+  "id": "2qfLSrLaRkA5",
+  "kind": "stats",
+  "ts": 1786715567526,
+  "data": {
+   "ev": "open",
+   "src": "prod"
+  }
+ },
+ {
+  "id": "cTKWWjuqo4S0",
+  "kind": "stats",
+  "ts": 1786715589214,
+  "data": {
+   "ev": "open",
+   "src": "prod"
+  }
+ },
+ {
+  "id": "eISMEln5aIZz",
+  "kind": "stats",
+  "ts": 1786715595793,
+  "data": {
+   "ev": "open",
+   "src": "prod"
+  }
+ },
+ {
+  "id": "XGrbkFx69Bqc",
+  "kind": "stats",
+  "ts": 1786718293958,
+  "data": {
+   "ev": "open",
+   "src": "prod"
+  }
+ },
+ {
+  "id": "Iknzx6MdQW3t",
+  "kind": "stats",
+  "ts": 1786718541740,
+  "data": {
+   "ev": "open",
+   "src": "prod"
+  }
+ },
+ {
+  "id": "WgH9qIFJBOoo",
+  "kind": "stats",
+  "ts": 1786720233973,
+  "data": {
+   "ev": "open",
+   "src": "prod"
+  }
+ },
+ {
+  "id": "avWCOCJLSsiv",
+  "kind": "stats",
+  "ts": 1786722113374,
+  "data": {
+   "ev": "open",
+   "src": "prod"
+  }
+ },
+ {
+  "id": "I6ttAaZGqYX8",
+  "kind": "stats",
+  "ts": 1786722175067,
+  "data": {
+   "ev": "open",
+   "src": "prod"
+  }
+ },
+ {
+  "id": "VkrlcN3C1GqI",
+  "kind": "stats",
+  "ts": 1786722505121,
+  "data": {
+   "ev": "open",
+   "src": "prod"
+  }
+ },
+ {
+  "id": "uyhq8LRX7Kau",
+  "kind": "stats",
+  "ts": 1786729131037,
+  "data": {
+   "ev": "open",
+   "src": "prod"
+  }
+ },
+ {
+  "id": "XhZqy5mhNCob",
+  "kind": "stats",
+  "ts": 1786729893021,
+  "data": {
+   "ev": "open",
+   "src": "prod"
+  }
+ },
+ {
+  "id": "sHumyAi9e705",
+  "kind": "stats",
+  "ts": 1786729896462,
+  "data": {
+   "ev": "room",
+   "src": "prod"
+  }
+ },
+ {
+  "id": "eW1P4Ee0wF0c",
+  "kind": "stats",
+  "ts": 1786729916279,
+  "data": {
+   "ev": "room",
+   "src": "prod"
+  }
+ },
+ {
+  "id": "qaNtjlYMFss8",
+  "kind": "stats",
+  "ts": 1786732209920,
+  "data": {
+   "ev": "open",
+   "src": "prod"
+  }
+ },
+ {
+  "id": "DFACQT8j19C0",
+  "kind": "stats",
+  "ts": 1786732350379,
+  "data": {
+   "ev": "open",
+   "src": "prod"
+  }
  }
 ]
