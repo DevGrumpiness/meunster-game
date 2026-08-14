@@ -241,6 +241,7 @@ check('Gespeicherte Host-Session ist fuer explizites Fortsetzen lesbar', !!G.get
 check('Landingpage startet alte Session nicht automatisch', !/AUTO-RESUME/.test(html) && !/let _resumed/.test(html) && /resumeSavedSession/.test(html) && /render\(\);\s*<\/script>/.test(html));
 check('Link teilen ist wieder aktiv, aber ohne Auto-Resume-Magie', /onclick="shareRoom\(\)"/.test(html) && /async function shareRoom\(\)/.test(html) && /navigator\.share/.test(html) && !/markResumeIntent/.test(html) && !/mk-resume-intent/.test(html));
 check('localStorage (nicht sessionStorage) wird fuer mk-session verwendet', /const SESSION_KEY = 'mk-session'/.test(html) && /localStorage\.setItem\(SESSION_KEY/.test(html) && !/sessionStorage\.(get|set|remove)Item\([`'"]mk-session/.test(html));
+check('Kein hartcodierter alter Versionshinweis v29.07 in der UI', !/v29\.07/.test(html));
 
 realLog(`\n${pass} passed, ${fail} failed`);
 process.exit(fail ? 1 : 0);
