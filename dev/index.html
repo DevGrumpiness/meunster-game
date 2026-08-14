@@ -1979,7 +1979,12 @@
         // bevor der Nutzer eine Fehlermeldung sieht (statt Dauer-Spinner).
         if (attempt < 2) {
           try { peer.destroy(); } catch (e) { }
-          setTimeout(() => createHost(name, attempt + 1, forcedCode), 1200 + attempt * 1200);
+          // Wichtig fuer App-Wechsel/Resume: Auch normale PeerJS-Netzwerkfehler
+          // nach einem bereits erstellten Raum duerfen NIEMALS einen neuen Code
+          // erzeugen. Genau dieser Pfad lief bisher ohne forcedCode weiter und
+          // erzeugte nach ~1-2s einen frischen Raumcode.
+          const retryCode = forcedCode || roomCode;
+          setTimeout(() => createHost(name, attempt + 1, retryCode), 1200 + attempt * 1200);
         } else {
           clearSession();
           gameState.phase = 'error';

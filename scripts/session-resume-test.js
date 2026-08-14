@@ -107,6 +107,22 @@ check('roomCode bleibt ABCD nach Resume', G.roomCode === 'ABCD');
 let saved = JSON.parse(localStorage.getItem('mk-session'));
 check('Session nach Host-Open gespeichert (role host, code ABCD)', !!saved && saved.role === 'host' && saved.code === 'ABCD' && saved.name === 'HostTest');
 
+// ===== TEST 1b: Host-App-Wechsel/PeerJS-Netzwerkfehler nach bereits
+// erstelltem Raum darf NIEMALS einen neuen Raumcode erzeugen. Das war der
+// Realgeraete-Bug: Beim Zurueckkommen meldet PeerJS nach ~1-2s einen transienten
+// Netzwerkfehler; der Retry lief ohne forcedCode weiter und generierte dadurch
+// einen neuen Code. =====
+localStorage._d = {};
+__peerInstances = [];
+G.createHost('HostSwitch');
+const switchCode = G.roomCode;
+check('Normal erstellter Host hat initialen Code', /^[A-Z0-9]{4}$/.test(switchCode));
+lastPeer()._trigger('open', 'msk-dev-' + switchCode.toLowerCase());
+lastPeer()._trigger('error', { type: 'network' });
+check('Host-Retry nach Netzwerkfehler behaelt denselben Code (1. Retry)', G.roomCode === switchCode && lastPeer().id === 'msk-dev-' + switchCode.toLowerCase());
+lastPeer()._trigger('error', { type: 'network' });
+check('Host-Retry nach Netzwerkfehler behaelt denselben Code (2. Retry)', G.roomCode === switchCode && lastPeer().id === 'msk-dev-' + switchCode.toLowerCase());
+
 // ===== TEST 2: unavailable-id auf Resume-Code retried viele Male denselben Code,
 // dann erst Fallback (Kernfix dieser Runde: Budget von 2 auf 20 Retries erhoeht,
 // weil der echte PeerJS-Signaling-Server eine Peer-ID nach einem unsauberen
