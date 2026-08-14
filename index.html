@@ -1971,8 +1971,11 @@
 
       const peerId = 'msk-dev-' + roomCode.toLowerCase();
       peer = new Peer(peerId, PEER_CONFIG);
+      let didOpen = false;
 
       peer.on('open', (id) => {
+        didOpen = true;
+        attempt = 0;
         myId = id;
         gameState.phase = 'lobby';
         gameState.players = [{ id: myId, name: myName, color: PLAYER_COLORS[0], score: 0, connected: true, isHost: true }];
@@ -2012,16 +2015,19 @@
           }
           return;
         }
-        // Transient Signaling-/Netzwerkfehler: still ein paar Mal neu versuchen,
-        // bevor der Nutzer eine Fehlermeldung sieht (statt Dauer-Spinner).
-        if (attempt < 2) {
+        // Transient Signaling-/Netzwerkfehler:
+        // - Beim frischen Raumerstellen nur kurz retryen.
+        // - Wenn der Raum aber schon einmal offen war (typisch: App-Wechsel /
+        //   Share-Sheet / WhatsApp zurueck), darf der Retry-Zaehler NICHT ueber
+        //   mehrere erfolgreiche Rueckkehrten aufsummieren. Sonst kippt der Host
+        //   beim 2./3. Zurueckkommen in "Konnte nicht verbinden".
+        const retryExistingRoom = didOpen || !!forcedCode;
+        const maxAttempts = retryExistingRoom ? 20 : 2;
+        if (attempt < maxAttempts) {
           try { peer.destroy(); } catch (e) { }
-          // Wichtig fuer App-Wechsel/Resume: Auch normale PeerJS-Netzwerkfehler
-          // nach einem bereits erstellten Raum duerfen NIEMALS einen neuen Code
-          // erzeugen. Genau dieser Pfad lief bisher ohne forcedCode weiter und
-          // erzeugte nach ~1-2s einen frischen Raumcode.
-          const retryCode = forcedCode || roomCode;
-          setTimeout(() => createHost(name, attempt + 1, retryCode), 1200 + attempt * 1200);
+          const retryCode = retryExistingRoom ? (forcedCode || roomCode) : undefined;
+          const delay = retryExistingRoom ? Math.min(1200 + attempt * 700, 4000) : (1200 + attempt * 1200);
+          setTimeout(() => createHost(name, attempt + 1, retryCode), delay);
         } else {
           clearSession();
           gameState.phase = 'error';

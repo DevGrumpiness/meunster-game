@@ -124,6 +124,21 @@ check('Host-Retry nach Netzwerkfehler behaelt denselben Code (1. Retry)', G.room
 lastPeer()._trigger('error', { type: 'network' });
 check('Host-Retry nach Netzwerkfehler behaelt denselben Code (2. Retry)', G.roomCode === switchCode && lastPeer().id === 'msk-dev-' + switchCode.toLowerCase());
 
+// ===== TEST 1c: Mehrfaches Zurueckkommen zur Host-Lobby darf den Host NICHT
+// in den "Konnte nicht verbinden"-Fehler kippen. Nach jedem erfolgreichen
+// Wieder-Oeffnen muss der Transient-Error-Zaehler wieder frisch sein. =====
+localStorage._d = {};
+__peerInstances = [];
+G.gameState.phase = 'home';
+G.createHost('HostRepeatedSwitch');
+const repeatedSwitchCode = G.roomCode;
+lastPeer()._trigger('open', 'msk-dev-' + repeatedSwitchCode.toLowerCase());
+for (let i = 0; i < 5; i++) {
+  lastPeer()._trigger('error', { type: 'network' });
+  check('Host-Lobby-Rueckkehr #' + (i + 1) + ' behaelt Code und bleibt aus Error', G.roomCode === repeatedSwitchCode && G.gameState.phase !== 'error' && lastPeer().id === 'msk-dev-' + repeatedSwitchCode.toLowerCase());
+  lastPeer()._trigger('open', 'msk-dev-' + repeatedSwitchCode.toLowerCase());
+}
+
 // ===== TEST 2: unavailable-id auf Resume-Code retried viele Male denselben Code,
 // dann erst Fallback (Kernfix dieser Runde: Budget von 2 auf 20 Retries erhoeht,
 // weil der echte PeerJS-Signaling-Server eine Peer-ID nach einem unsauberen
