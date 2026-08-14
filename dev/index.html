@@ -1902,9 +1902,27 @@
       }
     };
 
-    function createHost(name, attempt) {
+    // ============================================================
+    // SESSION-PERSISTENZ (uebersteht einen ungewollten Reload, z.B. wenn das
+    // Share-Sheet/App-Wechsel beim Teilen des Links den Tab im Hintergrund
+    // killt - beim Zurueckkommen wuerde createHost() sonst einen NEUEN
+    // Zufalls-Code erzeugen und der gerade geteilte Code waere ungueltig).
+    // sessionStorage uebersteht einen Reload im selben Tab, wird aber beim
+    // echten Schliessen des Tabs automatisch vom Browser geloescht.
+    // ============================================================
+    function saveSession() {
+      try {
+        sessionStorage.setItem('mk-session', JSON.stringify({ role, code: roomCode, name: myName, id: myId }));
+      } catch (e) { }
+    }
+    function clearSession() {
+      try { sessionStorage.removeItem('mk-session'); } catch (e) { }
+    }
+
+    function createHost(name, attempt, forcedCode, codeRetries) {
       attempt = attempt || 0;
-      roomCode = generateRoomCode();
+      codeRetries = codeRetries || 0;
+      roomCode = forcedCode || generateRoomCode();
       myName = name;
       role = 'host';
 
@@ -1915,6 +1933,7 @@
         myId = id;
         gameState.phase = 'lobby';
         gameState.players = [{ id: myId, name: myName, color: PLAYER_COLORS[0], score: 0, connected: true, isHost: true }];
+        saveSession();
         trackEvent('room');
         render();
       });
@@ -1930,16 +1949,24 @@
       peer.on('error', (err) => {
         console.error('Peer error (host):', err && err.type);
         if (err && err.type === 'unavailable-id') {
-          peer.destroy();
-          createHost(name, attempt);
+          try { peer.destroy(); } catch (e) { }
+          if (forcedCode && codeRetries < 2) {
+            // Resume nach Reload: alte Peer-ID ist evtl. noch nicht vom
+            // Signaling-Server freigegeben - kurz nochmal mit demselben Code
+            // versuchen, bevor wir auf einen neuen Code ausweichen.
+            setTimeout(() => createHost(name, attempt, forcedCode, codeRetries + 1), 900 + codeRetries * 900);
+          } else {
+            createHost(name, attempt);
+          }
           return;
         }
         // Transient Signaling-/Netzwerkfehler: still ein paar Mal neu versuchen,
         // bevor der Nutzer eine Fehlermeldung sieht (statt Dauer-Spinner).
         if (attempt < 2) {
           try { peer.destroy(); } catch (e) { }
-          setTimeout(() => createHost(name, attempt + 1), 1200 + attempt * 1200);
+          setTimeout(() => createHost(name, attempt + 1, forcedCode), 1200 + attempt * 1200);
         } else {
+          clearSession();
           gameState.phase = 'error';
           render();
         }
@@ -1962,7 +1989,7 @@
       }, 12000);
     }
 
-    function joinRoom(name, code, attempt) {
+    function joinRoom(name, code, attempt, resumeId) {
       attempt = attempt || 0;
       myName = name;
       roomCode = code.toUpperCase();
@@ -1978,6 +2005,7 @@
       const retryOrFail = (err) => {
         console.error('Peer error (join):', err && err.type);
         if (didOpen) {
+          clearSession();
           gameState.phase = 'error';
           render();
           return;
@@ -1985,8 +2013,9 @@
         if (attempt < 2) {
           try { peer.destroy(); } catch (e) { }
           armJoinTimeout(code);
-          setTimeout(() => joinRoom(name, code, attempt + 1), 1200 + attempt * 1200);
+          setTimeout(() => joinRoom(name, code, attempt + 1, resumeId), 1200 + attempt * 1200);
         } else {
+          clearSession();
           gameState.phase = 'error';
           render();
         }
@@ -2000,7 +2029,12 @@
         hostConn.on('open', () => {
           didOpen = true;
           clearTimeout(window._joinTimeout);
-          hostConn.send({ type: 'join', name: myName, id: myId });
+          if (resumeId) {
+            hostConn.send({ type: 'rejoin', name: myName, id: myId, oldId: resumeId });
+          } else {
+            hostConn.send({ type: 'join', name: myName, id: myId });
+          }
+          saveSession();
         });
 
         hostConn.on('data', (data) => handlePlayerMessage(data));
@@ -2233,6 +2267,7 @@
         return;
       }
       if (data.type === 'kicked') {
+        clearSession();
         gameState.phase = 'kicked';
         if (peer) peer.destroy();
         render();
@@ -2502,6 +2537,7 @@
           });
         });
 
+        saveSession();
         render();
       });
 
@@ -2509,6 +2545,7 @@
         if (err.type === 'unavailable-id') {
           setTimeout(() => reconnectAsPlayer(), 2000);
         } else {
+          clearSession();
           gameState.phase = 'disconnected';
           render();
         }
@@ -2528,20 +2565,24 @@
 
         hostConn.on('open', () => {
           hostConn.send({ type: 'rejoin', name: myName, id: myId, oldId: savedGameId });
+          saveSession();
         });
 
         hostConn.on('data', (data) => handlePlayerMessage(data));
         hostConn.on('close', () => {
+          clearSession();
           gameState.phase = 'disconnected';
           render();
         });
         hostConn.on('error', () => {
+          clearSession();
           gameState.phase = 'error';
           render();
         });
       });
 
       peer.on('error', () => {
+        clearSession();
         gameState.phase = 'disconnected';
         render();
       });
@@ -4220,6 +4261,7 @@
     // Player leaves deliberately: tell the host first, then reload
     function leaveGame() {
       try { sendToHost({ type: 'leave', playerId: myId }); } catch (e) { }
+      clearSession();
       setTimeout(() => location.reload(), 250);
     }
 
@@ -5054,8 +5096,28 @@
       if (jc.length === 4) joinLinkCode = jc;
     } catch (e) { }
 
+    // AUTO-RESUME nach ungewolltem Reload (z.B. killt das Share-Sheet beim
+    // "Link teilen" den Tab im Hintergrund - siehe SESSION-PERSISTENZ oben).
+    // Ohne das wuerde der Host beim Zurueckkommen einen NEUEN Zufalls-Code
+    // bekommen und der gerade geteilte Code/Link waere sofort ungueltig.
+    let _resumed = false;
+    try {
+      const saved = JSON.parse(sessionStorage.getItem('mk-session') || 'null');
+      if (saved && saved.code && saved.name) {
+        app.innerHTML = '<div class="card"><div class="waiting">Stelle Verbindung wieder her<span class="waiting-dots"></span></div></div>';
+        if (saved.role === 'host') {
+          createHost(saved.name, 0, saved.code);
+          _resumed = true;
+        } else if (saved.role === 'player' && saved.id) {
+          armJoinTimeout(saved.code);
+          joinRoom(saved.name, saved.code, 0, saved.id);
+          _resumed = true;
+        }
+      }
+    } catch (e) { }
+
     // INIT
-    render();
+    if (!_resumed) render();
   </script>
 
   <div id="howto-overlay"
