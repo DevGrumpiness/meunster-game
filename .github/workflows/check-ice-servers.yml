@@ -1,0 +1,22 @@
+name: ICE-Server-Check (STUN/TURN)
+# Prueft nach jedem Deploy + alle 6h, ob die im Spiel hinterlegten STUN/TURN-
+# Server wirklich noch erreichbar/funktionsfaehig sind. Hintergrund: am
+# 14./15.08.2026 ist der TURN-Server openrelay.metered.ca unbemerkt
+# abgeschaltet worden, Nutzer landeten reihenweise in "Konnte nicht
+# verbinden" - ohne dass irgendwas das automatisch gemeldet haette.
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '47 */6 * * *'
+  workflow_run:
+    workflows: ["Deploy to GitHub Pages"]
+    types: [completed]
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name != 'workflow_run' }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: ICE-Server pruefen (prod)
+        run: node scripts/check-ice-servers.mjs https://ms-game.de/

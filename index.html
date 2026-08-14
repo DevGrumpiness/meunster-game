@@ -1882,20 +1882,25 @@
       return code;
     }
 
+    // WICHTIG: openrelay.metered.ca (alter TURN-Server) ist seit 08/2026 tot (DNS
+    // aufgeloest sich nicht mehr, von Metered eingestellt). Sogar PeerJS' eigener
+    // Standard-TURN (eu-0/us-0.turn.peerjs.com) ist ebenfalls tot. Ohne TURN
+    // schlaegt die Verbindung fehl, wenn beide Seiten hinter restriktivem NAT
+    // sitzen (z.B. Mobilfunk) - STUN allein reicht dann nicht.
+    // check-ice-servers.mjs prueft das automatisch nach jedem Deploy + per Cron.
     const PEER_CONFIG = {
       debug: 0,
       config: {
         iceServers: [
           { urls: 'stun:stun.l.google.com:19302' },
           { urls: 'stun:stun1.l.google.com:19302' },
-          { urls: 'turn:openrelay.metered.ca:80', username: 'openrelayproject', credential: 'openrelayproject' },
-          { urls: 'turn:openrelay.metered.ca:443', username: 'openrelayproject', credential: 'openrelayproject' },
-          { urls: 'turn:openrelay.metered.ca:443?transport=tcp', username: 'openrelayproject', credential: 'openrelayproject' }
+          { urls: 'stun:stun.cloudflare.com:3478' }
         ]
       }
     };
 
-    function createHost(name) {
+    function createHost(name, attempt) {
+      attempt = attempt || 0;
       roomCode = generateRoomCode();
       myName = name;
       role = 'host';
@@ -1920,22 +1925,69 @@
       });
 
       peer.on('error', (err) => {
-        if (err.type === 'unavailable-id') {
-          roomCode = generateRoomCode();
+        console.error('Peer error (host):', err && err.type);
+        if (err && err.type === 'unavailable-id') {
           peer.destroy();
-          createHost(name);
+          createHost(name, attempt);
+          return;
+        }
+        // Transient Signaling-/Netzwerkfehler: still ein paar Mal neu versuchen,
+        // bevor der Nutzer eine Fehlermeldung sieht (statt Dauer-Spinner).
+        if (attempt < 2) {
+          try { peer.destroy(); } catch (e) { }
+          setTimeout(() => createHost(name, attempt + 1), 1200 + attempt * 1200);
         } else {
-          console.error('Peer error:', err);
+          gameState.phase = 'error';
+          render();
         }
       });
     }
 
-    function joinRoom(name, code) {
+    function armJoinTimeout(code) {
+      clearTimeout(window._joinTimeout);
+      window._joinTimeout = setTimeout(() => {
+        if (gameState.phase === 'home') {
+          app.innerHTML = `<div class="card">
+            <div class="result-box fail">
+              <div class="result-big">⏳ Verbindung fehlgeschlagen</div>
+              <div class="result-detail">Raum ${code} nicht erreichbar. Ist der Host online?</div>
+            </div>
+            <button class="btn btn-gold" onclick="onJoinRoom()" style="margin-top:16px;">🔄 Nochmal versuchen</button>
+            <button class="btn" onclick="gameState.phase='home';render();" style="margin-top:8px;">← Zurück</button>
+          </div>`;
+        }
+      }, 12000);
+    }
+
+    function joinRoom(name, code, attempt) {
+      attempt = attempt || 0;
       myName = name;
       roomCode = code.toUpperCase();
       role = 'player';
 
+      let didOpen = false;
       peer = new Peer(undefined, PEER_CONFIG);
+
+      // Peer-/Signaling-Fehler koennen transient sein (kurzer Aussetzer beim
+      // Broker). Statt sofort eine Dauer-Fehlermeldung zu zeigen: 2x mit kurzer
+      // Pause neu versuchen, BEVOR wir aufgeben - aber nur, solange wir noch
+      // nicht erfolgreich verbunden waren (mid-game bleibt unveraendert).
+      const retryOrFail = (err) => {
+        console.error('Peer error (join):', err && err.type);
+        if (didOpen) {
+          gameState.phase = 'error';
+          render();
+          return;
+        }
+        if (attempt < 2) {
+          try { peer.destroy(); } catch (e) { }
+          armJoinTimeout(code);
+          setTimeout(() => joinRoom(name, code, attempt + 1), 1200 + attempt * 1200);
+        } else {
+          gameState.phase = 'error';
+          render();
+        }
+      };
 
       peer.on('open', (id) => {
         myId = id;
@@ -1943,6 +1995,7 @@
         hostConn = peer.connect(hostPeerId, { reliable: true });
 
         hostConn.on('open', () => {
+          didOpen = true;
           clearTimeout(window._joinTimeout);
           hostConn.send({ type: 'join', name: myName, id: myId });
         });
@@ -1963,16 +2016,10 @@
           }
         });
 
-        hostConn.on('error', (err) => {
-          gameState.phase = 'error';
-          render();
-        });
+        hostConn.on('error', retryOrFail);
       });
 
-      peer.on('error', (err) => {
-        gameState.phase = 'error';
-        render();
-      });
+      peer.on('error', retryOrFail);
     }
 
     // HOST: handle messages from players
@@ -3278,20 +3325,8 @@
       app.innerHTML = `<div class="card"><div class="waiting">Verbinde mit Raum ${code}<span class="waiting-dots"></span></div></div>`;
 
       // Timeout: if not connected after 12s, show retry
-      clearTimeout(window._joinTimeout);
       if (peer) { try { peer.destroy(); } catch (e) { } }
-      window._joinTimeout = setTimeout(() => {
-        if (gameState.phase === 'home') {
-          app.innerHTML = `<div class="card">
-            <div class="result-box fail">
-              <div class="result-big">⏳ Verbindung fehlgeschlagen</div>
-              <div class="result-detail">Raum ${code} nicht erreichbar. Ist der Host online?</div>
-            </div>
-            <button class="btn btn-gold" onclick="onJoinRoom()" style="margin-top:16px;">🔄 Nochmal versuchen</button>
-            <button class="btn" onclick="gameState.phase='home';render();" style="margin-top:8px;">← Zurück</button>
-          </div>`;
-        }
-      }, 12000);
+      armJoinTimeout(code);
 
       joinRoom(name, code);
     }
