@@ -2819,5 +2819,183 @@
    "ev": "open",
    "src": "prod"
   }
+ },
+ {
+  "id": "Hmcly8gSWBwE",
+  "kind": "stats",
+  "ts": 1786802668669,
+  "data": {
+   "ev": "open",
+   "src": "prod"
+  }
+ },
+ {
+  "id": "Hc71rQkdXvMq",
+  "kind": "stats",
+  "ts": 1786809638000,
+  "data": {
+   "ev": "open",
+   "src": "prod"
+  }
+ },
+ {
+  "id": "d09f9RrNGtJT",
+  "kind": "stats",
+  "ts": 1786811099422,
+  "data": {
+   "ev": "open",
+   "src": "prod"
+  }
+ },
+ {
+  "id": "Mcrv7c5wdKBq",
+  "kind": "stats",
+  "ts": 1786811099858,
+  "data": {
+   "ev": "room",
+   "src": "prod"
+  }
+ },
+ {
+  "id": "cxOagQM9Xx5x",
+  "kind": "stats",
+  "ts": 1786811116169,
+  "data": {
+   "ev": "room",
+   "src": "prod"
+  }
+ },
+ {
+  "id": "1c92NUNl4BK6",
+  "kind": "stats",
+  "ts": 1786811120622,
+  "data": {
+   "ev": "open",
+   "src": "prod"
+  }
+ },
+ {
+  "id": "JY0J4BUehHzL",
+  "kind": "stats",
+  "ts": 1786811141349,
+  "data": {
+   "ev": "open",
+   "src": "prod"
+  }
+ },
+ {
+  "id": "XTqP9O8HiiPZ",
+  "kind": "stats",
+  "ts": 1786811215928,
+  "data": {
+   "ev": "open",
+   "src": "prod"
+  }
+ },
+ {
+  "id": "dBynQVsWi98G",
+  "kind": "stats",
+  "ts": 1786811297000,
+  "data": {
+   "ev": "open",
+   "src": "prod"
+  }
+ },
+ {
+  "id": "zVH39BgihwJm",
+  "kind": "stats",
+  "ts": 1786811319464,
+  "data": {
+   "ev": "game_start",
+   "src": "prod",
+   "players": 3,
+   "deckel": false,
+   "allg": false,
+   "rounds": 12
+  }
+ },
+ {
+  "id": "HiguQAX9TS59",
+  "kind": "questions",
+  "ts": 1786811506548,
+  "data": {
+   "sid": "KQBU-2026-08-15",
+   "players": 2,
+   "items": [
+    {
+     "q": "Wie viel kostet ein Pinkus Alt im Brauhaus ungefähr (0,3l)?",
+     "cat": "ausgehen",
+     "up": 0,
+     "down": 1,
+     "reasons": {}
+    }
+   ]
+  }
+ },
+ {
+  "id": "e7gQdqtVDK3l",
+  "kind": "stats",
+  "ts": 1786811724836,
+  "data": {
+   "ev": "game_end",
+   "src": "prod",
+   "rounds": 12,
+   "players": 2,
+   "mins": 7
+  }
+ },
+ {
+  "id": "i5HMQeHjhr78",
+  "kind": "stats",
+  "ts": 1786812304191,
+  "data": {
+   "ev": "open",
+   "src": "prod"
+  }
+ },
+ {
+  "id": "pAJBWmWtguUF",
+  "kind": "stats",
+  "ts": 1786813300324,
+  "data": {
+   "ev": "open",
+   "src": "prod"
+  }
+ },
+ {
+  "id": "meTIOqzWXykQ",
+  "kind": "stats",
+  "ts": 1786813445992,
+  "data": {
+   "ev": "open",
+   "src": "prod"
+  }
+ },
+ {
+  "id": "I7msipt5F5ci",
+  "kind": "stats",
+  "ts": 1786815767187,
+  "data": {
+   "ev": "open",
+   "src": "prod"
+  }
+ },
+ {
+  "id": "IM9seaXK5l05",
+  "kind": "stats",
+  "ts": 1786816265289,
+  "data": {
+   "ev": "open",
+   "src": "prod"
+  }
+ },
+ {
+  "id": "lzJtwfy4pXIe",
+  "kind": "stats",
+  "ts": 1786818239185,
+  "data": {
+   "ev": "open",
+   "src": "prod"
+  }
  }
 ]
