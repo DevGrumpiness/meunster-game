@@ -3564,5 +3564,820 @@
    "ev": "room",
    "src": "prod"
   }
+ },
+ {
+  "id": "g1YlvnL4FkEY",
+  "kind": "stats",
+  "ts": 1786883895312,
+  "data": {
+   "ev": "open",
+   "src": "prod"
+  }
+ },
+ {
+  "id": "2qWkNTCmea1W",
+  "kind": "stats",
+  "ts": 1786883902764,
+  "data": {
+   "ev": "open",
+   "src": "prod"
+  }
+ },
+ {
+  "id": "B53YeOr7wAKw",
+  "kind": "stats",
+  "ts": 1786883910109,
+  "data": {
+   "ev": "room",
+   "src": "prod"
+  }
+ },
+ {
+  "id": "eoI2Fph0clRe",
+  "kind": "stats",
+  "ts": 1786883921794,
+  "data": {
+   "ev": "open",
+   "src": "prod"
+  }
+ },
+ {
+  "id": "Mvg46DjbCeDS",
+  "kind": "stats",
+  "ts": 1786884364727,
+  "data": {
+   "ev": "open",
+   "src": "prod"
+  }
+ },
+ {
+  "id": "iZp0ihnoxUjx",
+  "kind": "stats",
+  "ts": 1786884576811,
+  "data": {
+   "ev": "open",
+   "src": "prod"
+  }
+ },
+ {
+  "id": "WQ7ND4qkUP7C",
+  "kind": "stats",
+  "ts": 1786884610014,
+  "data": {
+   "ev": "open",
+   "src": "prod"
+  }
+ },
+ {
+  "id": "83xygArixkIZ",
+  "kind": "stats",
+  "ts": 1786884659656,
+  "data": {
+   "ev": "open",
+   "src": "prod"
+  }
+ },
+ {
+  "id": "4jyW6UqB1XlU",
+  "kind": "stats",
+  "ts": 1786884684818,
+  "data": {
+   "ev": "room",
+   "src": "prod"
+  }
+ },
+ {
+  "id": "8MA5YlSZzMVm",
+  "kind": "stats",
+  "ts": 1786884747576,
+  "data": {
+   "ev": "open",
+   "src": "prod"
+  }
+ },
+ {
+  "id": "oqLJqlsdOCA4",
+  "kind": "stats",
+  "ts": 1786886077526,
+  "data": {
+   "ev": "open",
+   "src": "prod"
+  }
+ },
+ {
+  "id": "vxTiiYJetdps",
+  "kind": "stats",
+  "ts": 1786886081109,
+  "data": {
+   "ev": "open",
+   "src": "prod"
+  }
+ },
+ {
+  "id": "8kx1h4Q4HnWO",
+  "kind": "stats",
+  "ts": 1786886083943,
+  "data": {
+   "ev": "open",
+   "src": "prod"
+  }
+ },
+ {
+  "id": "OUubuhQlw0tl",
+  "kind": "stats",
+  "ts": 1786887851728,
+  "data": {
+   "ev": "open",
+   "src": "prod"
+  }
+ },
+ {
+  "id": "0iE6Z77cuJBi",
+  "kind": "stats",
+  "ts": 1786888041138,
+  "data": {
+   "ev": "open",
+   "src": "prod"
+  }
+ },
+ {
+  "id": "yP0NjKcp0arW",
+  "kind": "stats",
+  "ts": 1786888394231,
+  "data": {
+   "ev": "open",
+   "src": "prod"
+  }
+ },
+ {
+  "id": "y4DMxiPuqSs3",
+  "kind": "stats",
+  "ts": 1786888399070,
+  "data": {
+   "ev": "room",
+   "src": "prod"
+  }
+ },
+ {
+  "id": "2VzPXw3f8cFb",
+  "kind": "stats",
+  "ts": 1786888435336,
+  "data": {
+   "ev": "open",
+   "src": "prod"
+  }
+ },
+ {
+  "id": "Sio918ZAqmZ9",
+  "kind": "stats",
+  "ts": 1786888439231,
+  "data": {
+   "ev": "open",
+   "src": "prod"
+  }
+ },
+ {
+  "id": "kMwcZvxV28VZ",
+  "kind": "stats",
+  "ts": 1786888442170,
+  "data": {
+   "ev": "room",
+   "src": "prod"
+  }
+ },
+ {
+  "id": "zGnCiQPaSDQl",
+  "kind": "stats",
+  "ts": 1786888566768,
+  "data": {
+   "ev": "open",
+   "src": "prod"
+  }
+ },
+ {
+  "id": "aqjH15hML1Ti",
+  "kind": "stats",
+  "ts": 1786888577785,
+  "data": {
+   "ev": "open",
+   "src": "prod"
+  }
+ },
+ {
+  "id": "f9sBhLpl5RxZ",
+  "kind": "stats",
+  "ts": 1786889177344,
+  "data": {
+   "ev": "open",
+   "src": "prod"
+  }
+ },
+ {
+  "id": "GoSD3JpUcllv",
+  "kind": "stats",
+  "ts": 1786889179757,
+  "data": {
+   "ev": "room",
+   "src": "prod"
+  }
+ },
+ {
+  "id": "l6sh1QxPhXuv",
+  "kind": "stats",
+  "ts": 1786889195682,
+  "data": {
+   "ev": "open",
+   "src": "prod"
+  }
+ },
+ {
+  "id": "JRhCtXb1IeKy",
+  "kind": "stats",
+  "ts": 1786889199886,
+  "data": {
+   "ev": "room",
+   "src": "prod"
+  }
+ },
+ {
+  "id": "fddwRAxwOpRF",
+  "kind": "stats",
+  "ts": 1786889214069,
+  "data": {
+   "ev": "open",
+   "src": "prod"
+  }
+ },
+ {
+  "id": "GOoeNgbtX5EZ",
+  "kind": "stats",
+  "ts": 1786889245522,
+  "data": {
+   "ev": "open",
+   "src": "prod"
+  }
+ },
+ {
+  "id": "ZWYyq7ObXhre",
+  "kind": "stats",
+  "ts": 1786889251193,
+  "data": {
+   "ev": "open",
+   "src": "prod"
+  }
+ },
+ {
+  "id": "zAv7avhJuGTW",
+  "kind": "stats",
+  "ts": 1786889269240,
+  "data": {
+   "ev": "room",
+   "src": "prod"
+  }
+ },
+ {
+  "id": "6U7c3DEREWLc",
+  "kind": "stats",
+  "ts": 1786889270483,
+  "data": {
+   "ev": "room",
+   "src": "prod"
+  }
+ },
+ {
+  "id": "bjdnLNTYmqJG",
+  "kind": "stats",
+  "ts": 1786889307533,
+  "data": {
+   "ev": "open",
+   "src": "prod"
+  }
+ },
+ {
+  "id": "tCVXMajuIDZP",
+  "kind": "stats",
+  "ts": 1786889313464,
+  "data": {
+   "ev": "open",
+   "src": "prod"
+  }
+ },
+ {
+  "id": "HgE4ifeeVcMd",
+  "kind": "stats",
+  "ts": 1786889654817,
+  "data": {
+   "ev": "open",
+   "src": "prod"
+  }
+ },
+ {
+  "id": "OLyIjG8Aku2v",
+  "kind": "stats",
+  "ts": 1786889677174,
+  "data": {
+   "ev": "open",
+   "src": "prod"
+  }
+ },
+ {
+  "id": "o58y2QtOPh1e",
+  "kind": "stats",
+  "ts": 1786889680195,
+  "data": {
+   "ev": "open",
+   "src": "prod"
+  }
+ },
+ {
+  "id": "x1O9CA1FEDc4",
+  "kind": "stats",
+  "ts": 1786889967129,
+  "data": {
+   "ev": "open",
+   "src": "prod"
+  }
+ },
+ {
+  "id": "vXgnjAIrWwav",
+  "kind": "stats",
+  "ts": 1786890746934,
+  "data": {
+   "ev": "open",
+   "src": "prod"
+  }
+ },
+ {
+  "id": "ITZWatQcxhs9",
+  "kind": "stats",
+  "ts": 1786891438083,
+  "data": {
+   "ev": "open",
+   "src": "prod"
+  }
+ },
+ {
+  "id": "Ftn6ZKIWxtvG",
+  "kind": "stats",
+  "ts": 1786893557964,
+  "data": {
+   "ev": "open",
+   "src": "prod"
+  }
+ },
+ {
+  "id": "XE10J4IPop9F",
+  "kind": "stats",
+  "ts": 1786893559370,
+  "data": {
+   "ev": "room",
+   "src": "prod"
+  }
+ },
+ {
+  "id": "hZ7LnGlUIT6J",
+  "kind": "stats",
+  "ts": 1786893582055,
+  "data": {
+   "ev": "open",
+   "src": "prod"
+  }
+ },
+ {
+  "id": "9MUYtK6MqqWw",
+  "kind": "stats",
+  "ts": 1786893644286,
+  "data": {
+   "ev": "open",
+   "src": "prod"
+  }
+ },
+ {
+  "id": "ufFpzxkX8No9",
+  "kind": "stats",
+  "ts": 1786893648656,
+  "data": {
+   "ev": "open",
+   "src": "prod"
+  }
+ },
+ {
+  "id": "xwvi70rKkicQ",
+  "kind": "stats",
+  "ts": 1786893666017,
+  "data": {
+   "ev": "game_start",
+   "src": "prod",
+   "players": 3,
+   "deckel": false,
+   "allg": true,
+   "rounds": 12
+  }
+ },
+ {
+  "id": "jYad6LO65eNH",
+  "kind": "stats",
+  "ts": 1786895806405,
+  "data": {
+   "ev": "open",
+   "src": "prod"
+  }
+ },
+ {
+  "id": "YSGrMLqHfTfm",
+  "kind": "stats",
+  "ts": 1786895826652,
+  "data": {
+   "ev": "open",
+   "src": "prod"
+  }
+ },
+ {
+  "id": "WSbnLP2Yp4hZ",
+  "kind": "stats",
+  "ts": 1786895828481,
+  "data": {
+   "ev": "room",
+   "src": "prod"
+  }
+ },
+ {
+  "id": "GAJ6zSF7N7qq",
+  "kind": "stats",
+  "ts": 1786895841016,
+  "data": {
+   "ev": "open",
+   "src": "prod"
+  }
+ },
+ {
+  "id": "vs9LOWHnDqQu",
+  "kind": "stats",
+  "ts": 1786895846936,
+  "data": {
+   "ev": "game_start",
+   "src": "prod",
+   "players": 2,
+   "deckel": false,
+   "allg": true,
+   "rounds": 12
+  }
+ },
+ {
+  "id": "jIdaIWEz8hBK",
+  "kind": "stats",
+  "ts": 1786896067622,
+  "data": {
+   "ev": "open",
+   "src": "prod"
+  }
+ },
+ {
+  "id": "Ure3TnuIp9ZZ",
+  "kind": "stats",
+  "ts": 1786896069923,
+  "data": {
+   "ev": "open",
+   "src": "prod"
+  }
+ },
+ {
+  "id": "rrjLgnzWvhgp",
+  "kind": "stats",
+  "ts": 1786896071074,
+  "data": {
+   "ev": "room",
+   "src": "prod"
+  }
+ },
+ {
+  "id": "wGQ6dOxgtgJz",
+  "kind": "stats",
+  "ts": 1786896090453,
+  "data": {
+   "ev": "open",
+   "src": "prod"
+  }
+ },
+ {
+  "id": "m0uV2neH5prX",
+  "kind": "stats",
+  "ts": 1786896094810,
+  "data": {
+   "ev": "room",
+   "src": "prod"
+  }
+ },
+ {
+  "id": "j5ak7OSTOajj",
+  "kind": "stats",
+  "ts": 1786896103264,
+  "data": {
+   "ev": "open",
+   "src": "prod"
+  }
+ },
+ {
+  "id": "zSxbGu1VnuI4",
+  "kind": "stats",
+  "ts": 1786896107034,
+  "data": {
+   "ev": "open",
+   "src": "prod"
+  }
+ },
+ {
+  "id": "QPA0AAekJcK6",
+  "kind": "stats",
+  "ts": 1786896139618,
+  "data": {
+   "ev": "open",
+   "src": "prod"
+  }
+ },
+ {
+  "id": "fkEI0y6PqwGk",
+  "kind": "stats",
+  "ts": 1786896158335,
+  "data": {
+   "ev": "open",
+   "src": "prod"
+  }
+ },
+ {
+  "id": "tHci5XHmYnvS",
+  "kind": "stats",
+  "ts": 1786896158461,
+  "data": {
+   "ev": "room",
+   "src": "prod"
+  }
+ },
+ {
+  "id": "Q6fGUrMHjbrr",
+  "kind": "stats",
+  "ts": 1786896168182,
+  "data": {
+   "ev": "room",
+   "src": "prod"
+  }
+ },
+ {
+  "id": "70DVBh20HbiD",
+  "kind": "stats",
+  "ts": 1786896177428,
+  "data": {
+   "ev": "open",
+   "src": "prod"
+  }
+ },
+ {
+  "id": "emoGJSQIW0jx",
+  "kind": "stats",
+  "ts": 1786896180767,
+  "data": {
+   "ev": "open",
+   "src": "prod"
+  }
+ },
+ {
+  "id": "UCrzJozwMtEb",
+  "kind": "stats",
+  "ts": 1786896189168,
+  "data": {
+   "ev": "open",
+   "src": "prod"
+  }
+ },
+ {
+  "id": "OjMa6rxsdL7p",
+  "kind": "stats",
+  "ts": 1786896192362,
+  "data": {
+   "ev": "room",
+   "src": "prod"
+  }
+ },
+ {
+  "id": "gjAZtni1Fd7v",
+  "kind": "stats",
+  "ts": 1786896202466,
+  "data": {
+   "ev": "room",
+   "src": "prod"
+  }
+ },
+ {
+  "id": "IzMPIX6MEJBY",
+  "kind": "stats",
+  "ts": 1786896230061,
+  "data": {
+   "ev": "open",
+   "src": "prod"
+  }
+ },
+ {
+  "id": "snYVJawDdEso",
+  "kind": "stats",
+  "ts": 1786896246831,
+  "data": {
+   "ev": "open",
+   "src": "prod"
+  }
+ },
+ {
+  "id": "NNLOfebBXNGJ",
+  "kind": "stats",
+  "ts": 1786896252845,
+  "data": {
+   "ev": "game_start",
+   "src": "prod",
+   "players": 3,
+   "deckel": false,
+   "allg": false,
+   "rounds": 12
+  }
+ },
+ {
+  "id": "vK6kDsUASRK0",
+  "kind": "stats",
+  "ts": 1786896283874,
+  "data": {
+   "ev": "room",
+   "src": "prod"
+  }
+ },
+ {
+  "id": "u8r5m1CaxEp8",
+  "kind": "stats",
+  "ts": 1786896287593,
+  "data": {
+   "ev": "ad_click",
+   "src": "prod"
+  }
+ },
+ {
+  "id": "UTNgYIGxCu4H",
+  "kind": "stats",
+  "ts": 1786897389833,
+  "data": {
+   "ev": "room",
+   "src": "prod"
+  }
+ },
+ {
+  "id": "4wiDpk1XoOtz",
+  "kind": "stats",
+  "ts": 1786901771456,
+  "data": {
+   "ev": "open",
+   "src": "prod"
+  }
+ },
+ {
+  "id": "x3RBVhl9lgAM",
+  "kind": "stats",
+  "ts": 1786903445419,
+  "data": {
+   "ev": "open",
+   "src": "prod"
+  }
+ },
+ {
+  "id": "KU4t4kLk9Z58",
+  "kind": "stats",
+  "ts": 1786903446289,
+  "data": {
+   "ev": "room",
+   "src": "prod"
+  }
+ },
+ {
+  "id": "KPMuPXESJGMc",
+  "kind": "stats",
+  "ts": 1786903472018,
+  "data": {
+   "ev": "room",
+   "src": "prod"
+  }
+ },
+ {
+  "id": "Lnnpj40js9YU",
+  "kind": "stats",
+  "ts": 1786903510460,
+  "data": {
+   "ev": "room",
+   "src": "prod"
+  }
+ },
+ {
+  "id": "74gd4vgcY9Cg",
+  "kind": "stats",
+  "ts": 1786903514106,
+  "data": {
+   "ev": "open",
+   "src": "prod"
+  }
+ },
+ {
+  "id": "vDoUu0JWZxxs",
+  "kind": "stats",
+  "ts": 1786903520838,
+  "data": {
+   "ev": "game_start",
+   "src": "prod",
+   "players": 2,
+   "deckel": false,
+   "allg": false,
+   "rounds": 12
+  }
+ },
+ {
+  "id": "ezvlBDwkQ2L2",
+  "kind": "questions",
+  "ts": 1786903880190,
+  "data": {
+   "sid": "2CCJ-2026-08-16",
+   "players": 2,
+   "items": [
+    {
+     "q": "Münster hat mehr Fahrräder als Einwohner. Stimmt das?",
+     "cat": "wissen",
+     "up": 0,
+     "down": 1,
+     "reasons": {
+      "zu_einfach": 1
+     }
+    }
+   ]
+  }
+ },
+ {
+  "id": "AZbj8uMBeJ5N",
+  "kind": "questions",
+  "ts": 1786903906662,
+  "data": {
+   "sid": "2CCJ-2026-08-16",
+   "players": 2,
+   "items": [
+    {
+     "q": "Münster hat mehr Fahrräder als Einwohner. Stimmt das?",
+     "cat": "wissen",
+     "up": 0,
+     "down": 1,
+     "reasons": {
+      "zu_einfach": 1
+     }
+    },
+    {
+     "q": "Welches Verkehrsmittel gab es in Münster nie?",
+     "cat": "fahrrad",
+     "up": 0,
+     "down": 1,
+     "reasons": {
+      "zu_einfach": 1
+     }
+    }
+   ]
+  }
+ },
+ {
+  "id": "Eqryg7LGSXiH",
+  "kind": "stats",
+  "ts": 1786903946670,
+  "data": {
+   "ev": "game_end",
+   "src": "prod",
+   "rounds": 12,
+   "players": 2,
+   "mins": 7
+  }
+ },
+ {
+  "id": "tEhCHhxEksoE",
+  "kind": "stats",
+  "ts": 1786904118016,
+  "data": {
+   "ev": "room",
+   "src": "prod"
+  }
+ },
+ {
+  "id": "HtdtavmlNZk7",
+  "kind": "stats",
+  "ts": 1786904135823,
+  "data": {
+   "ev": "open",
+   "src": "prod"
+  }
+ },
+ {
+  "id": "w9AgYvP6oPnU",
+  "kind": "stats",
+  "ts": 1786904648243,
+  "data": {
+   "ev": "open",
+   "src": "prod"
+  }
  }
 ]
