@@ -639,6 +639,25 @@
       border-color: #d0d7de !important;
     }
 
+    .smart10-player-pill.banked {
+      background: #fff4cf !important;
+      color: #7a5a00 !important;
+      border-color: #e0b84f !important;
+      box-shadow: 0 2px 8px rgba(224, 184, 79, 0.2);
+    }
+
+    .smart10-self-notice {
+      background: #fff8e6;
+      border: 1.5px solid #ead08a;
+      color: #6f5300;
+      border-radius: 12px;
+      padding: 9px 12px;
+      margin: 8px 0 12px;
+      text-align: center;
+      font-size: 0.82rem;
+      font-weight: 800;
+    }
+
     .smart10-tile-meta {
       font-size: 0.74rem;
       font-weight: 700;
@@ -746,6 +765,95 @@
       font-weight: 700;
       color: white;
       min-width: fit-content;
+    }
+
+    .estimate-results {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin: 12px 0;
+    }
+
+    .estimate-result-row,
+    .score-delta-row {
+      background: #f8fafc;
+      border: 1px solid #e4e8ee;
+      border-radius: 12px;
+      padding: 10px 12px;
+    }
+
+    .estimate-result-row.closest {
+      background: #fff8e6;
+      border-color: #e6c45d;
+    }
+
+    .estimate-result-main,
+    .score-delta-main {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      font-weight: 800;
+      color: var(--ms-blue);
+    }
+
+    .estimate-result-sub,
+    .score-delta-sub {
+      margin-top: 4px;
+      font-size: 0.78rem;
+      color: #7a8590;
+      font-weight: 700;
+    }
+
+    .score-delta-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin: 12px 0;
+    }
+
+    .score-delta-badge {
+      border-radius: 999px;
+      padding: 4px 10px;
+      background: #eef2f6;
+      color: #64748b;
+      font-size: 0.78rem;
+      font-weight: 900;
+      white-space: nowrap;
+    }
+
+    .score-delta-badge.gain {
+      background: #e6f4ea;
+      color: var(--ms-green);
+    }
+
+    .score-total-track {
+      height: 7px;
+      background: #e9edf2;
+      border-radius: 999px;
+      overflow: hidden;
+      margin-top: 8px;
+    }
+
+    .score-total-fill {
+      height: 100%;
+      border-radius: 999px;
+      min-width: 4px;
+      transition: width 0.5s ease;
+    }
+
+    .fact-toggle {
+      margin-top: 12px;
+      text-align: center;
+      cursor: pointer;
+      font-size: 0.82rem;
+      color: #8a6d1a;
+      font-weight: 800;
+      background: #fff8e6;
+      border: 1px solid #ead08a;
+      border-radius: 999px;
+      padding: 8px 12px;
+      -webkit-tap-highlight-color: transparent;
     }
 
     /* Waiting */
@@ -1736,7 +1844,7 @@
       { cat: 'viral', type: 'höher_tiefer', q: 'Die Uni Münster hat ca. 44.000 Studierende. Wie viele hat die RWTH Aachen?', reference: 44000, answer: 47000, unit: 'Studierende', fact: 'Ein Kopf-an-Kopf-Rennen der Riesen-Unis – je nach Jahr wechselt die Reihenfolge.' },
       { cat: 'viral', type: 'höher_tiefer', q: 'Der Lambertiturm misst 90 m. Wie hoch ist das Send-Riesenrad ungefähr?', reference: 90, answer: 50, unit: 'm', fact: 'Auch das größte Riesenrad bleibt unter dem Kirchturm – die Aussicht lohnt trotzdem.' },
       { cat: 'viral', type: 'höher_tiefer', q: 'Der meistgelikte Instagram-Post (ein Ei) hat ca. 60 Mio. Likes. Wie viele Views hat das meistgesehene YouTube-Video?', reference: 60000000, answer: 15000000000, unit: 'Views', fact: '„Baby Shark" knackte als erstes Video die 10-Milliarden-Marke – gegen Kinderlieder ist kein Algorithmus gewachsen.' },
-      { cat: 'viral', type: 'höher_tiefer', q: 'TikTok hat ca. 1 Mrd. Nutzer. Wie viele hat Instagram?', reference: 1000000000, answer: 2000000000, unit: 'Nutzer', fact: 'Instagram liegt bei rund zwei Milliarden Konten – TikTok holt aber schneller auf.' },
+      { cat: 'allgemein', type: 'höher_tiefer', q: 'TikTok hat ca. 1 Mrd. Nutzer. Wie viele hat Instagram?', reference: 1000000000, answer: 2000000000, unit: 'Nutzer', fact: 'Instagram liegt bei rund zwei Milliarden Konten – TikTok holt aber schneller auf.' },
       { cat: 'viral', type: 'vote', q: 'Was würde in Münster SOFORT viral gehen?', options: ['🦢 Schwan blockiert die Promenade', '👮 Polizei-Leeze-Verfolgungsjagd', '🌧️ Send im Jahrhundertregen', '🎡 Riesenrad-Panne mit Happy End'] },
       { cat: 'viral', type: 'vote', q: 'Bester Münster-Fotospot für Instagram?', options: ['🏰 Schloss zur blauen Stunde', '🏗️ Hafenkräne im Sonnenuntergang', '⛪ Prinzipalmarkt-Bögen', '🍂 Promenade im Herbst'] },
       { cat: 'viral', type: 'vote', q: 'Welches Meme beschreibt Münster am besten?', options: ['☔ „Es regnet eh"', '🚲 „Mehr Räder als Menschen"', '🎓 „Alle studieren irgendwas"', '😇 „Zu brav zum Sündigen"'] },
@@ -2431,8 +2539,8 @@
       }
       const label = myPts > 0
         ? (gameState.deckelMode
-          ? `Passen – ${myPts} Richtige sichern`
-          : `Passen – ${myPts} Punkt${myPts === 1 ? '' : 'e'} sichern`)
+          ? `Passen, um ${myPts} Richtige zu sichern`
+          : `Passen, um ${pointWord(myPts)} zu sichern`)
         : 'Passen';
       return `<button class="btn" style="background:linear-gradient(135deg,#e9c46a,#d9ba55);color:#2b3440;border:none;box-shadow:0 3px 10px rgba(217,186,85,0.4);padding:12px 24px;font-size:0.95rem;font-weight:700;border-radius:12px;" onclick="submitSmart10Pass()">🛡️ ${label}</button>
         <div style="font-size:0.72rem;color:#98a1ab;margin-top:5px;">${hint}</div>`;
@@ -2450,6 +2558,9 @@
       const participantPlayers = gameState.players.filter(p => participantIds.includes(p.id));
       const isOut = smart10.playerOut.includes(myId);
       const isMyTurn = !!activePlayer && activePlayer.id === myId && !isOut;
+      const iPassed = (smart10.passed || []).includes(myId);
+      const iBusted = isOut && !iPassed;
+      const mySecured = (smart10.secured && smart10.secured[myId]) || 0;
       const eliminatedCount = smart10.eliminated.filter(Boolean).length;
       const playersStillIn = participantPlayers.filter(p => p.connected && !smart10.playerOut.includes(p.id)).length;
       const isParticipating = participantIds.includes(myId);
@@ -2474,6 +2585,23 @@
         passRow.remove();
       }
 
+      const noticeText = iPassed
+        ? (mySecured > 0
+          ? (gameState.deckelMode ? `Du hast ${mySecured} Richtige gesichert.` : `Du hast ${pointWord(mySecured)} gesichert.`)
+          : 'Du hast gepasst – 0 Punkte aus dieser Runde.')
+        : (iBusted ? 'Du bist raus – 0 Punkte aus dieser Runde.' : '');
+      const selfNotice = document.getElementById('smart10-self-notice');
+      if (noticeText && isParticipating) {
+        if (selfNotice) {
+          selfNotice.textContent = noticeText;
+        } else {
+          const anchor = document.querySelector('.smart10-grid');
+          if (anchor) anchor.insertAdjacentHTML('beforebegin', `<div id="smart10-self-notice" class="smart10-self-notice">${noticeText}</div>`);
+        }
+      } else if (selfNotice) {
+        selfNotice.remove();
+      }
+
       // Update tiles
       const tiles = document.querySelectorAll('.smart10-tile');
       tiles.forEach((tile, i) => {
@@ -2493,10 +2621,12 @@
         if (metaArea) metaArea.remove();
 
         if (isEliminated) {
-          const claimLabel = smart10.claims[i] ? '✓ Gehört dazu' : '✗ Gehört nicht dazu';
+          const claimLabel = smart10ChoiceText(!!smart10.claims[i]);
+          const truthLabel = smart10ChoiceText(!!q.correct[i]);
+          const playerName = attemptedBy ? escapeHtml(attemptedBy.name) : 'Jemand';
           tile.insertAdjacentHTML('beforeend',
-            `<div class="smart10-tile-note">${guessResult === 'correct' ? '✓ Richtig aufgedeckt' : '✗ Fehlversuch – Spieler raus'}</div>
-             <div class="smart10-tile-meta">${attemptedBy ? `<span style="color:${attemptedBy.color}">${attemptedBy.name}</span>${guessResult === 'wrong' ? `: ${claimLabel}` : ''}` : ''}</div>`);
+            `<div class="smart10-tile-note">${guessResult === 'correct' ? `${playerName} richtig: ${claimLabel}` : `${playerName} tippte: ${claimLabel}`}</div>
+             <div class="smart10-tile-meta">${guessResult === 'correct' ? `Wahrheit: ${truthLabel}` : `Richtig wäre: ${truthLabel} · ${playerName} raus`}</div>`);
         } else if (isMyTurn) {
           tile.insertAdjacentHTML('beforeend',
             `<div class="smart10-actions">
@@ -2516,13 +2646,14 @@
           const rp = (smart10.roundPoints && smart10.roundPoints[p.id]) || 0;
           const hasPassed = (smart10.passed || []).includes(p.id);
           const isBusted = smart10.playerOut.includes(p.id) && !hasPassed;
+          const isActive = activePlayer && activePlayer.id === p.id;
           const statusLabel = gameState.deckelMode
-            ? (hasPassed ? ` 🛡️ ${(smart10.secured && smart10.secured[p.id]) || 0}` : isBusted ? ' 💥 0' : !p.connected ? ' – raus' : (rp > 0 ? ` ·${rp}` : ''))
-            : hasPassed ? ` 💰 +${(smart10.secured && smart10.secured[p.id]) || 0}` : (isBusted || !p.connected) ? ' – raus' : (rp > 0 ? ` ·+${rp}` : '');
+            ? (hasPassed ? ` ✓ gesichert ${(smart10.secured && smart10.secured[p.id]) || 0}` : isBusted ? ' raus · 0' : !p.connected ? ' – raus' : isActive ? ' ist dran' : (rp > 0 ? ` · ${rp} offen` : ''))
+            : hasPassed ? ` ✓ gesichert +${(smart10.secured && smart10.secured[p.id]) || 0}` : (isBusted || !p.connected) ? ' raus · 0' : isActive ? ' ist dran' : (rp > 0 ? ` · ${rp} offen` : '');
           return `
-          <div class="smart10-player-pill ${activePlayer && activePlayer.id === p.id ? 'active' : ''} ${smart10.playerOut.includes(p.id) || !p.connected ? 'out' : ''}"
+          <div class="smart10-player-pill ${isActive ? 'active' : ''} ${hasPassed ? 'banked' : ''} ${isBusted || !p.connected ? 'out' : ''}"
                style="--pc:${p.color};background:${p.color}22;color:${p.color};border-color:${p.color};">
-            ${p.name}${statusLabel}
+            ${escapeHtml(p.name)}${statusLabel}
           </div>
         `;
         }).join('');
@@ -2547,9 +2678,11 @@
       const waiting = document.querySelector('.waiting');
       if (!isMyTurn && !waiting) {
         const card = document.querySelector('.card');
-        if (card) card.insertAdjacentHTML('beforeend', '<div class="waiting">Warte auf den Zug<span class="waiting-dots"></span></div>');
+        if (card) card.insertAdjacentHTML('beforeend', `<div class="waiting">${turnWaitText(activePlayer)}<span class="waiting-dots"></span></div>`);
       } else if (isMyTurn && waiting) {
         waiting.remove();
+      } else if (!isMyTurn && waiting) {
+        waiting.innerHTML = `${turnWaitText(activePlayer)}<span class="waiting-dots"></span>`;
       }
     }
 
@@ -3909,6 +4042,14 @@
       const isParticipating = participantIds.includes(myId);
       const isOut = smart10.playerOut.includes(myId);
       const isMyTurn = !!activePlayer && activePlayer.id === myId && !isOut;
+      const iPassed = (smart10.passed || []).includes(myId);
+      const iBusted = isOut && !iPassed;
+      const mySecured = (smart10.secured && smart10.secured[myId]) || 0;
+      const selfNoticeText = iPassed
+        ? (mySecured > 0
+          ? (gameState.deckelMode ? `Du hast ${mySecured} Richtige gesichert.` : `Du hast ${pointWord(mySecured)} gesichert.`)
+          : 'Du hast gepasst – 0 Punkte aus dieser Runde.')
+        : (iBusted ? 'Du bist raus – 0 Punkte aus dieser Runde.' : '');
       const eliminatedCount = smart10.eliminated.filter(Boolean).length;
       const playersStillIn = participantPlayers.filter(p => p.connected && !smart10.playerOut.includes(p.id)).length;
 
@@ -3924,13 +4065,14 @@
         const rp = (smart10.roundPoints && smart10.roundPoints[p.id]) || 0;
         const hasPassed = (smart10.passed || []).includes(p.id);
         const isBusted = smart10.playerOut.includes(p.id) && !hasPassed;
+        const isActive = activePlayer && activePlayer.id === p.id;
         const statusLabel = gameState.deckelMode
-          ? (hasPassed ? ` 🛡️ ${(smart10.secured && smart10.secured[p.id]) || 0}` : isBusted ? ' 💥 0' : !p.connected ? ' – raus' : (rp > 0 ? ` ·${rp}` : ''))
-          : hasPassed ? ` 💰 +${(smart10.secured && smart10.secured[p.id]) || 0}` : (isBusted || !p.connected) ? ' – raus' : (rp > 0 ? ` ·+${rp}` : '');
+          ? (hasPassed ? ` ✓ gesichert ${(smart10.secured && smart10.secured[p.id]) || 0}` : isBusted ? ' raus · 0' : !p.connected ? ' – raus' : isActive ? ' ist dran' : (rp > 0 ? ` · ${rp} offen` : ''))
+          : hasPassed ? ` ✓ gesichert +${(smart10.secured && smart10.secured[p.id]) || 0}` : (isBusted || !p.connected) ? ' raus · 0' : isActive ? ' ist dran' : (rp > 0 ? ` · ${rp} offen` : '');
         return `
-          <div class="smart10-player-pill ${activePlayer && activePlayer.id === p.id ? 'active' : ''} ${smart10.playerOut.includes(p.id) || !p.connected ? 'out' : ''}"
+          <div class="smart10-player-pill ${isActive ? 'active' : ''} ${hasPassed ? 'banked' : ''} ${isBusted || !p.connected ? 'out' : ''}"
                style="--pc:${p.color};background:${p.color}22;color:${p.color};border-color:${p.color};">
-            ${p.name}${statusLabel}
+            ${escapeHtml(p.name)}${statusLabel}
           </div>
         `;
       }).join('')}
@@ -3939,6 +4081,7 @@
       <div id="smart10-pass-row" style="text-align:center;margin:10px 0 12px;">
         ${smart10PassRowInnerHtml(smart10)}
       </div>` : ''}
+      ${selfNoticeText && isParticipating ? `<div id="smart10-self-notice" class="smart10-self-notice">${selfNoticeText}</div>` : ''}
       <div class="smart10-grid">
         ${q.options.map((option, i) => {
         const isEliminated = !!smart10.eliminated[i];
@@ -3950,13 +4093,15 @@
           !isEliminated && isMyTurn ? 'active' : '',
         ].filter(Boolean).join(' ');
 
-        const claimLabel = smart10.claims[i] ? '✓ Gehört dazu' : '✗ Gehört nicht dazu';
+        const claimLabel = smart10ChoiceText(!!smart10.claims[i]);
+        const truthLabel = smart10ChoiceText(!!q.correct[i]);
+        const playerName = attemptedBy ? escapeHtml(attemptedBy.name) : 'Jemand';
         return `
             <div class="${tileClasses}">
               <div class="smart10-option-text">${option}</div>
               ${isEliminated ? `
-                <div class="smart10-tile-note">${guessResult === 'correct' ? '✓ Richtig aufgedeckt' : '✗ Fehlversuch – Spieler raus'}</div>
-                <div class="smart10-tile-meta">${attemptedBy ? `<span style="color:${attemptedBy.color}">${attemptedBy.name}</span>${guessResult === 'wrong' ? `: ${claimLabel}` : ''}` : ''}</div>
+                <div class="smart10-tile-note">${guessResult === 'correct' ? `${playerName} richtig: ${claimLabel}` : `${playerName} tippte: ${claimLabel}`}</div>
+                <div class="smart10-tile-meta">${guessResult === 'correct' ? `Wahrheit: ${truthLabel}` : `Richtig wäre: ${truthLabel} · ${playerName} raus`}</div>
               ` : isMyTurn ? `
                 <div class="smart10-actions">
                   <button class="smart10-action-btn true" onclick="submitSmart10Choice(${i}, true)">✓</button>
@@ -3970,7 +4115,7 @@
       }).join('')}
       </div>
       <div class="answer-count">${eliminatedCount}/${q.options.length} Felder eliminiert · ${playersStillIn} Spieler noch im Rennen</div>
-      ${!isMyTurn ? '<div class="waiting">Warte auf den Zug<span class="waiting-dots"></span></div>' : ''}
+      ${!isMyTurn ? `<div class="waiting">${turnWaitText(activePlayer)}<span class="waiting-dots"></span></div>` : ''}
     </div>
   `;
     }
@@ -3994,83 +4139,124 @@
       if (q.type === 'quiz') {
         const myCorrect = gameState.answers[myId] === q.correct;
         const correctPlayers = gameState.players.filter(p => gameState.answers[p.id] === q.correct);
+        const myAnswerIdx = gameState.answers[myId];
+        const myAnswerLabel = myAnswerIdx !== undefined ? q.answers[myAnswerIdx] : 'Keine Antwort';
+        const gainById = {};
+        const detailById = {};
+        resultPlayers().forEach(p => {
+          const answerIdx = gameState.answers[p.id];
+          gainById[p.id] = answerIdx === q.correct ? 2 : 0;
+          detailById[p.id] = answerIdx !== undefined ? `Antwort: ${q.answers[answerIdx]}` : 'Keine Antwort';
+        });
 
         resultContent = `
       <div class="result-box ${iWasSpectator ? 'info' : myCorrect ? 'success' : 'fail'}">
         <div class="result-big">${iWasSpectator ? '👀 Zugeschaut' : myCorrect ? '✅ Richtig!' : '❌ Falsch!'}</div>
-        <div class="result-detail">Antwort: <strong>${q.answers[q.correct]}</strong></div>
+        <div class="result-detail">Richtige Antwort: <strong>${q.answers[q.correct]}</strong></div>
+        ${!iWasSpectator ? `<div class="result-detail" style="font-size:0.82rem;font-weight:600;opacity:0.82;">Deine Antwort: ${myAnswerLabel}</div>` : ''}
       </div>
-      ${correctPlayers.length > 0 ? `
+      ${gameState.deckelMode ? (correctPlayers.length > 0 ? `
         <p style="text-align:center;font-weight:600;margin-top:8px;">
-          ${gameState.deckelMode ? '✅ Richtig:' : '+2 Punkte für:'} ${correctPlayers.map(p => `<span style="color:${p.color}">${p.name}</span>`).join(', ')}
+          ✅ Richtig: ${correctPlayers.map(p => `<span style="color:${p.color}">${escapeHtml(p.name)}</span>`).join(', ')}
         </p>
-      ` : '<p style="text-align:center;color:#888;">Niemand hatte recht!</p>'}
+      ` : '<p style="text-align:center;color:#888;">Niemand hatte recht!</p>') : renderScoreDeltaRows(gainById, detailById)}
     `;
       } else if (q.type === 'estimate') {
         const winnerIds = gameState._estimateWinners || [];
         const winners = gameState.players.filter(p => winnerIds.includes(p.id));
-        const sorted = gameState.players
+        const sorted = resultPlayers()
           .map(p => ({ name: p.name, color: p.color, id: p.id, est: parseFloat(gameState.answers[p.id]), diff: Math.abs(parseFloat(gameState.answers[p.id]) - q.answer) }))
           .filter(p => !isNaN(p.est))
           .sort((a, b) => a.diff - b.diff);
+        const myEstimate = parseFloat(gameState.answers[myId]);
+        const unit = q.unit ? ` ${q.unit}` : '';
+        const gainById = {};
+        const detailById = {};
+        resultPlayers().forEach(p => {
+          const est = parseFloat(gameState.answers[p.id]);
+          const diff = Math.abs(est - q.answer);
+          gainById[p.id] = isNaN(est) ? 0 : winnerIds.includes(p.id) ? 3 : (diff <= q.tolerance ? 1 : 0);
+          detailById[p.id] = isNaN(est) ? 'Keine Schätzung' : `Schätzung: ${formatNumber(est)}${unit}`;
+        });
 
         const winnerText = winners.length > 1
-          ? `🏆 ${winners.map(w => `<span style="color:${w.color}">${w.name}</span>`).join(' & ')} waren gleich nah dran!${gameState.deckelMode ? '' : ' Je +3 Punkte'}`
+          ? `🏆 ${winners.map(w => `<span style="color:${w.color}">${escapeHtml(w.name)}</span>`).join(' & ')} waren gleich nah dran!${gameState.deckelMode ? '' : ' Je +3 Punkte'}`
           : winners.length === 1
-            ? `🏆 ${winners[0].name} war am nächsten!${gameState.deckelMode ? '' : ' +3 Punkte'}`
+            ? `🏆 ${escapeHtml(winners[0].name)} war am nächsten!${gameState.deckelMode ? '' : ' +3 Punkte'}`
             : '';
         const winnerColor = winners.length === 1 ? winners[0].color : '#1d3557';
 
         resultContent = `
       <div class="result-box info">
         <div class="result-big">${formatNumber(q.answer)} ${q.unit || ''}</div>
-        <div class="result-detail">Die richtige Antwort</div>
+        <div class="result-detail">Richtige Antwort: <strong>${formatNumber(q.answer)}${unit}</strong></div>
+        ${!iWasSpectator ? `<div class="result-detail" style="font-size:0.82rem;font-weight:600;opacity:0.82;">Deine Antwort: ${isNaN(myEstimate) ? 'Keine Schätzung' : `${formatNumber(myEstimate)}${unit}`}</div>` : ''}
       </div>
-      <div class="vote-results">
+      <div class="estimate-results">
         ${sorted.map((s, i) => `
-          <div class="vote-result-row">
-            <div class="vote-result-name" style="color:${s.color}">${winnerIds.includes(s.id) ? '🏆' : ''} ${s.name}</div>
-            <div class="vote-result-bar-bg">
-              <div class="vote-result-bar" style="background:${s.color};width:${Math.max(15, 100 - (s.diff / Math.max(q.answer, 1) * 80))}%">
-                ${formatNumber(s.est)}
-              </div>
+          <div class="estimate-result-row ${winnerIds.includes(s.id) ? 'closest' : ''}">
+            <div class="estimate-result-main">
+              <span style="color:${s.color}">${winnerIds.includes(s.id) ? '🏆 ' : `${i + 1}. `}${escapeHtml(s.name)}</span>
+              <span>${formatNumber(s.est)}${unit}</span>
             </div>
+            <div class="estimate-result-sub">Abweichung: ${formatNumber(s.diff)}${unit}${winnerIds.includes(s.id) ? ' · am nächsten' : (s.diff <= q.tolerance ? ' · im Toleranzbereich' : '')}</div>
           </div>
         `).join('')}
       </div>
       ${winnerText ? `<p style="text-align:center;font-weight:700;color:${winnerColor};">${winnerText}</p>` : ''}
+      ${renderScoreDeltaRows(gainById, detailById)}
     `;
       } else if (q.type === 'höher_tiefer') {
         const correctAnswer = gameState._hotCorrectAnswer;
         const realValue = gameState._hotRealValue;
         const myCorrect = gameState.answers[myId] === correctAnswer;
         const correctPlayers = gameState.players.filter(p => gameState.answers[p.id] === correctAnswer);
+        const correctLabel = correctAnswer === 'höher' ? 'Höher' : 'Tiefer';
+        const myHotAnswer = gameState.answers[myId];
+        const myHotLabel = myHotAnswer === 'höher' ? 'Höher' : myHotAnswer === 'tiefer' ? 'Tiefer' : 'Keine Antwort';
+        const gainById = {};
+        const detailById = {};
+        resultPlayers().forEach(p => {
+          const answer = gameState.answers[p.id];
+          gainById[p.id] = answer === correctAnswer ? 2 : 0;
+          detailById[p.id] = answer === 'höher' ? 'Antwort: Höher' : answer === 'tiefer' ? 'Antwort: Tiefer' : 'Keine Antwort';
+        });
 
         resultContent = `
       <div class="result-box info">
         <div class="result-big">${formatNumber(realValue)} ${q.unit || ''}</div>
-        <div class="result-detail">Die echte Antwort → ${correctAnswer === 'höher' ? '⬆️ Höher' : '⬇️ Tiefer'} als ${formatNumber(q.reference)}</div>
+        <div class="result-detail">Richtige Antwort: <strong>${formatNumber(realValue)} ${q.unit || ''}</strong></div>
+        <div class="result-detail" style="font-size:0.82rem;font-weight:600;opacity:0.82;">Das ist ${correctLabel} als ${formatNumber(q.reference)}.</div>
       </div>
       <div class="result-box ${iWasSpectator ? 'info' : myCorrect ? 'success' : 'fail'}">
         <div class="result-big">${iWasSpectator ? '👀 Zugeschaut' : myCorrect ? '✅ Richtig!' : '❌ Falsch!'}</div>
+        ${!iWasSpectator ? `<div class="result-detail" style="font-size:0.82rem;font-weight:600;opacity:0.82;">Deine Antwort: ${myHotLabel}</div>` : ''}
       </div>
-      ${correctPlayers.length > 0 ? `
+      ${gameState.deckelMode ? (correctPlayers.length > 0 ? `
         <p style="text-align:center;font-weight:600;margin-top:8px;">
-          ${gameState.deckelMode ? '✅ Richtig:' : '+2 Punkte für:'} ${correctPlayers.map(p => '<span style="color:' + p.color + '">' + p.name + '</span>').join(', ')}
+          ✅ Richtig: ${correctPlayers.map(p => '<span style="color:' + p.color + '">' + escapeHtml(p.name) + '</span>').join(', ')}
         </p>
-      ` : '<p style="text-align:center;color:#888;">Niemand hatte recht!</p>'}
+      ` : '<p style="text-align:center;color:#888;">Niemand hatte recht!</p>') : renderScoreDeltaRows(gainById, detailById)}
     `;
       } else if (q.type === 'vote') {
         const counts = gameState._voteCounts || {};
         const majority = gameState._majorityOption;
         const isTie = gameState._voteTie;
         const majorityPlayers = isTie ? [] : gameState.players.filter(p => gameState.answers[p.id] === majority);
+        const totalVotePlayers = Math.max(1, resultPlayers().length);
+        const gainById = {};
+        const detailById = {};
+        resultPlayers().forEach(p => {
+          const choice = gameState.answers[p.id];
+          gainById[p.id] = !isTie && choice === majority ? 1 : 0;
+          detailById[p.id] = choice !== undefined ? `Wahl: ${q.options[choice]}` : 'Keine Stimme';
+        });
 
         resultContent = `
       <div class="vote-results">
         ${q.options.map((o, i) => {
           const count = counts[i] || 0;
-          const pct = count / gameState.players.length * 100;
+          const pct = count / totalVotePlayers * 100;
           const isWin = !isTie && i === majority;
           return `
             <div class="vote-result-row">
@@ -4088,28 +4274,32 @@
         <p style="text-align:center;font-weight:600;margin-top:8px;color:#888;">
           ⚖️ Gleichstand${gameState.deckelMode ? '!' : ' – keine Punkte!'}
         </p>
-      ` : `
+      ` : gameState.deckelMode ? `
         <p style="text-align:center;font-weight:600;margin-top:8px;">
-          ${gameState.deckelMode ? '👑 Mehrheit:' : '+1 Punkt für Mehrheit:'} ${majorityPlayers.map(p => `<span style="color:${p.color}">${p.name}</span>`).join(', ')}
+          👑 Mehrheit: ${majorityPlayers.map(p => `<span style="color:${p.color}">${escapeHtml(p.name)}</span>`).join(', ')}
         </p>
-      `}
+      ` : ''}
+      ${renderScoreDeltaRows(gainById, detailById)}
     `;
       } else if (q.type === 'smart10') {
         const smart10 = gameState.smart10State || { playerOut: [], resolvedBy: [], attemptedBy: [], secured: {}, lost: {}, passed: [] };
         const secured = smart10.secured || {};
-        const lost = smart10.lost || {};
         const passed = smart10.passed || [];
         const mySecured = secured[myId] || 0;
         const iPassed = passed.includes(myId);
         const iBusted = (smart10.playerOut || []).includes(myId) && !iPassed;
-        const myLost = lost[myId] || 0;
-
-        const scorers = gameState.players
-          .map(p => ({ ...p, sec: secured[p.id] || 0 }))
-          .filter(p => p.sec > 0);
-        const busted = gameState.players
-          .filter(p => (smart10.playerOut || []).includes(p.id) && !passed.includes(p.id) && (gameState.questionPlayerIds || []).includes(p.id))
-          .map(p => ({ ...p, lostPts: lost[p.id] || 0 }));
+        const gainById = {};
+        const detailById = {};
+        resultPlayers().forEach(p => {
+          const pBusted = (smart10.playerOut || []).includes(p.id) && !passed.includes(p.id);
+          const sec = secured[p.id] || 0;
+          gainById[p.id] = pBusted ? 0 : sec;
+          detailById[p.id] = pBusted
+            ? 'Verzockt: 0 Punkte aus dieser Runde'
+            : sec > 0
+              ? `${passed.includes(p.id) ? 'Gepasst' : 'Gesichert'}: ${pointWord(sec)}`
+              : '0 Punkte aus dieser Runde';
+        });
 
         const roundDeckelIds = gameState._roundDeckel || [];
         const myDeckelCount = gameState.deckelMode ? roundDeckelIds.filter(id => id === myId).length : 0;
@@ -4126,10 +4316,10 @@
         const myBig = gameState.deckelMode
           ? (gotDeckel ? `❌ ${myDeckelCount > 1 ? myDeckelCount + ' Deckel!' : 'Deckel!'}` : '🛡️ Kein Deckel!')
           : iBusted
-            ? (myLost > 0 ? `💥 Verzockt! ${myLost} Punkt${myLost === 1 ? '' : 'e'} verloren` : '❌ Raus')
+            ? '💥 Verzockt – 0 Punkte'
             : mySecured > 0
-              ? `+${mySecured} Punkt${mySecured === 1 ? '' : 'e'} gesichert`
-              : '🧩 Runde vorbei';
+              ? `+${pointWord(mySecured)} gesichert`
+              : '0 Punkte aus dieser Runde';
         const myDetail = gameState.deckelMode
           ? (gotDeckel
               ? (s10Tie
@@ -4137,7 +4327,7 @@
                   : (iBusted ? 'Verzockt – volle Distanz zum Besten kassiert.' : `Nur ${mySecured} Richtige – Letzter zahlt den Abstand zum Besten.`))
               : (iBusted ? 'Verzockt, aber Gleichstand rettet dich.' : `${mySecured} Richtige – das reicht.`))
           : iBusted
-            ? (myLost > 0 ? 'Ein Fehlgriff – deine ungesicherten Punkte sind weg.' : 'Ein Fehlgriff hat dich aus der Runde genommen.')
+            ? 'Ein Fehlgriff – deine ungesicherten Punkte zählen nicht.'
             : mySecured > 0
               ? (iPassed ? 'Rechtzeitig gepasst und Punkte gebunkert. 💰' : 'Runde beendet – Punkte automatisch gesichert.')
               : 'Alle Felder sind jetzt aufgedeckt.';
@@ -4154,21 +4344,26 @@
           const attempter = gameState.players.find(p => p.id === smart10.attemptedBy?.[i]);
           const wasPicked = !!solver || !!attempter;
           if (!wasPicked) {
+            const truthLabel = smart10ChoiceText(actualTrue);
             return `
               <div class="smart10-tile not-revealed">
                 <div class="smart10-option-text">${option}</div>
                 <div class="smart10-tile-note" style="color:#adb5bd;">Nicht aufgedeckt</div>
+                <div class="smart10-tile-meta">Wahrheit: ${truthLabel}</div>
               </div>
             `;
           }
           const tileClass = solver ? 'truth-true' : 'fehlversuch';
-          const wrongClaimLabel = smart10.claims?.[i] ? '✓ Gehört dazu' : '✗ Gehört nicht dazu';
+          const claimLabel = smart10ChoiceText(!!smart10.claims?.[i]);
+          const truthLabel = smart10ChoiceText(actualTrue);
+          const solverName = solver ? escapeHtml(solver.name) : '';
+          const attempterName = attempter ? escapeHtml(attempter.name) : 'Jemand';
           return `
             <div class="smart10-tile ${tileClass}">
               <div class="smart10-option-text">${option}</div>
-              <div class="smart10-tile-note">${actualTrue ? '✓ Gehört dazu' : '✗ Gehört nicht dazu'}</div>
+              <div class="smart10-tile-note">${solver ? `${solverName} richtig: ${claimLabel}` : `${attempterName} tippte: ${claimLabel}`}</div>
               <div class="smart10-tile-meta">
-                ${solver ? `${gameState.deckelMode ? 'Gelöst von' : '+1 für'} <span style="color:${solver.color}">${solver.name}</span>` : `Fehlversuch: <span style="color:${attempter.color}">${attempter.name}</span> sagte ${wrongClaimLabel}`}
+                ${solver ? `Wahrheit: ${truthLabel}` : `Richtig wäre: ${truthLabel} · 0 Punkte für ${attempterName}`}
               </div>
             </div>
           `;
@@ -4180,19 +4375,10 @@
             const p = gameState.players.find(pl => pl.id === pid);
             if (!p) return '';
             const pBust = (smart10.playerOut || []).includes(pid) && !passed.includes(pid);
-            return `<span style="color:${p.color}">${p.name} ${pBust ? '💥 0' : (secured[pid] || 0)}</span>`;
+            return `<span style="color:${p.color}">${escapeHtml(p.name)} ${pBust ? '💥 0' : (secured[pid] || 0)}</span>`;
           }).filter(Boolean).join(' · ')}
         </p>
-      ` : scorers.length ? `
-        <p style="text-align:center;font-weight:700;margin-top:8px;">
-          Gesichert: ${scorers.map(p => `<span style="color:${p.color}">${p.name} +${p.sec}${passed.includes(p.id) ? ' 💰' : ''}</span>`).join(' · ')}
-        </p>
-      ` : '<p style="text-align:center;color:#888;">In dieser Runde hat niemand gepunktet.</p>'}
-      ${busted.length && !gameState.deckelMode ? `
-        <p style="text-align:center;color:#666;font-weight:600;margin-top:6px;">
-          💥 Verzockt: ${busted.map(p => `<span style="color:${p.color}">${p.name}${p.lostPts > 0 ? ` (−${p.lostPts})` : ''}</span>`).join(', ')}
-        </p>
-      ` : ''}
+      ` : renderScoreDeltaRows(gainById, detailById)}
     `;
       }
 
@@ -4206,7 +4392,7 @@
       ${renderDeckelResultLine()}
       ${q.fact ? (_factOpen && _factQIdx === q.idx
         ? `<div class="fun-fact" onclick="toggleFunFact()" style="cursor:pointer;"><strong>💡 Wusstest du?</strong> ${q.fact}</div>`
-        : `<div onclick="toggleFunFact()" style="margin-top:12px;text-align:center;cursor:pointer;font-size:0.8rem;color:#a58a3d;-webkit-tap-highlight-color:transparent;">💡 Wusstest du? <span style="opacity:0.55;">▸</span></div>`) : ''}
+        : `<div class="fact-toggle" onclick="toggleFunFact()">💡 Wusstest du? <span style="opacity:0.7;">Mehr anzeigen ▾</span></div>`) : ''}
       ${renderFeedbackRow()}
       ${renderReadySection()}
     </div>
@@ -4517,6 +4703,55 @@
       if (n === undefined || n === null) return '?';
       if (Math.abs(n) >= 10000) return Math.round(n).toLocaleString('de-DE');
       return String(n).replace('.', ',');
+    }
+
+    function pointWord(n) {
+      return `${n} Punkt${n === 1 ? '' : 'e'}`;
+    }
+
+    function smart10ChoiceText(value) {
+      return value ? 'Gehört dazu' : 'Gehört nicht dazu';
+    }
+
+    function turnWaitText(player) {
+      if (!player) return 'Warte auf die Auswertung';
+      const rawName = String(player.name || 'Spieler');
+      const suffix = /[sxzß]$/i.test(rawName.trim()) ? "'" : 's';
+      return `Warte auf ${escapeHtml(rawName)}${suffix} Zug`;
+    }
+
+    function resultPlayers() {
+      const ids = (gameState.questionPlayerIds || []).length
+        ? gameState.questionPlayerIds
+        : gameState.players.filter(p => p.connected).map(p => p.id);
+      return gameState.players.filter(p => ids.includes(p.id));
+    }
+
+    function renderScoreDeltaRows(gainById, detailById = {}) {
+      if (gameState.deckelMode) return '';
+      const players = resultPlayers();
+      if (!players.length) return '';
+      const maxScore = Math.max(1, ...gameState.players.map(p => p.score || 0));
+      return `<div class="score-delta-list">
+        ${players.map(p => {
+          const gain = Math.max(0, gainById[p.id] || 0);
+          const width = p.score > 0 ? Math.max(6, (p.score / maxScore) * 100) : 0;
+          const baseDetail = detailById[p.id];
+          const detail = baseDetail
+            ? `${baseDetail} · Gesamt: ${pointWord(p.score)}`
+            : `Gesamt: ${pointWord(p.score)}`;
+          return `
+            <div class="score-delta-row">
+              <div class="score-delta-main">
+                <span style="color:${p.color};">${escapeHtml(p.name)}</span>
+                <span class="score-delta-badge ${gain > 0 ? 'gain' : ''}">${gain > 0 ? '+' : ''}${pointWord(gain)}</span>
+              </div>
+              <div class="score-total-track"><div class="score-total-fill" style="background:${p.color};width:${width}%;"></div></div>
+              <div class="score-delta-sub">${escapeHtml(detail)}</div>
+            </div>
+          `;
+        }).join('')}
+      </div>`;
     }
 
     function spawnConfetti() {
