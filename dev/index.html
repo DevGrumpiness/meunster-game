@@ -2429,9 +2429,11 @@
       } else {
         hint = 'Weiterraten bringt mehr – ein Fehler kostet alles.';
       }
-      const label = gameState.deckelMode
-        ? `Passen – ${myPts} Richtige sichern`
-        : `Passen – ${myPts} Punkt${myPts === 1 ? '' : 'e'} sichern`;
+      const label = myPts > 0
+        ? (gameState.deckelMode
+          ? `Passen – ${myPts} Richtige sichern`
+          : `Passen – ${myPts} Punkt${myPts === 1 ? '' : 'e'} sichern`)
+        : 'Passen';
       return `<button class="btn" style="background:linear-gradient(135deg,#e9c46a,#d9ba55);color:#2b3440;border:none;box-shadow:0 3px 10px rgba(217,186,85,0.4);padding:12px 24px;font-size:0.95rem;font-weight:700;border-radius:12px;" onclick="submitSmart10Pass()">🛡️ ${label}</button>
         <div style="font-size:0.72rem;color:#98a1ab;margin-top:5px;">${hint}</div>`;
     }
