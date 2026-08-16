@@ -2658,9 +2658,7 @@
           const truthLabel = smart10ChoiceText(!!q.correct[i]);
           const playerName = attemptedBy ? escapeHtml(attemptedBy.name) : 'Jemand';
           tile.insertAdjacentHTML('beforeend',
-            `<div class="smart10-tile-note">${guessResult === 'correct'
-              ? (isOwnAttempt ? '✅ Dein Treffer' : `✅ ${playerName} lag richtig`)
-              : `${isOwnAttempt ? '❌ Dein Tipp' : `❌ ${playerName} tippte`}: ${claimLabel}`}</div>
+            `<div class="smart10-tile-note">${guessResult === 'correct' ? '✓' : `✗ Tipp: ${claimLabel}`}</div>
              <div class="smart10-tile-meta">${guessResult === 'correct' ? truthLabel : `Richtig: ${truthLabel}`}</div>`);
         } else if (isMyTurn) {
           tile.insertAdjacentHTML('beforeend',
@@ -4030,9 +4028,9 @@
       }
 
       app.innerHTML = `
+    ${renderScoreboard()}
     <div class="category-badge-wrapper"><div class="category-badge" style="background:${cat.color}">${cat.icon} ${cat.name}</div></div>
     <div class="card" style="border-top:5px solid ${cat.color};border-radius:0 0 var(--ms-radius) var(--ms-radius);">
-      ${renderScoreboard()}
       ${renderRoundInfo()}
       ${inFinale ? `<div style="text-align:center;background:#1d3557;color:#fff;border-radius:8px;padding:8px;margin-bottom:10px;font-weight:700;font-size:.9rem;">🥊 FINALE: ${finalists.map(p => `<span style="color:#ffd166">${p.name}</span>`).join(' vs ')}${isSpectator ? ' – du schaust zu!' : ''}</div>` : ''}
       ${isSpectator ? `<div style="pointer-events:none;opacity:0.7;">${content}</div>` : content}
@@ -4089,9 +4087,9 @@
       const playersStillIn = participantPlayers.filter(p => p.connected && !smart10.playerOut.includes(p.id)).length;
 
       app.innerHTML = `
+    ${renderScoreboard()}
     <div class="category-badge-wrapper"><div class="category-badge" style="background:${cat.color}">${cat.icon} ${cat.name}</div></div>
     <div class="card" style="border-top:5px solid ${cat.color};border-radius:0 0 var(--ms-radius) var(--ms-radius);">
-      ${renderScoreboard()}
       ${renderRoundInfo()}
       <div class="question-type-label">Wahr oder Falsch · reihum</div>
       <div class="question-text">${q.q}</div>
@@ -4138,9 +4136,7 @@
             <div class="${tileClasses}">
               <div class="smart10-option-text">${option}</div>
               ${isEliminated ? `
-                <div class="smart10-tile-note">${guessResult === 'correct'
-                  ? (isOwnAttempt ? '✅ Dein Treffer' : `✅ ${playerName} lag richtig`)
-                  : `${isOwnAttempt ? '❌ Dein Tipp' : `❌ ${playerName} tippte`}: ${claimLabel}`}</div>
+                <div class="smart10-tile-note">${guessResult === 'correct' ? '✓' : `✗ Tipp: ${claimLabel}`}</div>
                 <div class="smart10-tile-meta">${guessResult === 'correct' ? truthLabel : `Richtig: ${truthLabel}`}</div>
               ` : isMyTurn ? `
                 <div class="smart10-actions">
@@ -4406,8 +4402,8 @@
             <div class="smart10-tile ${tileClass}">
               <div class="smart10-option-text">${option}</div>
               <div class="smart10-tile-note">${solver
-                ? (solverIsMe ? '✅ Dein Treffer' : `✅ ${solverName} lag richtig`)
-                : `${attempterIsMe ? '❌ Dein Tipp' : `❌ ${attempterName} tippte`}: ${claimLabel}`}</div>
+                ? '✓'
+                : `✗ Tipp: ${claimLabel}`}</div>
               <div class="smart10-tile-meta">
                 ${solver ? truthLabel : `Richtig: ${truthLabel}`}
               </div>
@@ -4429,9 +4425,9 @@
       }
 
       app.innerHTML = `
+    ${renderScoreboard()}
     <div class="category-badge-wrapper"><div class="category-badge" style="background:${cat.color}">${cat.icon} ${cat.name}</div></div>
     <div class="card" style="border-top:5px solid ${cat.color};border-radius:0 0 var(--ms-radius) var(--ms-radius);">
-      ${renderScoreboard()}
       ${renderRoundInfo()}
       <div class="question-text">${q.q}</div>
       ${resultContent}
@@ -4724,7 +4720,7 @@
         ? (gameState.players[gameState.smart10State.currentTurnIdx] || {}).id
         : null;
       return `
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;width:100%;">
       <div class="scoreboard" style="margin-bottom:0;flex:1;">
         ${gameState.players.map((p, i) => {
         const isLeader = hasScores && p.score === maxScore;
