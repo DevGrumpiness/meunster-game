@@ -822,6 +822,23 @@
       white-space: nowrap;
     }
 
+    .score-delta-badges {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .score-delta-badge.round {
+      background: #f1f4f8;
+      color: #64748b;
+    }
+
+    .score-delta-badge.total {
+      background: #e8f1fb;
+      color: var(--ms-blue);
+    }
+
     .score-delta-badge.gain {
       background: #e6f4ea;
       color: var(--ms-green);
@@ -4734,14 +4751,17 @@
           const gain = Math.max(0, gainById[p.id] || 0);
           const width = p.score > 0 ? Math.max(6, (p.score / maxScore) * 100) : 0;
           const baseDetail = detailById[p.id];
-          const detail = baseDetail
-            ? `${baseDetail} · Gesamt: ${pointWord(p.score)}`
-            : `Gesamt: ${pointWord(p.score)}`;
+          const detail = baseDetail || 'Aktueller Stand nach dieser Runde';
+          const roundLabel = `Runde: ${gain > 0 ? '+' : ''}${pointWord(gain)}`;
+          const totalLabel = `Gesamt: ${pointWord(p.score)}`;
           return `
             <div class="score-delta-row">
               <div class="score-delta-main">
                 <span style="color:${p.color};">${escapeHtml(p.name)}</span>
-                <span class="score-delta-badge ${gain > 0 ? 'gain' : ''}">${gain > 0 ? '+' : ''}${pointWord(gain)}</span>
+                <span class="score-delta-badges">
+                  <span class="score-delta-badge round ${gain > 0 ? 'gain' : ''}">${roundLabel}</span>
+                  <span class="score-delta-badge total">${totalLabel}</span>
+                </span>
               </div>
               <div class="score-total-track"><div class="score-total-fill" style="background:${p.color};width:${width}%;"></div></div>
               <div class="score-delta-sub">${escapeHtml(detail)}</div>
