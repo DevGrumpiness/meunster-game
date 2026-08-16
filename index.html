@@ -3385,11 +3385,12 @@
       const savedName = escapeHtml(localStorage.getItem('mk-name') || '');
       const landingHref = escapeHtml((location.origin && location.origin !== 'null') ? (location.origin + location.pathname) : location.pathname);
       if (joinLinkCode) {
+        const inviter = joinLinkFrom ? escapeHtml(joinLinkFrom) : '';
         app.innerHTML = `
     <div class="card">
       <a href="${landingHref}" style="display:inline-block;margin-bottom:12px;color:#777;font-size:0.8rem;text-decoration:none;">← Zurück zur Startseite</a>
       <h1><span class="bike">🚲</span> Münster Game</h1>
-      <p class="subtitle" style="margin-bottom:18px;">Einladung zum Mitspielen</p>
+      <p class="subtitle" style="margin-bottom:18px;">${inviter ? `Einladung von ${inviter}` : 'Einladung zum Mitspielen'}</p>
 
       <div style="margin-bottom:16px;">
         <label style="font-weight:700;display:block;margin-bottom:6px;">Dein Name:</label>
@@ -3398,7 +3399,7 @@
       </div>
 
       <div class="btn-row">
-        <button class="btn btn-gold" onclick="onJoinRoom()">Beitreten!</button>
+        <button class="btn btn-gold" onclick="onJoinRoom()">Mitspielen</button>
       </div>
     </div>
   `;
@@ -4694,15 +4695,19 @@
     // Button fuer die gespeicherte Session.
     // ============================================================
     function roomLink() {
-      return location.origin + location.pathname + '?join=' + roomCode;
+      const params = new URLSearchParams({ join: roomCode });
+      const inviter = (myName || '').trim();
+      if (inviter) params.set('from', inviter.slice(0, 14));
+      return location.origin + location.pathname + '?' + params.toString();
     }
     async function shareRoom() {
       const link = roomLink();
-      const text = 'Komm in meinen Münster-Game-Raum ' + roomCode + ': ' + link;
+      const inviter = (myName || '').trim();
+      const text = (inviter ? inviter + ' lädt dich ins Münster Game ein: ' : 'Komm ins Münster Game: ') + link;
       try { saveSession(); } catch (e) { }
       if (navigator.share) {
         try {
-          await navigator.share({ title: 'Münster Game', text: 'Raum-Code: ' + roomCode, url: link });
+          await navigator.share({ title: 'Münster Game', text: inviter ? 'Einladung von ' + inviter : 'Einladung zum Mitspielen', url: link });
           return;
         } catch (e) {
           if (e && e.name === 'AbortError') return;
@@ -5194,10 +5199,12 @@
 
     // Deeplink: ?join=CODE prefills the join flow
     let joinLinkCode = '';
+    let joinLinkFrom = '';
     try {
       const params = new URLSearchParams(location.search || '');
       const jc = (params.get('join') || '').toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 4);
       if (jc.length === 4) joinLinkCode = jc;
+      joinLinkFrom = (params.get('from') || '').trim().slice(0, 14);
     } catch (e) { }
 
     // INIT
