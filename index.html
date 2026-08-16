@@ -519,6 +519,12 @@
       background: #d4edda;
     }
 
+    .smart10-tile.own-hit {
+      border-color: var(--ms-gold);
+      background: linear-gradient(135deg, #fff7dd 0%, #d9f0df 100%);
+      box-shadow: 0 0 0 3px rgba(244, 162, 97, 0.25);
+    }
+
     .smart10-tile.guess-wrong,
     .smart10-tile.truth-false {
       border-color: #cfd4da;
@@ -529,6 +535,12 @@
     .smart10-tile.fehlversuch {
       border-color: #e07070;
       background: #fde8e8;
+    }
+
+    .smart10-tile.own-miss {
+      border-color: var(--ms-red);
+      background: linear-gradient(135deg, #fff0d8 0%, #fde8e8 100%);
+      box-shadow: 0 0 0 3px rgba(230, 57, 70, 0.15);
     }
 
     .smart10-tile.not-revealed {
@@ -547,6 +559,10 @@
     .smart10-tile.guess-correct .smart10-option-text,
     .smart10-tile.truth-true .smart10-option-text {
       color: var(--ms-green);
+    }
+
+    .smart10-tile.own-hit .smart10-option-text {
+      color: var(--ms-blue);
     }
 
     .smart10-tile.guess-wrong .smart10-option-text,
@@ -2624,8 +2640,11 @@
         const guessResult = smart10.claimResults[i];
         const attemptedBy = gameState.players.find(p => p.id === smart10.attemptedBy[i]);
 
+        const isOwnAttempt = !!attemptedBy && attemptedBy.id === myId;
         tile.className = ['smart10-tile',
           isEliminated ? (guessResult === 'correct' ? 'guess-correct' : 'guess-wrong') : '',
+          isEliminated && isOwnAttempt && guessResult === 'correct' ? 'own-hit' : '',
+          isEliminated && isOwnAttempt && guessResult === 'wrong' ? 'own-miss' : '',
           !isEliminated && isMyTurn ? 'active' : ''
         ].filter(Boolean).join(' ');
 
@@ -2639,8 +2658,10 @@
           const truthLabel = smart10ChoiceText(!!q.correct[i]);
           const playerName = attemptedBy ? escapeHtml(attemptedBy.name) : 'Jemand';
           tile.insertAdjacentHTML('beforeend',
-            `<div class="smart10-tile-note">${guessResult === 'correct' ? `${playerName} richtig: ${claimLabel}` : `${playerName} tippte: ${claimLabel}`}</div>
-             <div class="smart10-tile-meta">${guessResult === 'correct' ? `Wahrheit: ${truthLabel}` : `Richtig wäre: ${truthLabel} · ${playerName} raus`}</div>`);
+            `<div class="smart10-tile-note">${guessResult === 'correct'
+              ? (isOwnAttempt ? '✅ Dein Treffer' : `✅ ${playerName} lag richtig`)
+              : `${isOwnAttempt ? '❌ Dein Tipp' : `❌ ${playerName} tippte`}: ${claimLabel}`}</div>
+             <div class="smart10-tile-meta">${guessResult === 'correct' ? truthLabel : `Richtig: ${truthLabel}`}</div>`);
         } else if (isMyTurn) {
           tile.insertAdjacentHTML('beforeend',
             `<div class="smart10-actions">
@@ -4104,18 +4125,23 @@
         const tileClasses = [
           'smart10-tile',
           isEliminated ? (guessResult === 'correct' ? 'guess-correct' : 'guess-wrong') : '',
+          isEliminated && attemptedBy && attemptedBy.id === myId && guessResult === 'correct' ? 'own-hit' : '',
+          isEliminated && attemptedBy && attemptedBy.id === myId && guessResult === 'wrong' ? 'own-miss' : '',
           !isEliminated && isMyTurn ? 'active' : '',
         ].filter(Boolean).join(' ');
 
         const claimLabel = smart10ChoiceText(!!smart10.claims[i]);
         const truthLabel = smart10ChoiceText(!!q.correct[i]);
         const playerName = attemptedBy ? escapeHtml(attemptedBy.name) : 'Jemand';
+        const isOwnAttempt = !!attemptedBy && attemptedBy.id === myId;
         return `
             <div class="${tileClasses}">
               <div class="smart10-option-text">${option}</div>
               ${isEliminated ? `
-                <div class="smart10-tile-note">${guessResult === 'correct' ? `${playerName} richtig: ${claimLabel}` : `${playerName} tippte: ${claimLabel}`}</div>
-                <div class="smart10-tile-meta">${guessResult === 'correct' ? `Wahrheit: ${truthLabel}` : `Richtig wäre: ${truthLabel} · ${playerName} raus`}</div>
+                <div class="smart10-tile-note">${guessResult === 'correct'
+                  ? (isOwnAttempt ? '✅ Dein Treffer' : `✅ ${playerName} lag richtig`)
+                  : `${isOwnAttempt ? '❌ Dein Tipp' : `❌ ${playerName} tippte`}: ${claimLabel}`}</div>
+                <div class="smart10-tile-meta">${guessResult === 'correct' ? truthLabel : `Richtig: ${truthLabel}`}</div>
               ` : isMyTurn ? `
                 <div class="smart10-actions">
                   <button class="smart10-action-btn true" onclick="submitSmart10Choice(${i}, true)">✓</button>
@@ -4363,11 +4389,15 @@
               <div class="smart10-tile not-revealed">
                 <div class="smart10-option-text">${option}</div>
                 <div class="smart10-tile-note" style="color:#adb5bd;">Nicht aufgedeckt</div>
-                <div class="smart10-tile-meta">Wahrheit: ${truthLabel}</div>
+                <div class="smart10-tile-meta">Richtig: ${truthLabel}</div>
               </div>
             `;
           }
-          const tileClass = solver ? 'truth-true' : 'fehlversuch';
+          const solverIsMe = !!solver && solver.id === myId;
+          const attempterIsMe = !!attempter && attempter.id === myId;
+          const tileClass = solver
+            ? `truth-true ${solverIsMe ? 'own-hit' : ''}`
+            : `fehlversuch ${attempterIsMe ? 'own-miss' : ''}`;
           const claimLabel = smart10ChoiceText(!!smart10.claims?.[i]);
           const truthLabel = smart10ChoiceText(actualTrue);
           const solverName = solver ? escapeHtml(solver.name) : '';
@@ -4375,9 +4405,11 @@
           return `
             <div class="smart10-tile ${tileClass}">
               <div class="smart10-option-text">${option}</div>
-              <div class="smart10-tile-note">${solver ? `${solverName} richtig: ${claimLabel}` : `${attempterName} tippte: ${claimLabel}`}</div>
+              <div class="smart10-tile-note">${solver
+                ? (solverIsMe ? '✅ Dein Treffer' : `✅ ${solverName} lag richtig`)
+                : `${attempterIsMe ? '❌ Dein Tipp' : `❌ ${attempterName} tippte`}: ${claimLabel}`}</div>
               <div class="smart10-tile-meta">
-                ${solver ? `Wahrheit: ${truthLabel}` : `Richtig wäre: ${truthLabel} · 0 Punkte für ${attempterName}`}
+                ${solver ? truthLabel : `Richtig: ${truthLabel}`}
               </div>
             </div>
           `;
