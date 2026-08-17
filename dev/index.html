@@ -2520,6 +2520,7 @@
         ? gameState.questionPlayerIds
         : gameState.players.filter(p => p.connected).map(p => p.id);
       const myPts = (smart10.roundPoints && smart10.roundPoints[myId]) || 0;
+      if (myPts <= 0) return '';
       let hint;
       if (gameState.deckelMode) {
         const effNow = pids.map(id => {
@@ -2534,11 +2535,9 @@
       } else {
         hint = 'Weiterraten bringt mehr – ein Fehler kostet alles.';
       }
-      const label = myPts > 0
-        ? (gameState.deckelMode
-          ? `Passen, um ${myPts} Richtige zu sichern`
-          : `Passen, um ${pointWord(myPts)} zu sichern`)
-        : 'Passen';
+      const label = gameState.deckelMode
+        ? `Passen, um ${myPts} Richtige zu sichern`
+        : `Passen, um ${pointWord(myPts)} zu sichern`;
       return `<button class="btn" style="background:linear-gradient(135deg,#e9c46a,#d9ba55);color:#2b3440;border:none;box-shadow:0 3px 10px rgba(217,186,85,0.4);padding:12px 24px;font-size:0.95rem;font-weight:700;border-radius:12px;" onclick="submitSmart10Pass()">🛡️ ${label}</button>
         <div style="font-size:0.72rem;color:#98a1ab;margin-top:5px;">${hint}</div>`;
     }
@@ -2570,8 +2569,8 @@
 
       // Update pass button (appears only on my turn)
       const passRow = document.getElementById('smart10-pass-row');
-      if (isMyTurn) {
-        const passHtml = smart10PassRowInnerHtml(smart10);
+      const passHtml = isMyTurn ? smart10PassRowInnerHtml(smart10) : '';
+      if (passHtml) {
         if (passRow) {
           passRow.innerHTML = passHtml;
         } else {
@@ -2904,6 +2903,7 @@
       if (!activePlayer || activePlayer.id !== playerId) return;
 
       const pts = smart10.roundPoints[playerId] || 0;
+      if (pts <= 0) return;
       const player = gameState.players.find(p => p.id === playerId);
       if (player) player.score += pts;
       smart10.secured[playerId] = pts;
@@ -4040,7 +4040,7 @@
       ${renderRoundInfo()}
       <div class="question-type-label">Wahr oder Falsch · reihum</div>
       <div class="question-text">${q.q}</div>
-      ${isMyTurn ? `
+      ${isMyTurn && ((smart10.roundPoints && smart10.roundPoints[myId]) || 0) > 0 ? `
       <div id="smart10-pass-row" style="text-align:center;margin:10px 0 12px;">
         ${smart10PassRowInnerHtml(smart10)}
       </div>` : ''}
