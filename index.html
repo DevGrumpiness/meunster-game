@@ -626,42 +626,6 @@
       text-align: center;
     }
 
-    .smart10-status-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      justify-content: center;
-      margin-bottom: 8px;
-    }
-
-    .smart10-player-pill {
-      padding: 6px 10px;
-      border-radius: 999px;
-      font-size: 0.78rem;
-      font-weight: 800;
-      border: 2px solid transparent;
-    }
-
-    .smart10-player-pill.active {
-      background: var(--pc) !important;
-      color: #fff !important;
-      transform: scale(1.05);
-      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15);
-    }
-
-    .smart10-player-pill.out {
-      background: #f1f3f5 !important;
-      color: #7a7a7a !important;
-      border-color: #d0d7de !important;
-    }
-
-    .smart10-player-pill.banked {
-      background: #fff4cf !important;
-      color: #7a5a00 !important;
-      border-color: #e0b84f !important;
-      box-shadow: 0 2px 8px rgba(224, 184, 79, 0.2);
-    }
-
     .smart10-self-notice {
       background: #fff8e6;
       border: 1.5px solid #ead08a;
@@ -2658,7 +2622,7 @@
           const truthLabel = smart10ChoiceText(!!q.correct[i]);
           const playerName = attemptedBy ? escapeHtml(attemptedBy.name) : 'Jemand';
           tile.insertAdjacentHTML('beforeend',
-            `<div class="smart10-tile-note">${guessResult === 'correct' ? '✓' : `✗ Tipp: ${claimLabel}`}</div>
+            `<div class="smart10-tile-note">${guessResult === 'correct' ? `✓ ${playerName}` : `✗ ${playerName}`}</div>
              <div class="smart10-tile-meta">${guessResult === 'correct' ? truthLabel : `Richtig: ${truthLabel}`}</div>`);
         } else if (isMyTurn) {
           tile.insertAdjacentHTML('beforeend',
@@ -2671,26 +2635,6 @@
             `<div class="smart10-note">${activePlayer ? `${activePlayer.name} entscheidet` : 'Wird ausgewertet...'}</div>`);
         }
       });
-
-      // Update player pills
-      const statusRow = document.querySelector('.smart10-status-row');
-      if (statusRow) {
-        statusRow.innerHTML = participantPlayers.map(p => {
-          const rp = (smart10.roundPoints && smart10.roundPoints[p.id]) || 0;
-          const hasPassed = (smart10.passed || []).includes(p.id);
-          const isBusted = smart10.playerOut.includes(p.id) && !hasPassed;
-          const isActive = activePlayer && activePlayer.id === p.id;
-          const statusLabel = gameState.deckelMode
-            ? (hasPassed ? ` ✓ gesichert ${(smart10.secured && smart10.secured[p.id]) || 0}` : isBusted ? ' raus · 0' : !p.connected ? ' – raus' : isActive ? ' ist dran' : (rp > 0 ? ` · ${rp} offen` : ''))
-            : hasPassed ? ` ✓ gesichert +${(smart10.secured && smart10.secured[p.id]) || 0}` : (isBusted || !p.connected) ? ' raus · 0' : isActive ? ' ist dran' : (rp > 0 ? ` · ${rp} offen` : '');
-          return `
-          <div class="smart10-player-pill ${isActive ? 'active' : ''} ${hasPassed ? 'banked' : ''} ${isBusted || !p.connected ? 'out' : ''}"
-               style="--pc:${p.color};background:${p.color}22;color:${p.color};border-color:${p.color};">
-            ${escapeHtml(p.name)}${statusLabel}
-          </div>
-        `;
-        }).join('');
-      }
 
       // Update counter
       const counter = document.querySelector('.answer-count');
@@ -4093,23 +4037,6 @@
       ${renderRoundInfo()}
       <div class="question-type-label">Wahr oder Falsch · reihum</div>
       <div class="question-text">${q.q}</div>
-      <div class="smart10-status-row">
-        ${participantPlayers.map(p => {
-        const rp = (smart10.roundPoints && smart10.roundPoints[p.id]) || 0;
-        const hasPassed = (smart10.passed || []).includes(p.id);
-        const isBusted = smart10.playerOut.includes(p.id) && !hasPassed;
-        const isActive = activePlayer && activePlayer.id === p.id;
-        const statusLabel = gameState.deckelMode
-          ? (hasPassed ? ` ✓ gesichert ${(smart10.secured && smart10.secured[p.id]) || 0}` : isBusted ? ' raus · 0' : !p.connected ? ' – raus' : isActive ? ' ist dran' : (rp > 0 ? ` · ${rp} offen` : ''))
-          : hasPassed ? ` ✓ gesichert +${(smart10.secured && smart10.secured[p.id]) || 0}` : (isBusted || !p.connected) ? ' raus · 0' : isActive ? ' ist dran' : (rp > 0 ? ` · ${rp} offen` : '');
-        return `
-          <div class="smart10-player-pill ${isActive ? 'active' : ''} ${hasPassed ? 'banked' : ''} ${isBusted || !p.connected ? 'out' : ''}"
-               style="--pc:${p.color};background:${p.color}22;color:${p.color};border-color:${p.color};">
-            ${escapeHtml(p.name)}${statusLabel}
-          </div>
-        `;
-      }).join('')}
-      </div>
       ${isMyTurn ? `
       <div id="smart10-pass-row" style="text-align:center;margin:10px 0 12px;">
         ${smart10PassRowInnerHtml(smart10)}
@@ -4136,7 +4063,7 @@
             <div class="${tileClasses}">
               <div class="smart10-option-text">${option}</div>
               ${isEliminated ? `
-                <div class="smart10-tile-note">${guessResult === 'correct' ? '✓' : `✗ Tipp: ${claimLabel}`}</div>
+                <div class="smart10-tile-note">${guessResult === 'correct' ? `✓ ${playerName}` : `✗ ${playerName}`}</div>
                 <div class="smart10-tile-meta">${guessResult === 'correct' ? truthLabel : `Richtig: ${truthLabel}`}</div>
               ` : isMyTurn ? `
                 <div class="smart10-actions">
@@ -4402,8 +4329,8 @@
             <div class="smart10-tile ${tileClass}">
               <div class="smart10-option-text">${option}</div>
               <div class="smart10-tile-note">${solver
-                ? '✓'
-                : `✗ Tipp: ${claimLabel}`}</div>
+                ? `✓ ${solverName}`
+                : `✗ ${attempterName}`}</div>
               <div class="smart10-tile-meta">
                 ${solver ? truthLabel : `Richtig: ${truthLabel}`}
               </div>
