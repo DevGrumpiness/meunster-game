@@ -6,7 +6,7 @@
 // zu loeschen (siehe unten) - ohne Versionswechsel koennte auf manchen
 // Geraeten dauerhaft eine veraltete/kaputte gecachte Version als Offline-
 // Fallback ueberleben, selbst nach etlichen Deployments.
-const CACHE = 'msgame-v16';
+const CACHE = 'msgame-v17';
 const PRECACHE = ['/', '/manifest.webmanifest', '/icons/icon-192.png', '/icons/icon-512.png'];
 
 self.addEventListener('install', e => {
