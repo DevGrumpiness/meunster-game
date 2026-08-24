@@ -7329,5 +7329,14 @@
    "ev": "room",
    "src": "prod"
   }
+ },
+ {
+  "id": "SzDmktMkKm2g",
+  "kind": "stats",
+  "ts": 1787527954671,
+  "data": {
+   "ev": "open",
+   "src": "prod"
+  }
  }
 ]
