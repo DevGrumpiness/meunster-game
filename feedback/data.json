@@ -7392,5 +7392,41 @@
    "ev": "room",
    "src": "prod"
   }
+ },
+ {
+  "id": "e6LXpUrUFysw",
+  "kind": "stats",
+  "ts": 1788536164054,
+  "data": {
+   "ev": "open",
+   "src": "prod"
+  }
+ },
+ {
+  "id": "BBT2Q76X8cOx",
+  "kind": "stats",
+  "ts": 1788536186034,
+  "data": {
+   "ev": "open",
+   "src": "prod"
+  }
+ },
+ {
+  "id": "k3hEkoVXR8Nk",
+  "kind": "stats",
+  "ts": 1788536206330,
+  "data": {
+   "ev": "open",
+   "src": "prod"
+  }
+ },
+ {
+  "id": "ayoMXQlHscaV",
+  "kind": "stats",
+  "ts": 1788536226054,
+  "data": {
+   "ev": "open",
+   "src": "prod"
+  }
  }
 ]
