@@ -7428,5 +7428,57 @@
    "ev": "open",
    "src": "prod"
   }
+ },
+ {
+  "id": "P8oAXFAqt3wp",
+  "kind": "stats",
+  "ts": 1788621556440,
+  "data": {
+   "ev": "open",
+   "src": "prod"
+  }
+ },
+ {
+  "id": "B0zi0xNJ8q95",
+  "kind": "stats",
+  "ts": 1788621557875,
+  "data": {
+   "ev": "room",
+   "src": "prod"
+  }
+ },
+ {
+  "id": "mFPTAyARrGWu",
+  "kind": "stats",
+  "ts": 1788621610964,
+  "data": {
+   "ev": "open",
+   "src": "prod"
+  }
+ },
+ {
+  "id": "4FteVYim7UMS",
+  "kind": "stats",
+  "ts": 1788621616819,
+  "data": {
+   "ev": "game_start",
+   "src": "prod",
+   "players": 2,
+   "deckel": false,
+   "allg": true,
+   "rounds": 12
+  }
+ },
+ {
+  "id": "xNUbIJkqBSeZ",
+  "kind": "stats",
+  "ts": 1788622546513,
+  "data": {
+   "ev": "game_end",
+   "src": "prod",
+   "rounds": 12,
+   "players": 2,
+   "mins": 15
+  }
  }
 ]
