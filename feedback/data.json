@@ -7480,5 +7480,14 @@
    "players": 2,
    "mins": 15
   }
+ },
+ {
+  "id": "QNEfTPqxmNtX",
+  "kind": "stats",
+  "ts": 1788812386739,
+  "data": {
+   "ev": "open",
+   "src": "prod"
+  }
  }
 ]
