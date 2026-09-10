@@ -7489,5 +7489,14 @@
    "ev": "open",
    "src": "prod"
   }
+ },
+ {
+  "id": "gH399cJ2ySDw",
+  "kind": "stats",
+  "ts": 1789038147540,
+  "data": {
+   "ev": "open",
+   "src": "prod"
+  }
  }
 ]
