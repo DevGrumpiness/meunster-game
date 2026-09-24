@@ -50,12 +50,36 @@ function extractPeerConfig(html) {
   const startMarker = 'const PEER_CONFIG';
   const idxStart = html.indexOf(startMarker);
   if (idxStart === -1) throw new Error('PEER_CONFIG nicht im HTML gefunden');
-  const idxFnStart = html.indexOf('function createHost', idxStart);
-  if (idxFnStart === -1) throw new Error('Ende von PEER_CONFIG nicht gefunden (Marker function createHost fehlt)');
-  const block = html.slice(idxStart, idxFnStart);
-  const eqIdx = block.indexOf('=');
-  let objText = block.slice(eqIdx + 1).trim();
-  objText = objText.replace(/;\s*$/, '');
+  const eqIdx = html.indexOf('=', idxStart);
+  if (eqIdx === -1) throw new Error('Zuweisung fuer PEER_CONFIG nicht gefunden');
+  const idxObjStart = html.indexOf('{', eqIdx);
+  if (idxObjStart === -1) throw new Error('Beginn des PEER_CONFIG-Objekts nicht gefunden');
+
+  // Statt auf einen (fragilen) nachfolgenden Code-Marker zu vertrauen, wird das
+  // Ende des Objektliterals durch Klammer-Zaehlung ermittelt. So bleibt die
+  // Extraktion robust, egal welcher Code als naechstes im HTML folgt. String-
+  // und Template-Literale werden dabei uebersprungen, damit Klammern darin
+  // die Zaehlung nicht verfaelschen.
+  let depth = 0;
+  let idxObjEnd = -1;
+  let quote = null;
+  for (let i = idxObjStart; i < html.length; i++) {
+    const ch = html[i];
+    if (quote) {
+      if (ch === '\\') { i++; continue; }
+      if (ch === quote) quote = null;
+      continue;
+    }
+    if (ch === '"' || ch === "'" || ch === '`') { quote = ch; continue; }
+    if (ch === '{') depth++;
+    else if (ch === '}') {
+      depth--;
+      if (depth === 0) { idxObjEnd = i; break; }
+    }
+  }
+  if (idxObjEnd === -1) throw new Error('Ende von PEER_CONFIG nicht gefunden (unausgeglichene Klammern)');
+
+  const objText = html.slice(idxObjStart, idxObjEnd + 1);
   return vm.runInNewContext('(' + objText + ')');
 }
 
