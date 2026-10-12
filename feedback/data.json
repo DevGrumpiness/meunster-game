@@ -7718,5 +7718,14 @@
    "ev": "open",
    "src": "prod"
   }
+ },
+ {
+  "id": "bPmBWLeMWUvP",
+  "kind": "stats",
+  "ts": 1791801619605,
+  "data": {
+   "ev": "open",
+   "src": "prod"
+  }
  }
 ]
